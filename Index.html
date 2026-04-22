@@ -1,0 +1,2389 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<meta name="theme-color" content="#05070d" />
+<meta name="description" content="KVS Timetable Nexus — a futuristic offline-first timetable engine for Kendriya Vidyalaya classrooms." />
+<meta name="author" content="Aayush Singh" />
+
+<!-- iOS / iPadOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="KVS Nexus" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="application-name" content="KVS Nexus" />
+<meta name="format-detection" content="telephone=no" />
+
+<!-- Windows tiles -->
+<meta name="msapplication-TileColor" content="#05070d" />
+<meta name="msapplication-tap-highlight" content="no" />
+
+<title>KVS Timetable Nexus · आकाश</title>
+
+<!-- Inline SVG favicon + apple-touch-icon (so everything stays in a single file) -->
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="%2300e5ff"/><stop offset="1" stop-color="%23ff9933"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="%23070a12"/><path d="M14 14h8v14l12-14h10L30 32l14 18H34L22 36v14h-8z" fill="url(%23g)"/></svg>' />
+<link rel="apple-touch-icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="%2300e5ff"/><stop offset="1" stop-color="%23ff9933"/></linearGradient></defs><rect width="180" height="180" rx="40" fill="%23070a12"/><path d="M40 40h22v40l34-40h28L86 90l40 50H98L62 100v40H40z" fill="url(%23g)"/></svg>' />
+
+<!-- External libraries via CDN (used for export only; the app runs fully offline after first load) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous"></script>
+
+<!-- Typography: deliberately non-generic pairing -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700;800&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+Devanagari:wght@400;500;700&display=swap" rel="stylesheet" />
+
+<style>
+  /* ═══════════════════════════════════════════════════════════════════
+     KVS TIMETABLE NEXUS — stylesheet
+     Architected by Aayush Singh
+     Design language: "Command-Core" — cyan/amber on near-black, glass,
+     holographic gradients, 3D parallax tilt, neon glow on focus.
+     ═══════════════════════════════════════════════════════════════════ */
+
+  :root {
+    --bg-0: #05070d;
+    --bg-1: #0a0e18;
+    --bg-2: #111623;
+    --bg-3: #1a2130;
+    --surface: rgba(18, 24, 38, 0.72);
+    --surface-2: rgba(26, 33, 48, 0.55);
+    --stroke: rgba(130, 180, 255, 0.14);
+    --stroke-strong: rgba(130, 180, 255, 0.28);
+
+    --text-0: #e9f1ff;
+    --text-1: #b7c3d9;
+    --text-2: #7a8699;
+    --text-3: #4a5366;
+
+    --cyan: #00e5ff;
+    --cyan-soft: rgba(0, 229, 255, 0.18);
+    --amber: #ffab3d;
+    --amber-soft: rgba(255, 171, 61, 0.18);
+    --saffron: #ff7a29;
+    --lime: #9eff5a;
+    --violet: #a18bff;
+    --rose: #ff5d8f;
+    --red: #ff4d6d;
+
+    --grad-hero: radial-gradient(1200px 600px at 10% -10%, rgba(0,229,255,.20), transparent 60%),
+                 radial-gradient(900px 500px at 110% 10%, rgba(255,122,41,.18), transparent 60%),
+                 radial-gradient(700px 700px at 50% 120%, rgba(161,139,255,.14), transparent 60%);
+    --grad-accent: linear-gradient(135deg, #00e5ff 0%, #a18bff 55%, #ff7a29 100%);
+    --grad-accent-soft: linear-gradient(135deg, rgba(0,229,255,.25), rgba(255,122,41,.25));
+
+    --radius-s: 8px;
+    --radius-m: 14px;
+    --radius-l: 22px;
+    --radius-xl: 30px;
+
+    --shadow-soft: 0 8px 30px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.03) inset;
+    --shadow-pop:  0 18px 60px rgba(0,0,0,.55), 0 0 0 1px var(--stroke-strong) inset;
+    --shadow-glow: 0 0 0 1px rgba(0,229,255,.35), 0 0 32px rgba(0,229,255,.25);
+
+    --font-display: "Unbounded", system-ui, sans-serif;
+    --font-body:    "Manrope", system-ui, sans-serif;
+    --font-mono:    "JetBrains Mono", ui-monospace, monospace;
+
+    --ease: cubic-bezier(.22,.61,.36,1);
+    --ease-bounce: cubic-bezier(.34,1.56,.64,1);
+  }
+
+  html[lang="hi"] body,
+  html[lang="hi"] .timetable *,
+  html[lang="hi"] .chip,
+  html[lang="hi"] .btn { font-family: "Noto Sans Devanagari", "Manrope", system-ui, sans-serif; }
+
+  /* ───────────────────── base ───────────────────── */
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: var(--bg-0);
+    color: var(--text-0);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.55;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; border: 0; background: none; }
+  a { color: var(--cyan); text-decoration: none; }
+  ::selection { background: var(--cyan-soft); color: var(--text-0); }
+
+  /* Scrollbars */
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(0,229,255,.35), rgba(161,139,255,.35));
+    border-radius: 10px; border: 2px solid var(--bg-0);
+  }
+  *::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, var(--cyan), var(--violet)); }
+
+  /* ───────────────────── cosmic background ───────────────────── */
+  .cosmos {
+    position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background: var(--bg-0);
+    overflow: hidden;
+  }
+  .cosmos::before {
+    content: ""; position: absolute; inset: -10%;
+    background: var(--grad-hero);
+    filter: blur(40px) saturate(130%);
+    animation: drift 26s ease-in-out infinite alternate;
+  }
+  .cosmos::after {
+    content: ""; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(120,180,255,.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120,180,255,.05) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: radial-gradient(ellipse at center, #000 30%, transparent 80%);
+  }
+  @keyframes drift {
+    0%   { transform: translate3d(0,0,0) scale(1); }
+    50%  { transform: translate3d(-2%,1%,0) scale(1.05); }
+    100% { transform: translate3d(2%,-1%,0) scale(1); }
+  }
+
+  /* Starfield dots */
+  .stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .55; }
+  .stars span {
+    position: absolute; width: 2px; height: 2px; border-radius: 50%;
+    background: #fff; box-shadow: 0 0 6px #fff;
+    animation: twinkle var(--d, 3s) ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: .2; transform: scale(.6); }
+    50%      { opacity: 1;  transform: scale(1); }
+  }
+
+  /* ───────────────────── boot screen ───────────────────── */
+  .boot {
+    position: fixed; inset: 0; z-index: 9999;
+    display: grid; place-items: center;
+    background: radial-gradient(circle at center, #0b1020, #020308 70%);
+    transition: opacity .6s var(--ease), visibility .6s;
+  }
+  .boot.done { opacity: 0; visibility: hidden; }
+  .boot-core {
+    position: relative; width: 180px; height: 180px;
+    display: grid; place-items: center;
+  }
+  .boot-ring {
+    position: absolute; inset: 0; border-radius: 50%;
+    border: 1px solid rgba(0,229,255,.25);
+    animation: boot-spin 3s linear infinite;
+  }
+  .boot-ring:nth-child(2) { inset: 18px; border-color: rgba(255,122,41,.3); animation-duration: 4.2s; animation-direction: reverse; }
+  .boot-ring:nth-child(3) { inset: 36px; border-color: rgba(161,139,255,.3); animation-duration: 5.5s; }
+  .boot-ring::before {
+    content: ""; position: absolute; top: -3px; left: 50%;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--cyan); box-shadow: 0 0 12px var(--cyan);
+  }
+  @keyframes boot-spin { to { transform: rotate(360deg); } }
+  .boot-logo {
+    font-family: var(--font-display); font-weight: 800; font-size: 28px;
+    background: var(--grad-accent); -webkit-background-clip: text; background-clip: text; color: transparent;
+    letter-spacing: -1px;
+  }
+  .boot-label {
+    position: absolute; bottom: -46px; left: 50%; transform: translateX(-50%);
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px;
+    color: var(--text-2); text-transform: uppercase; white-space: nowrap;
+  }
+  .boot-label::after { content: "▮"; color: var(--cyan); animation: blink 1s steps(2) infinite; margin-left: 4px; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ───────────────────── app shell ───────────────────── */
+  .app {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh; min-height: 100dvh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: sticky; top: 0; height: 100vh; height: 100dvh;
+    padding: 22px 18px;
+    background: linear-gradient(180deg, rgba(10,14,24,.85), rgba(5,7,13,.85));
+    border-right: 1px solid var(--stroke);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex; flex-direction: column; gap: 18px;
+    z-index: 50;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 12px;
+    padding: 4px 6px 14px; border-bottom: 1px dashed var(--stroke);
+  }
+  .brand-mark {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--grad-accent);
+    display: grid; place-items: center;
+    box-shadow: 0 10px 30px rgba(0,229,255,.25), 0 0 0 1px rgba(255,255,255,.08) inset;
+    position: relative; overflow: hidden;
+  }
+  .brand-mark::before {
+    content: ""; position: absolute; inset: 1px; border-radius: 11px;
+    background: linear-gradient(180deg, rgba(255,255,255,.15), transparent 40%);
+  }
+  .brand-mark svg { position: relative; z-index: 1; }
+  .brand-text h1 {
+    margin: 0; font-family: var(--font-display); font-weight: 700;
+    font-size: 15px; letter-spacing: -.3px;
+  }
+  .brand-text small {
+    font-family: var(--font-mono); font-size: 10px; color: var(--text-2);
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+
+  .nav { display: flex; flex-direction: column; gap: 4px; }
+  .nav-section {
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--text-3); letter-spacing: 2px; text-transform: uppercase;
+    padding: 12px 10px 4px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px; border-radius: 10px;
+    color: var(--text-1); font-weight: 500;
+    transition: all .25s var(--ease);
+    position: relative;
+    width: 100%; text-align: left;
+  }
+  .nav-item:hover { color: var(--text-0); background: var(--surface-2); }
+  .nav-item.active {
+    color: var(--text-0);
+    background: linear-gradient(90deg, rgba(0,229,255,.12), rgba(255,122,41,.04));
+    box-shadow: inset 0 0 0 1px var(--stroke-strong);
+  }
+  .nav-item.active::before {
+    content: ""; position: absolute; left: -18px; top: 20%; bottom: 20%;
+    width: 3px; border-radius: 2px; background: var(--grad-accent);
+    box-shadow: 0 0 10px var(--cyan);
+  }
+  .nav-item svg { width: 18px; height: 18px; flex: 0 0 18px; }
+
+  .sidebar-foot {
+    margin-top: auto; padding-top: 12px; border-top: 1px dashed var(--stroke);
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .sig {
+    font-family: var(--font-mono); font-size: 10px; color: var(--text-3);
+    letter-spacing: 1px; text-align: center; line-height: 1.7;
+  }
+  .sig b { background: var(--grad-accent); -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: 1.5px; }
+
+  /* Main area */
+  .main { min-width: 0; }
+
+  /* Topbar */
+  .topbar {
+    position: sticky; top: 0; z-index: 30;
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 28px;
+    background: linear-gradient(180deg, rgba(5,7,13,.85), rgba(5,7,13,.55));
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--stroke);
+  }
+  .topbar h2 {
+    margin: 0; font-family: var(--font-display); font-weight: 500;
+    font-size: 20px; letter-spacing: -.5px; flex: 1 1 auto; min-width: 0;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .topbar h2 .subtle { color: var(--text-2); font-weight: 300; font-size: 14px; }
+
+  .hamburger { display: none; width: 40px; height: 40px; border-radius: 10px; background: var(--surface); border: 1px solid var(--stroke); }
+  .hamburger svg { width: 18px; height: 18px; }
+
+  .lang-switch {
+    display: inline-flex; padding: 3px; gap: 2px;
+    background: var(--surface); border: 1px solid var(--stroke);
+    border-radius: 999px;
+  }
+  .lang-switch button {
+    padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 999px;
+    color: var(--text-2); font-family: var(--font-mono); letter-spacing: 1px;
+    transition: all .25s var(--ease);
+  }
+  .lang-switch button.on { background: var(--grad-accent); color: #0a0f1a; box-shadow: 0 4px 16px rgba(0,229,255,.3); }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 13px;
+    transition: all .25s var(--ease);
+    position: relative; user-select: none; white-space: nowrap;
+    border: 1px solid var(--stroke);
+    background: var(--surface);
+    color: var(--text-0);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft); border-color: var(--stroke-strong); }
+  .btn:active { transform: translateY(0); }
+  .btn svg { width: 16px; height: 16px; }
+  .btn.primary {
+    background: var(--grad-accent); color: #0a0f1a; border: 0;
+    box-shadow: 0 6px 22px rgba(0,229,255,.28), 0 0 0 1px rgba(255,255,255,.08) inset;
+  }
+  .btn.primary:hover { box-shadow: 0 10px 30px rgba(0,229,255,.45), 0 0 0 1px rgba(255,255,255,.1) inset; }
+  .btn.ghost { background: transparent; }
+  .btn.danger { color: var(--red); border-color: rgba(255,77,109,.35); }
+  .btn.danger:hover { background: rgba(255,77,109,.1); }
+  .btn.small { padding: 7px 12px; font-size: 12px; }
+  .btn.icon { padding: 10px; width: 40px; }
+
+  /* Content container */
+  .content { padding: 28px; display: grid; gap: 24px; max-width: 1600px; }
+  .view { display: none; }
+  .view.active { display: grid; gap: 24px; animation: fade-in .5s var(--ease) both; }
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Panel / card */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--stroke);
+    border-radius: var(--radius-l);
+    padding: 22px;
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: var(--shadow-soft);
+    position: relative; overflow: hidden;
+    transform-style: preserve-3d;
+    transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+  }
+  .panel::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(140deg, rgba(255,255,255,.06), transparent 40%);
+  }
+  .panel.tilt:hover { transform: perspective(1200px) rotateX(1.2deg) rotateY(-1.2deg) translateY(-3px); box-shadow: var(--shadow-pop); }
+  .panel-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    margin-bottom: 16px;
+  }
+  .panel-head h3 {
+    margin: 0; font-family: var(--font-display); font-weight: 500; font-size: 17px; letter-spacing: -.3px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .panel-head h3 .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--cyan); box-shadow: 0 0 10px var(--cyan);
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { transform: scale(1.4); opacity: .6; } }
+
+  /* Hero / dashboard */
+  .hero {
+    position: relative;
+    padding: 32px 34px;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--stroke);
+    background:
+      radial-gradient(600px 300px at 90% -10%, rgba(0,229,255,.22), transparent 50%),
+      radial-gradient(500px 280px at 10% 110%, rgba(255,122,41,.20), transparent 55%),
+      linear-gradient(145deg, rgba(18,24,38,.9), rgba(10,14,24,.9));
+    overflow: hidden;
+  }
+  .hero::after {
+    content: ""; position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,.06) 1px, transparent 1px);
+    background-size: 22px 22px; mask-image: linear-gradient(180deg, transparent, #000 40%, transparent);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-2); margin-bottom: 14px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .hero-eyebrow::before {
+    content: ""; width: 20px; height: 1px; background: var(--cyan); box-shadow: 0 0 8px var(--cyan);
+  }
+  .hero h1 {
+    margin: 0 0 14px; font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(28px, 4.2vw, 48px); line-height: 1.05; letter-spacing: -1.5px;
+  }
+  .hero h1 span { background: var(--grad-accent); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p { max-width: 620px; color: var(--text-1); margin: 0 0 22px; font-size: 15px; }
+  .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* Stat grid */
+  .stat-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px;
+  }
+  .stat {
+    padding: 18px; border-radius: var(--radius-m); border: 1px solid var(--stroke);
+    background: var(--surface);
+    position: relative; overflow: hidden;
+    transition: transform .3s var(--ease), border-color .3s;
+  }
+  .stat:hover { transform: translateY(-4px); border-color: var(--stroke-strong); }
+  .stat::before {
+    content: ""; position: absolute; right: -20px; top: -20px;
+    width: 90px; height: 90px; border-radius: 50%;
+    background: var(--accent, var(--cyan)); opacity: .12; filter: blur(22px);
+  }
+  .stat-label {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--text-2); margin-bottom: 8px;
+  }
+  .stat-value {
+    font-family: var(--font-display); font-size: 32px; font-weight: 700; letter-spacing: -1px;
+    line-height: 1;
+  }
+  .stat-meta { font-size: 12px; color: var(--text-2); margin-top: 8px; }
+
+  /* Form controls */
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+    font-family: var(--font-mono); color: var(--text-2);
+  }
+  .input, .select, textarea {
+    width: 100%; padding: 11px 13px; border-radius: 10px;
+    background: var(--bg-1); border: 1px solid var(--stroke);
+    color: var(--text-0); font-size: 14px; font-family: inherit;
+    transition: all .25s var(--ease);
+  }
+  .input:focus, .select:focus, textarea:focus {
+    outline: none; border-color: var(--cyan);
+    box-shadow: 0 0 0 3px var(--cyan-soft);
+  }
+  .select { appearance: none; -webkit-appearance: none; background-image:
+    linear-gradient(45deg, transparent 50%, var(--text-2) 50%),
+    linear-gradient(135deg, var(--text-2) 50%, transparent 50%);
+    background-position: right 16px top 50%, right 11px top 50%;
+    background-size: 5px 5px; background-repeat: no-repeat;
+    padding-right: 32px;
+  }
+  .select option { background: var(--bg-2); color: var(--text-0); }
+
+  .row { display: grid; gap: 14px; }
+  .row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .row.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 780px) {
+    .row.cols-2, .row.cols-3, .row.cols-4 { grid-template-columns: 1fr; }
+  }
+
+  /* Chip */
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 600; letter-spacing: .3px;
+    background: var(--surface-2); border: 1px solid var(--stroke);
+    color: var(--text-1);
+  }
+  .chip.cyan { color: var(--cyan); border-color: rgba(0,229,255,.3); background: rgba(0,229,255,.08); }
+  .chip.amber { color: var(--amber); border-color: rgba(255,171,61,.3); background: rgba(255,171,61,.08); }
+  .chip.rose { color: var(--rose); border-color: rgba(255,93,143,.3); background: rgba(255,93,143,.08); }
+  .chip.violet { color: var(--violet); border-color: rgba(161,139,255,.3); background: rgba(161,139,255,.08); }
+  .chip.lime { color: var(--lime); border-color: rgba(158,255,90,.3); background: rgba(158,255,90,.08); }
+
+  /* Table */
+  .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+  .data-table th, .data-table td {
+    padding: 12px 14px; text-align: left;
+    border-bottom: 1px solid var(--stroke);
+  }
+  .data-table th {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--text-2); font-weight: 500;
+    background: var(--bg-1); position: sticky; top: 0;
+  }
+  .data-table tbody tr { transition: background .2s; }
+  .data-table tbody tr:hover { background: var(--surface-2); }
+  .data-table .action-col { text-align: right; white-space: nowrap; }
+  .icon-btn {
+    width: 32px; height: 32px; border-radius: 8px; display: inline-grid; place-items: center;
+    background: transparent; color: var(--text-2); transition: all .2s;
+  }
+  .icon-btn:hover { background: var(--surface-2); color: var(--text-0); }
+  .icon-btn.danger:hover { color: var(--red); background: rgba(255,77,109,.1); }
+  .icon-btn svg { width: 16px; height: 16px; }
+
+  .empty {
+    padding: 40px 20px; text-align: center; color: var(--text-2); font-size: 14px;
+    border: 1px dashed var(--stroke); border-radius: var(--radius-m);
+  }
+  .empty .emo { font-size: 36px; display: block; margin-bottom: 10px; filter: grayscale(.3); }
+
+  /* ───────────────────── TIMETABLE GRID ───────────────────── */
+  .tt-controls {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  }
+  .tt-controls .field { flex: 1 1 180px; }
+
+  .tt-wrap { overflow-x: auto; border-radius: var(--radius-m); border: 1px solid var(--stroke); }
+  .timetable {
+    width: 100%; min-width: 780px;
+    border-collapse: separate; border-spacing: 0;
+    background: var(--bg-1);
+  }
+  .timetable th, .timetable td {
+    padding: 0; border-right: 1px solid var(--stroke); border-bottom: 1px solid var(--stroke);
+    vertical-align: top;
+  }
+  .timetable th:last-child, .timetable td:last-child { border-right: 0; }
+  .timetable thead th {
+    background: linear-gradient(180deg, var(--bg-2), var(--bg-1));
+    padding: 14px 12px; font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--text-2);
+    font-weight: 500; position: sticky; top: 0; z-index: 2;
+  }
+  .timetable thead th .per-time {
+    display: block; margin-top: 4px; color: var(--text-3); font-size: 9px;
+    letter-spacing: 1px;
+  }
+  .timetable tbody th {
+    background: var(--bg-2); width: 130px;
+    font-family: var(--font-display); font-weight: 500; font-size: 13px;
+    letter-spacing: .3px; color: var(--text-0);
+    text-align: left; padding: 14px;
+    position: sticky; left: 0; z-index: 1;
+  }
+  .slot {
+    position: relative; min-height: 92px; padding: 10px;
+    cursor: pointer; transition: background .2s;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .slot:hover { background: var(--surface-2); }
+  .slot.filled {
+    background: linear-gradient(145deg, rgba(0,229,255,.06), rgba(161,139,255,.04));
+    border-left: 3px solid var(--slot-color, var(--cyan));
+  }
+  .slot.conflict {
+    background: rgba(255,77,109,.12) !important;
+    border-left: 3px solid var(--red) !important;
+  }
+  .slot .subj {
+    font-weight: 700; font-size: 13.5px; color: var(--text-0); letter-spacing: .2px;
+  }
+  .slot .teacher, .slot .room {
+    font-size: 11px; color: var(--text-2);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .slot .room { color: var(--text-3); font-family: var(--font-mono); letter-spacing: .5px; font-size: 10px; }
+  .slot .placeholder { color: var(--text-3); font-size: 12px; font-style: italic; opacity: .6; }
+  .slot .conflict-tag {
+    position: absolute; top: 6px; right: 6px;
+    font-size: 9px; padding: 2px 6px; border-radius: 4px;
+    background: var(--red); color: white; font-weight: 700;
+    letter-spacing: .5px;
+  }
+  .slot.break {
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(255,171,61,.06),
+      rgba(255,171,61,.06) 8px,
+      transparent 8px,
+      transparent 16px
+    );
+    cursor: default;
+    align-items: center; justify-content: center;
+    text-align: center;
+    font-family: var(--font-mono); font-size: 11px;
+    letter-spacing: 2px; text-transform: uppercase; color: var(--amber);
+  }
+
+  /* ───────────────────── modal ───────────────────── */
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(3, 5, 11, .72);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: grid; place-items: center; padding: 20px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s var(--ease);
+  }
+  .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+  .modal {
+    width: 100%; max-width: 520px;
+    background: linear-gradient(145deg, rgba(22,28,44,.98), rgba(12,16,26,.98));
+    border: 1px solid var(--stroke-strong);
+    border-radius: var(--radius-l);
+    padding: 26px;
+    box-shadow: var(--shadow-pop), 0 30px 80px rgba(0,0,0,.5);
+    transform: translateY(20px) scale(.96);
+    opacity: 0;
+    transition: all .4s var(--ease-bounce);
+    max-height: 90vh; overflow-y: auto;
+    position: relative;
+  }
+  .modal-backdrop.open .modal { opacity: 1; transform: translateY(0) scale(1); }
+  .modal::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(140deg, rgba(0,229,255,.15), transparent 40%);
+    opacity: .5;
+  }
+  .modal-head {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;
+    margin-bottom: 18px; position: relative;
+  }
+  .modal-head h3 {
+    margin: 0; font-family: var(--font-display); font-size: 18px; font-weight: 600;
+    letter-spacing: -.3px;
+  }
+  .modal-head small { display: block; color: var(--text-2); font-size: 12px; margin-top: 4px; }
+  .modal-body { display: grid; gap: 14px; position: relative; }
+  .modal-foot {
+    display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px;
+    position: relative;
+  }
+
+  /* Toast */
+  .toasts {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    z-index: 2000; display: flex; flex-direction: column; gap: 10px;
+    pointer-events: none;
+  }
+  .toast {
+    padding: 12px 18px; border-radius: 12px;
+    background: linear-gradient(145deg, rgba(26,33,48,.95), rgba(16,20,32,.95));
+    border: 1px solid var(--stroke-strong);
+    color: var(--text-0); font-size: 13px; font-weight: 500;
+    box-shadow: var(--shadow-pop);
+    animation: toast-in .4s var(--ease-bounce), toast-out .4s var(--ease) 2.6s forwards;
+    display: flex; align-items: center; gap: 10px; min-width: 240px;
+    backdrop-filter: blur(10px);
+  }
+  .toast.success { border-color: rgba(158,255,90,.35); }
+  .toast.success .dot { background: var(--lime); box-shadow: 0 0 10px var(--lime); }
+  .toast.error { border-color: rgba(255,77,109,.4); }
+  .toast.error .dot { background: var(--red); box-shadow: 0 0 10px var(--red); }
+  .toast.info .dot { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+  .toast .dot { width: 8px; height: 8px; border-radius: 50%; flex: 0 0 8px; }
+  @keyframes toast-in { from { transform: translateY(20px); opacity: 0; } }
+  @keyframes toast-out { to { transform: translateY(20px); opacity: 0; } }
+
+  /* Install banner */
+  .install-banner {
+    position: fixed; bottom: 20px; right: 20px; z-index: 800;
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px 12px 16px; border-radius: 16px;
+    background: linear-gradient(145deg, rgba(22,28,44,.95), rgba(12,16,26,.95));
+    border: 1px solid var(--stroke-strong);
+    box-shadow: var(--shadow-pop);
+    transform: translateY(120%); opacity: 0;
+    transition: all .5s var(--ease-bounce);
+    max-width: 330px;
+  }
+  .install-banner.show { transform: translateY(0); opacity: 1; }
+  .install-banner-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--grad-accent); display: grid; place-items: center;
+    box-shadow: 0 6px 16px rgba(0,229,255,.3);
+  }
+  .install-banner-text strong { display: block; font-size: 13px; }
+  .install-banner-text span { font-size: 11px; color: var(--text-2); }
+
+  /* ───────────────────── responsive ───────────────────── */
+  @media (max-width: 980px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar {
+      position: fixed; top: 0; left: 0; bottom: 0; width: 280px;
+      transform: translateX(-100%);
+      transition: transform .35s var(--ease);
+    }
+    .sidebar.open { transform: translateX(0); }
+    .hamburger { display: inline-grid; place-items: center; }
+    .topbar { padding: 12px 16px; }
+    .content { padding: 16px; }
+    .hero { padding: 24px 20px; border-radius: var(--radius-l); }
+    body.sidebar-open::before {
+      content: ""; position: fixed; inset: 0; background: rgba(0,0,0,.6);
+      z-index: 40; backdrop-filter: blur(3px);
+    }
+  }
+  @media (max-width: 540px) {
+    .topbar h2 { font-size: 16px; }
+    .hero h1 { letter-spacing: -1px; }
+    .btn { padding: 9px 13px; font-size: 12px; }
+    .panel { padding: 16px; border-radius: var(--radius-m); }
+    .timetable { min-width: 620px; }
+    .timetable tbody th { width: 90px; padding: 10px; font-size: 12px; }
+    .slot { min-height: 76px; padding: 8px; }
+    .slot .subj { font-size: 12.5px; }
+    .install-banner { left: 12px; right: 12px; max-width: none; bottom: 12px; }
+  }
+
+  /* Print */
+  @media print {
+    .sidebar, .topbar, .hero-actions, .install-banner, .toasts, .panel-head .btn, .btn { display: none !important; }
+    body { background: white; color: black; }
+    .panel, .hero { background: white; border: 1px solid #ccc; box-shadow: none; }
+    .timetable thead th, .timetable tbody th { background: #f0f0f0; color: black; }
+    .slot.filled { background: #e8f7ff; color: black; }
+    .slot .subj, .slot .teacher { color: black; }
+    .cosmos, .stars { display: none; }
+  }
+
+  /* Utility */
+  .hidden { display: none !important; }
+  .spacer { flex: 1; }
+  .mono { font-family: var(--font-mono); }
+  .muted { color: var(--text-2); }
+  .tiny { font-size: 11px; }
+  .grid-fluid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+  .flex { display: flex; gap: 10px; align-items: center; }
+  .flex.wrap { flex-wrap: wrap; }
+
+  /* Scanline flourish on primary buttons */
+  .btn.primary::after {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,.3) 50%, transparent 70%);
+    transform: translateX(-100%);
+    transition: transform .8s var(--ease);
+  }
+  .btn.primary:hover::after { transform: translateX(100%); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ BACKGROUND LAYERS ═══════════════ -->
+<div class="cosmos"></div>
+<div class="stars" id="stars"></div>
+
+<!-- ═══════════════ BOOT SCREEN ═══════════════ -->
+<div class="boot" id="boot">
+  <div class="boot-core">
+    <div class="boot-ring"></div>
+    <div class="boot-ring"></div>
+    <div class="boot-ring"></div>
+    <div class="boot-logo">KVS</div>
+    <div class="boot-label">Initialising Nexus</div>
+  </div>
+</div>
+
+<!-- ═══════════════ APP SHELL ═══════════════ -->
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0a0f1a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4v16"/><path d="M4 12l8-8"/><path d="M4 12l8 8"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>KVS Nexus</h1>
+        <small>Timetable OS</small>
+      </div>
+    </div>
+
+    <nav class="nav" id="nav">
+      <div class="nav-section" data-i18n="nav.core">Core</div>
+      <button class="nav-item active" data-view="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        <span data-i18n="nav.dashboard">Dashboard</span>
+      </button>
+      <button class="nav-item" data-view="timetable">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg>
+        <span data-i18n="nav.timetable">Timetable</span>
+      </button>
+
+      <div class="nav-section" data-i18n="nav.manage">Manage</div>
+      <button class="nav-item" data-view="classes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        <span data-i18n="nav.classes">Classes</span>
+      </button>
+      <button class="nav-item" data-view="teachers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        <span data-i18n="nav.teachers">Teachers</span>
+      </button>
+      <button class="nav-item" data-view="subjects">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        <span data-i18n="nav.subjects">Subjects</span>
+      </button>
+      <button class="nav-item" data-view="periods">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span data-i18n="nav.periods">Periods</span>
+      </button>
+      <button class="nav-item" data-view="rooms">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span data-i18n="nav.rooms">Rooms</span>
+      </button>
+
+      <div class="nav-section" data-i18n="nav.system">System</div>
+      <button class="nav-item" data-view="backup">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span data-i18n="nav.backup">Backup</span>
+      </button>
+      <button class="nav-item" data-view="about">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span data-i18n="nav.about">About</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="sig">
+        <span data-i18n="sig.crafted">CRAFTED BY</span><br>
+        <b>AAYUSH SINGH</b><br>
+        <span data-i18n="sig.offline">OFFLINE-FIRST · v1.0</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <button class="hamburger btn icon" id="hamburger" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <h2 id="topbar-title"><span data-i18n="topbar.welcome">Welcome</span> <span class="subtle">· <span id="topbar-date">—</span></span></h2>
+      <div class="lang-switch" role="tablist" aria-label="Language">
+        <button class="on" data-lang="en">EN</button>
+        <button data-lang="hi">हिं</button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ░░░░░ DASHBOARD ░░░░░ -->
+      <section class="view active" data-view="dashboard">
+        <div class="hero panel">
+          <div class="hero-eyebrow"><span data-i18n="hero.badge">Kendriya Vidyalaya · Operations Cortex</span></div>
+          <h1><span data-i18n="hero.title1">Orchestrate every</span> <span data-i18n="hero.title2">class, teacher, and period</span> <span data-i18n="hero.title3">— all offline.</span></h1>
+          <p data-i18n="hero.lead">A futuristic timetable engine built for KVS schools. Design schedules day-wise, weekly, or across the month. Detect teacher clashes in real time. Export crisp PDFs and Excel sheets. Everything lives on this device — nothing leaves.</p>
+          <div class="hero-actions">
+            <button class="btn primary" data-go="timetable">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span data-i18n="hero.cta1">Open Timetable</span>
+            </button>
+            <button class="btn" id="btn-seed">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M12 18v4"/><path d="M4.93 4.93l2.83 2.83"/><path d="M16.24 16.24l2.83 2.83"/><path d="M2 12h4"/><path d="M18 12h4"/><path d="M4.93 19.07l2.83-2.83"/><path d="M16.24 7.76l2.83-2.83"/></svg>
+              <span data-i18n="hero.cta2">Load Sample KVS Data</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="stat-grid" id="stat-grid">
+          <!-- stats injected by JS -->
+        </div>
+
+        <div class="panel tilt">
+          <div class="panel-head">
+            <h3><span class="dot"></span> <span data-i18n="dash.activity.title">Live Schedule Pulse</span></h3>
+            <span class="chip cyan mono" id="pulse-date">—</span>
+          </div>
+          <div id="pulse-body">
+            <div class="empty"><span class="emo">◔</span><span data-i18n="dash.activity.empty">No schedule activity yet. Create your first timetable to see it pulse here.</span></div>
+          </div>
+        </div>
+
+        <div class="row cols-2">
+          <div class="panel tilt">
+            <div class="panel-head">
+              <h3><span class="dot" style="background:var(--amber);box-shadow:0 0 10px var(--amber)"></span> <span data-i18n="dash.conflicts.title">Conflict Matrix</span></h3>
+            </div>
+            <div id="conflict-body" class="muted tiny" data-i18n="dash.conflicts.empty">No conflicts detected.</div>
+          </div>
+          <div class="panel tilt">
+            <div class="panel-head">
+              <h3><span class="dot" style="background:var(--violet);box-shadow:0 0 10px var(--violet)"></span> <span data-i18n="dash.quick.title">Quick Actions</span></h3>
+            </div>
+            <div class="flex wrap">
+              <button class="btn small" data-go="classes"><span data-i18n="dash.quick.class">+ Class</span></button>
+              <button class="btn small" data-go="teachers"><span data-i18n="dash.quick.teacher">+ Teacher</span></button>
+              <button class="btn small" data-go="subjects"><span data-i18n="dash.quick.subject">+ Subject</span></button>
+              <button class="btn small" data-go="periods"><span data-i18n="dash.quick.period">+ Period</span></button>
+              <button class="btn small" data-go="backup"><span data-i18n="dash.quick.backup">Backup</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ░░░░░ TIMETABLE ░░░░░ -->
+      <section class="view" data-view="timetable">
+        <div class="panel">
+          <div class="panel-head">
+            <h3><span class="dot"></span> <span data-i18n="tt.title">Timetable Studio</span></h3>
+            <div class="flex wrap">
+              <button class="btn small" id="btn-export-pdf">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                PDF
+              </button>
+              <button class="btn small" id="btn-export-xlsx">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8l8 8M16 8l-8 8"/></svg>
+                Excel
+              </button>
+              <button class="btn small" id="btn-print"><span data-i18n="tt.print">Print</span></button>
+              <button class="btn small danger" id="btn-clear-tt"><span data-i18n="tt.clear">Clear</span></button>
+            </div>
+          </div>
+
+          <div class="tt-controls">
+            <div class="field">
+              <label data-i18n="tt.view">View</label>
+              <select id="tt-view" class="select">
+                <option value="day" data-i18n="tt.view.day">Day</option>
+                <option value="week" selected data-i18n="tt.view.week">Week</option>
+                <option value="month" data-i18n="tt.view.month">Month</option>
+              </select>
+            </div>
+            <div class="field">
+              <label data-i18n="tt.scope">Scope</label>
+              <select id="tt-scope" class="select">
+                <option value="class" data-i18n="tt.scope.class">By Class</option>
+                <option value="teacher" data-i18n="tt.scope.teacher">By Teacher</option>
+              </select>
+            </div>
+            <div class="field">
+              <label><span id="tt-target-label">Class</span></label>
+              <select id="tt-target" class="select"></select>
+            </div>
+            <div class="field" id="tt-day-field" style="display:none">
+              <label data-i18n="tt.day">Day</label>
+              <select id="tt-day" class="select"></select>
+            </div>
+            <div class="field" id="tt-month-field" style="display:none">
+              <label data-i18n="tt.month">Month</label>
+              <input type="month" id="tt-month" class="input" />
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="tt-wrap" id="tt-wrap">
+            <!-- table injected -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ░░░░░ CLASSES ░░░░░ -->
+      <section class="view" data-view="classes">
+        <div class="panel">
+          <div class="panel-head">
+            <h3><span class="dot"></span> <span data-i18n="classes.title">Classes Registry</span></h3>
+            <button class="btn primary small" data-new="class"><span data-i18n="classes.add">+ Add Class</span></button>
+          </div>
+          <div id="classes-body"></div>
+        </div>
+      </section>
+
+      <!-- ░░░░░ TEACHERS ░░░░░ -->
+      <section class="view" data-view="teachers">
+        <div class="panel">
+          <div class="panel-head">
+            <h3><span class="dot"></span> <span data-i18n="teachers.title">Teachers Registry</span></h3>
+            <button class="btn primary small" data-new="teacher"><span data-i18n="teachers.add">+ Add Teacher</span></button>
+          </div>
+          <div id="teachers-body"></div>
+        </div>
+      </section>
+
+      <!-- ░░░░░ SUBJECTS ░░░░░ -->
+      <section class="view" data-view="subjects">
+        <div class="panel">
+          <div class="panel-head">
+            <h3><span class="dot"></span> <span data-i18n="subjects.title">Subjects Registry</span></h3>
+            <button class="btn primary small" data-new="subject"><span data-i18n="subjects.add">+ Add Subject</span></button>
+          </div>
+          <div id="subjects-body"></div>
+        </div>
+      </section>
+
+      <!-- ░░░░░ PERIODS ░░░░░ -->
+      <section class="view" data-view="periods">
+        <div class="panel">
+          <div class="panel-head">
+            <h3><span class="dot"></span> <span data-i18n="periods.title">Period Engine</span></h3>
+            <button class="btn primary small" data-new="period"><span data-i18n="periods.add">+ Add Period</span></button>
+          </div>
+          <p class="muted tiny" data-i18n="periods.hint">Define the time slots that repeat every day. Mark a period as a break to lock it.</p>
+          <div id="periods-body" style="margin-top:14px"></div>
+        </div>
+      </section>
+
+      <!-- ░░░░░ ROOMS ░░░░░ -->
+      <section class="view" data-view="rooms">
+        <div class="panel">
+          <div class="panel-head">
+            <h3><span class="dot"></span> <span data-i18n="rooms.title">Rooms Grid</span></h3>
+            <button class="btn primary small" data-new="room"><span data-i18n="rooms.add">+ Add Room</span></button>
+          </div>
+          <div id="rooms-body"></div>
+        </div>
+      </section>
+
+      <!-- ░░░░░ BACKUP ░░░░░ -->
+      <section class="view" data-view="backup">
+        <div class="panel tilt">
+          <div class="panel-head">
+            <h3><span class="dot"></span> <span data-i18n="backup.title">Vault & Sync</span></h3>
+          </div>
+          <p class="muted" data-i18n="backup.lead">Everything you create stays on this device — encrypted into LocalStorage. Export a vault file to move it to another phone or laptop.</p>
+          <div class="row cols-3" style="margin-top:18px">
+            <button class="btn primary" id="btn-export-json">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span data-i18n="backup.export">Export Vault (.json)</span>
+            </button>
+            <button class="btn" id="btn-import-json">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span data-i18n="backup.import">Import Vault</span>
+            </button>
+            <button class="btn danger" id="btn-wipe">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6"/></svg>
+              <span data-i18n="backup.wipe">Wipe Device</span>
+            </button>
+          </div>
+          <div style="margin-top:22px">
+            <div class="field">
+              <label data-i18n="backup.storage">Storage Footprint</label>
+              <div class="mono tiny muted" id="storage-info">—</div>
+            </div>
+          </div>
+          <input type="file" id="file-import" accept="application/json" hidden />
+        </div>
+      </section>
+
+      <!-- ░░░░░ ABOUT ░░░░░ -->
+      <section class="view" data-view="about">
+        <div class="panel tilt">
+          <div class="panel-head">
+            <h3><span class="dot"></span> <span data-i18n="about.title">About Nexus</span></h3>
+          </div>
+          <p data-i18n="about.lead">KVS Timetable Nexus is a single-file, offline-first Progressive Web App engineered for Kendriya Vidyalaya campuses. It runs equally well on an iPhone, iPad, Android tablet, Windows laptop, or a school desktop — installable to the home screen, fully functional without internet.</p>
+          <div class="row cols-2" style="margin-top:16px">
+            <div>
+              <div class="stat-label" data-i18n="about.built">Built With</div>
+              <div class="flex wrap" style="margin-top:8px">
+                <span class="chip cyan">HTML5</span>
+                <span class="chip amber">CSS3</span>
+                <span class="chip violet">JavaScript</span>
+                <span class="chip lime">LocalStorage</span>
+                <span class="chip rose">PWA</span>
+              </div>
+            </div>
+            <div>
+              <div class="stat-label" data-i18n="about.author">Author</div>
+              <div style="font-family:var(--font-display);font-size:22px;font-weight:700;margin-top:6px;background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;color:transparent">Aayush Singh</div>
+              <div class="tiny muted" data-i18n="about.role">Full-Stack Architect · UI Systems</div>
+            </div>
+          </div>
+          <div class="row cols-3" style="margin-top:24px">
+            <div class="stat" style="--accent:var(--cyan)">
+              <div class="stat-label" data-i18n="about.f1.t">Offline Engine</div>
+              <div class="tiny muted" data-i18n="about.f1.d">Runs after first load without any network.</div>
+            </div>
+            <div class="stat" style="--accent:var(--amber)">
+              <div class="stat-label" data-i18n="about.f2.t">Conflict Radar</div>
+              <div class="tiny muted" data-i18n="about.f2.d">Detects teacher clashes across classes instantly.</div>
+            </div>
+            <div class="stat" style="--accent:var(--violet)">
+              <div class="stat-label" data-i18n="about.f3.t">Bilingual</div>
+              <div class="tiny muted" data-i18n="about.f3.d">Switch between English & हिन्दी at any time.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════ MODAL ═══════════════ -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div>
+        <h3 id="modal-title">—</h3>
+        <small id="modal-sub"></small>
+      </div>
+      <button class="icon-btn" id="modal-close" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-foot" id="modal-foot"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ TOASTS ═══════════════ -->
+<div class="toasts" id="toasts"></div>
+
+<!-- ═══════════════ INSTALL BANNER ═══════════════ -->
+<div class="install-banner" id="install-banner">
+  <div class="install-banner-icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a0f1a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+  </div>
+  <div class="install-banner-text">
+    <strong data-i18n="install.title">Install Nexus</strong>
+    <span data-i18n="install.sub">Add to home screen for an app-like experience</span>
+  </div>
+  <button class="btn small primary" id="install-go" data-i18n="install.go">Install</button>
+  <button class="icon-btn" id="install-dismiss" aria-label="Dismiss">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     APPLICATION KERNEL
+     Architected by Aayush Singh — class-based, observable, reactive.
+     ═══════════════════════════════════════════════════════════════════ -->
+<script>
+"use strict";
+
+/* ─────────────────────────────────────────────────────────────
+   [0]  Utility primitives
+   ───────────────────────────────────────────────────────────── */
+const $  = (q, r = document) => r.querySelector(q);
+const $$ = (q, r = document) => Array.from(r.querySelectorAll(q));
+const h = (tag, attrs = {}, ...children) => {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") el.className = v;
+    else if (k === "style" && typeof v === "object") Object.assign(el.style, v);
+    else if (k.startsWith("on") && typeof v === "function") el.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (k === "html") el.innerHTML = v;
+    else if (v !== null && v !== undefined && v !== false) el.setAttribute(k, v);
+  }
+  for (const c of children.flat()) {
+    if (c == null || c === false) continue;
+    el.append(c.nodeType ? c : document.createTextNode(String(c)));
+  }
+  return el;
+};
+const uid = (p = "id") => p + "_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
+const clone = (o) => JSON.parse(JSON.stringify(o));
+const fmtTime = (t) => t;
+const today = () => new Date().toISOString().slice(0, 10);
+const pad = (n) => String(n).padStart(2, "0");
+
+/* ─────────────────────────────────────────────────────────────
+   [1]  Internationalisation — English / Hindi dictionaries
+   ───────────────────────────────────────────────────────────── */
+const I18N = {
+  en: {
+    "nav.core":"Core", "nav.manage":"Manage", "nav.system":"System",
+    "nav.dashboard":"Dashboard", "nav.timetable":"Timetable",
+    "nav.classes":"Classes", "nav.teachers":"Teachers", "nav.subjects":"Subjects",
+    "nav.periods":"Periods", "nav.rooms":"Rooms", "nav.backup":"Backup", "nav.about":"About",
+    "sig.crafted":"CRAFTED BY", "sig.offline":"OFFLINE-FIRST · v1.0",
+    "topbar.welcome":"Welcome",
+    "hero.badge":"Kendriya Vidyalaya · Operations Cortex",
+    "hero.title1":"Orchestrate every", "hero.title2":"class, teacher, and period", "hero.title3":"— all offline.",
+    "hero.lead":"A futuristic timetable engine built for KVS schools. Design schedules day-wise, weekly, or across the month. Detect teacher clashes in real time. Export crisp PDFs and Excel sheets. Everything lives on this device — nothing leaves.",
+    "hero.cta1":"Open Timetable", "hero.cta2":"Load Sample KVS Data",
+    "dash.activity.title":"Live Schedule Pulse",
+    "dash.activity.empty":"No schedule activity yet. Create your first timetable to see it pulse here.",
+    "dash.conflicts.title":"Conflict Matrix", "dash.conflicts.empty":"No conflicts detected.",
+    "dash.quick.title":"Quick Actions",
+    "dash.quick.class":"+ Class", "dash.quick.teacher":"+ Teacher", "dash.quick.subject":"+ Subject", "dash.quick.period":"+ Period", "dash.quick.backup":"Backup",
+    "stat.classes":"Classes", "stat.teachers":"Teachers", "stat.subjects":"Subjects", "stat.periods":"Periods", "stat.assigned":"Assignments", "stat.rooms":"Rooms",
+    "tt.title":"Timetable Studio", "tt.print":"Print", "tt.clear":"Clear",
+    "tt.view":"View", "tt.view.day":"Day", "tt.view.week":"Week", "tt.view.month":"Month",
+    "tt.scope":"Scope", "tt.scope.class":"By Class", "tt.scope.teacher":"By Teacher",
+    "tt.target":"Target", "tt.day":"Day", "tt.month":"Month",
+    "tt.empty":"Add classes, teachers, subjects and periods to begin designing.",
+    "tt.slot.tap":"Tap to assign",
+    "classes.title":"Classes Registry", "classes.add":"+ Add Class",
+    "teachers.title":"Teachers Registry", "teachers.add":"+ Add Teacher",
+    "subjects.title":"Subjects Registry", "subjects.add":"+ Add Subject",
+    "periods.title":"Period Engine", "periods.add":"+ Add Period",
+    "periods.hint":"Define the time slots that repeat every day. Mark a period as a break to lock it.",
+    "rooms.title":"Rooms Grid", "rooms.add":"+ Add Room",
+    "backup.title":"Vault & Sync",
+    "backup.lead":"Everything you create stays on this device — stored in LocalStorage. Export a vault file to move it to another phone or laptop.",
+    "backup.export":"Export Vault (.json)", "backup.import":"Import Vault", "backup.wipe":"Wipe Device",
+    "backup.storage":"Storage Footprint",
+    "about.title":"About Nexus",
+    "about.lead":"KVS Timetable Nexus is a single-file, offline-first Progressive Web App engineered for Kendriya Vidyalaya campuses. It runs equally well on an iPhone, iPad, Android tablet, Windows laptop, or a school desktop — installable to the home screen, fully functional without internet.",
+    "about.built":"Built With", "about.author":"Author", "about.role":"Full-Stack Architect · UI Systems",
+    "about.f1.t":"Offline Engine", "about.f1.d":"Runs after first load without any network.",
+    "about.f2.t":"Conflict Radar", "about.f2.d":"Detects teacher clashes across classes instantly.",
+    "about.f3.t":"Bilingual", "about.f3.d":"Switch between English & हिन्दी at any time.",
+    "install.title":"Install Nexus", "install.sub":"Add to home screen for an app-like experience", "install.go":"Install",
+    "modal.cancel":"Cancel", "modal.save":"Save", "modal.delete":"Delete", "modal.confirm":"Confirm",
+    "f.class.name":"Class Name", "f.class.section":"Section", "f.class.strength":"Strength",
+    "f.teacher.name":"Teacher Name", "f.teacher.code":"Code", "f.teacher.subjects":"Subjects Taught",
+    "f.subject.name":"Subject Name", "f.subject.code":"Code", "f.subject.color":"Accent Colour",
+    "f.period.label":"Label", "f.period.start":"Start Time", "f.period.end":"End Time", "f.period.break":"This is a break period",
+    "f.room.name":"Room Name", "f.room.capacity":"Capacity",
+    "f.slot.subject":"Subject", "f.slot.teacher":"Teacher", "f.slot.room":"Room (optional)", "f.slot.none":"— None —",
+    "t.empty.class":"No classes yet. Add one to begin.",
+    "t.empty.teacher":"No teachers yet.",
+    "t.empty.subject":"No subjects yet.",
+    "t.empty.period":"No periods defined yet. Add the daily time slots first.",
+    "t.empty.room":"No rooms yet.",
+    "modal.new.class":"New Class", "modal.edit.class":"Edit Class",
+    "modal.new.teacher":"New Teacher", "modal.edit.teacher":"Edit Teacher",
+    "modal.new.subject":"New Subject", "modal.edit.subject":"Edit Subject",
+    "modal.new.period":"New Period", "modal.edit.period":"Edit Period",
+    "modal.new.room":"New Room", "modal.edit.room":"Edit Room",
+    "modal.assign":"Assign Slot", "modal.assign.sub":"Pick a subject + teacher for this period.",
+    "modal.del.title":"Delete?", "modal.del.sub":"This cannot be undone.",
+    "modal.wipe.title":"Wipe all data?", "modal.wipe.sub":"Every class, teacher, subject, period, room and assignment will be permanently erased.",
+    "modal.clear.title":"Clear this timetable?", "modal.clear.sub":"All assignments for the current class / teacher scope will be removed.",
+    "toast.saved":"Saved", "toast.deleted":"Deleted", "toast.imported":"Vault imported", "toast.exported":"Vault exported",
+    "toast.wiped":"Device wiped", "toast.sample":"Sample KVS data loaded", "toast.clash":"Teacher clash detected",
+    "toast.cleared":"Timetable cleared", "toast.err.import":"Import failed — invalid file",
+    "toast.lang":"Language switched", "toast.pdf":"PDF ready", "toast.xlsx":"Excel ready", "toast.installed":"App installed",
+    "days.mon":"Monday", "days.tue":"Tuesday", "days.wed":"Wednesday", "days.thu":"Thursday", "days.fri":"Friday", "days.sat":"Saturday", "days.sun":"Sunday",
+    "days.short.mon":"Mon", "days.short.tue":"Tue", "days.short.wed":"Wed", "days.short.thu":"Thu", "days.short.fri":"Fri", "days.short.sat":"Sat", "days.short.sun":"Sun",
+    "break":"BREAK", "unassigned":"Unassigned", "conflict":"CLASH"
+  },
+  hi: {
+    "nav.core":"मुख्य", "nav.manage":"प्रबंधन", "nav.system":"सिस्टम",
+    "nav.dashboard":"डैशबोर्ड", "nav.timetable":"समय सारणी",
+    "nav.classes":"कक्षाएँ", "nav.teachers":"शिक्षक", "nav.subjects":"विषय",
+    "nav.periods":"कालांश", "nav.rooms":"कक्ष", "nav.backup":"बैकअप", "nav.about":"परिचय",
+    "sig.crafted":"निर्माण", "sig.offline":"ऑफ़लाइन-प्रथम · v1.0",
+    "topbar.welcome":"स्वागत है",
+    "hero.badge":"केन्द्रीय विद्यालय · संचालन केंद्र",
+    "hero.title1":"हर", "hero.title2":"कक्षा, शिक्षक और कालांश का", "hero.title3":"— पूर्ण प्रबंधन, ऑफ़लाइन।",
+    "hero.lead":"केन्द्रीय विद्यालयों के लिए एक अत्याधुनिक समय सारणी इंजन। दिन-वार, सप्ताह-वार या माह-वार समय सारणी बनाइए। शिक्षक टकराव तुरंत पहचानिए। साफ़-सुथरी PDF और Excel निर्यात कीजिए। सब कुछ इसी उपकरण पर सुरक्षित — कहीं नहीं जाता।",
+    "hero.cta1":"समय सारणी खोलें", "hero.cta2":"नमूना KVS डेटा लोड करें",
+    "dash.activity.title":"समय सारणी की स्पंदन",
+    "dash.activity.empty":"अभी कोई गतिविधि नहीं। पहली समय सारणी बनाइए।",
+    "dash.conflicts.title":"टकराव पटल", "dash.conflicts.empty":"कोई टकराव नहीं।",
+    "dash.quick.title":"त्वरित क्रियाएँ",
+    "dash.quick.class":"+ कक्षा", "dash.quick.teacher":"+ शिक्षक", "dash.quick.subject":"+ विषय", "dash.quick.period":"+ कालांश", "dash.quick.backup":"बैकअप",
+    "stat.classes":"कक्षाएँ", "stat.teachers":"शिक्षक", "stat.subjects":"विषय", "stat.periods":"कालांश", "stat.assigned":"नियुक्तियाँ", "stat.rooms":"कक्ष",
+    "tt.title":"समय सारणी स्टूडियो", "tt.print":"प्रिंट", "tt.clear":"साफ़ करें",
+    "tt.view":"दृश्य", "tt.view.day":"दिन", "tt.view.week":"सप्ताह", "tt.view.month":"माह",
+    "tt.scope":"क्षेत्र", "tt.scope.class":"कक्षा अनुसार", "tt.scope.teacher":"शिक्षक अनुसार",
+    "tt.target":"लक्ष्य", "tt.day":"दिन", "tt.month":"माह",
+    "tt.empty":"कक्षा, शिक्षक, विषय और कालांश जोड़कर प्रारम्भ करें।",
+    "tt.slot.tap":"असाइन करने हेतु टैप करें",
+    "classes.title":"कक्षा रजिस्टर", "classes.add":"+ कक्षा जोड़ें",
+    "teachers.title":"शिक्षक रजिस्टर", "teachers.add":"+ शिक्षक जोड़ें",
+    "subjects.title":"विषय रजिस्टर", "subjects.add":"+ विषय जोड़ें",
+    "periods.title":"कालांश इंजन", "periods.add":"+ कालांश जोड़ें",
+    "periods.hint":"प्रतिदिन दोहराए जाने वाले समय खण्ड परिभाषित करें। विराम को ब्रेक चिह्नित करें।",
+    "rooms.title":"कक्ष ग्रिड", "rooms.add":"+ कक्ष जोड़ें",
+    "backup.title":"तिजोरी व समन्वय",
+    "backup.lead":"सभी डेटा इसी उपकरण पर सुरक्षित — LocalStorage में। दूसरे फ़ोन/लैपटॉप में ले जाने के लिए तिजोरी फ़ाइल निर्यात करें।",
+    "backup.export":"तिजोरी निर्यात (.json)", "backup.import":"तिजोरी आयात", "backup.wipe":"उपकरण पूर्ण रीसेट",
+    "backup.storage":"संग्रहण प्रयोग",
+    "about.title":"Nexus के बारे में",
+    "about.lead":"KVS Timetable Nexus केन्द्रीय विद्यालयों के लिए बनाया गया एकल-फ़ाइल, ऑफ़लाइन-प्रथम प्रगतिशील वेब ऐप है। iPhone, iPad, Android टैबलेट, Windows लैपटॉप — सभी पर समान रूप से चलता है; होम स्क्रीन पर स्थापित किया जा सकता है, बिना इंटरनेट भी पूर्णतया कार्यरत।",
+    "about.built":"निर्मित", "about.author":"लेखक", "about.role":"फुल-स्टैक आर्किटेक्ट · यूआई सिस्टम",
+    "about.f1.t":"ऑफ़लाइन इंजन", "about.f1.d":"पहली बार लोड होने के बाद बिना नेटवर्क।",
+    "about.f2.t":"टकराव रडार", "about.f2.d":"शिक्षक टकराव तुरंत पहचानता है।",
+    "about.f3.t":"द्विभाषी", "about.f3.d":"English व हिन्दी में कभी भी स्विच करें।",
+    "install.title":"Nexus इंस्टॉल करें", "install.sub":"ऐप-जैसा अनुभव — होम स्क्रीन पर जोड़ें", "install.go":"इंस्टॉल",
+    "modal.cancel":"रद्द", "modal.save":"सहेजें", "modal.delete":"हटाएँ", "modal.confirm":"पुष्टि करें",
+    "f.class.name":"कक्षा नाम", "f.class.section":"वर्ग", "f.class.strength":"विद्यार्थी संख्या",
+    "f.teacher.name":"शिक्षक नाम", "f.teacher.code":"कोड", "f.teacher.subjects":"पढ़ाए जाने वाले विषय",
+    "f.subject.name":"विषय नाम", "f.subject.code":"कोड", "f.subject.color":"एक्सेंट रंग",
+    "f.period.label":"लेबल", "f.period.start":"प्रारम्भ समय", "f.period.end":"समाप्ति समय", "f.period.break":"यह विराम कालांश है",
+    "f.room.name":"कक्ष नाम", "f.room.capacity":"क्षमता",
+    "f.slot.subject":"विषय", "f.slot.teacher":"शिक्षक", "f.slot.room":"कक्ष (वैकल्पिक)", "f.slot.none":"— कुछ नहीं —",
+    "t.empty.class":"अभी कोई कक्षा नहीं। प्रारम्भ करने हेतु एक जोड़ें।",
+    "t.empty.teacher":"अभी कोई शिक्षक नहीं।",
+    "t.empty.subject":"अभी कोई विषय नहीं।",
+    "t.empty.period":"अभी कोई कालांश परिभाषित नहीं। पहले दैनिक समय खंड जोड़ें।",
+    "t.empty.room":"अभी कोई कक्ष नहीं।",
+    "modal.new.class":"नई कक्षा", "modal.edit.class":"कक्षा संपादन",
+    "modal.new.teacher":"नया शिक्षक", "modal.edit.teacher":"शिक्षक संपादन",
+    "modal.new.subject":"नया विषय", "modal.edit.subject":"विषय संपादन",
+    "modal.new.period":"नया कालांश", "modal.edit.period":"कालांश संपादन",
+    "modal.new.room":"नया कक्ष", "modal.edit.room":"कक्ष संपादन",
+    "modal.assign":"कालांश नियुक्ति", "modal.assign.sub":"इस कालांश के लिए विषय एवं शिक्षक चुनें।",
+    "modal.del.title":"हटाएँ?", "modal.del.sub":"यह क्रिया अपरिवर्तनीय है।",
+    "modal.wipe.title":"सारा डेटा मिटाएँ?", "modal.wipe.sub":"हर कक्षा, शिक्षक, विषय, कालांश, कक्ष व नियुक्ति स्थायी रूप से हटा दी जाएगी।",
+    "modal.clear.title":"यह समय सारणी साफ़ करें?", "modal.clear.sub":"वर्तमान क्षेत्र की सभी नियुक्तियाँ हटा दी जाएँगी।",
+    "toast.saved":"सहेजा गया", "toast.deleted":"हटाया गया", "toast.imported":"तिजोरी आयात हुई", "toast.exported":"तिजोरी निर्यात हुई",
+    "toast.wiped":"उपकरण रीसेट", "toast.sample":"नमूना डेटा लोड हुआ", "toast.clash":"शिक्षक टकराव",
+    "toast.cleared":"समय सारणी साफ़", "toast.err.import":"आयात विफल — अमान्य फ़ाइल",
+    "toast.lang":"भाषा बदली", "toast.pdf":"PDF तैयार", "toast.xlsx":"Excel तैयार", "toast.installed":"ऐप स्थापित",
+    "days.mon":"सोमवार", "days.tue":"मंगलवार", "days.wed":"बुधवार", "days.thu":"गुरुवार", "days.fri":"शुक्रवार", "days.sat":"शनिवार", "days.sun":"रविवार",
+    "days.short.mon":"सोम", "days.short.tue":"मंगल", "days.short.wed":"बुध", "days.short.thu":"गुरु", "days.short.fri":"शुक्र", "days.short.sat":"शनि", "days.short.sun":"रवि",
+    "break":"विराम", "unassigned":"अनियुक्त", "conflict":"टकराव"
+  }
+};
+const t = (k) => (I18N[App.state.lang] && I18N[App.state.lang][k]) || I18N.en[k] || k;
+
+/* ─────────────────────────────────────────────────────────────
+   [2]  Store — LocalStorage-backed, observable state container
+   ───────────────────────────────────────────────────────────── */
+class Store {
+  static KEY = "kvs_nexus_vault_v1";
+  #state; #listeners = new Set();
+
+  constructor(initial) {
+    this.#state = this.#load() || clone(initial);
+  }
+  #load() {
+    try {
+      const raw = localStorage.getItem(Store.KEY);
+      if (!raw) return null;
+      const decoded = JSON.parse(raw);
+      if (!decoded || decoded.__v !== 1) return null;
+      return decoded.data;
+    } catch (e) { console.warn("Store load failed:", e); return null; }
+  }
+  #persist() {
+    try {
+      localStorage.setItem(Store.KEY, JSON.stringify({ __v: 1, savedAt: Date.now(), data: this.#state }));
+    } catch (e) { console.error("Persist failed:", e); }
+  }
+  subscribe(fn) { this.#listeners.add(fn); return () => this.#listeners.delete(fn); }
+  #emit() { this.#listeners.forEach(fn => fn(this.#state)); }
+
+  get state() { return this.#state; }
+  mutate(fn) { fn(this.#state); this.#persist(); this.#emit(); }
+  replace(next) { this.#state = next; this.#persist(); this.#emit(); }
+  reset(seed) { this.#state = clone(seed); this.#persist(); this.#emit(); }
+  bytes() { return (localStorage.getItem(Store.KEY) || "").length; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   [3]  Domain defaults — KVS-flavoured seed data
+   ───────────────────────────────────────────────────────────── */
+const DAYS = ["mon","tue","wed","thu","fri","sat"]; // KVS typically operates Mon–Sat
+
+const EMPTY_VAULT = {
+  school:   { name: "Kendriya Vidyalaya", session: "2025-26" },
+  classes:  [],
+  teachers: [],
+  subjects: [],
+  periods:  [],
+  rooms:    [],
+  assignments: [],   // { id, classId, day, periodId, subjectId, teacherId, roomId }
+  meta:     { createdAt: Date.now(), updatedAt: Date.now() }
+};
+
+const SAMPLE_VAULT = () => {
+  const now = Date.now();
+  const subjects = [
+    { id: "sub_hin", name: "Hindi",          code: "HIN", color: "#ff7a29" },
+    { id: "sub_eng", name: "English",        code: "ENG", color: "#00e5ff" },
+    { id: "sub_mth", name: "Mathematics",    code: "MTH", color: "#a18bff" },
+    { id: "sub_sci", name: "Science",        code: "SCI", color: "#9eff5a" },
+    { id: "sub_sst", name: "Social Science", code: "SST", color: "#ffab3d" },
+    { id: "sub_snk", name: "Sanskrit",       code: "SNK", color: "#ff5d8f" },
+    { id: "sub_cmp", name: "Computer",       code: "CMP", color: "#5dd3ff" },
+    { id: "sub_art", name: "Art",            code: "ART", color: "#f49bff" },
+    { id: "sub_pe" , name: "Phys. Edu.",     code: "PE",  color: "#ffd75d" },
+  ];
+  const teachers = [
+    { id: "t_ak", name: "Sh. A. Kumar",    code: "AK", subjects: ["sub_mth","sub_cmp"] },
+    { id: "t_rs", name: "Smt. R. Sharma",  code: "RS", subjects: ["sub_eng"] },
+    { id: "t_vn", name: "Sh. V. Nair",     code: "VN", subjects: ["sub_sci"] },
+    { id: "t_pg", name: "Smt. P. Gupta",   code: "PG", subjects: ["sub_hin","sub_snk"] },
+    { id: "t_dm", name: "Sh. D. Meena",    code: "DM", subjects: ["sub_sst"] },
+    { id: "t_jk", name: "Sh. J. Khan",     code: "JK", subjects: ["sub_pe","sub_art"] },
+  ];
+  const classes = [
+    { id: "c_6a", name: "VI",   section: "A", strength: 38 },
+    { id: "c_6b", name: "VI",   section: "B", strength: 36 },
+    { id: "c_7a", name: "VII",  section: "A", strength: 40 },
+    { id: "c_8a", name: "VIII", section: "A", strength: 34 },
+  ];
+  const periods = [
+    { id: "p1", label: "P1", start: "08:00", end: "08:40", isBreak: false },
+    { id: "p2", label: "P2", start: "08:40", end: "09:20", isBreak: false },
+    { id: "p3", label: "P3", start: "09:20", end: "10:00", isBreak: false },
+    { id: "pB", label: "Break", start: "10:00", end: "10:20", isBreak: true },
+    { id: "p4", label: "P4", start: "10:20", end: "11:00", isBreak: false },
+    { id: "p5", label: "P5", start: "11:00", end: "11:40", isBreak: false },
+    { id: "p6", label: "P6", start: "11:40", end: "12:20", isBreak: false },
+    { id: "p7", label: "P7", start: "12:20", end: "13:00", isBreak: false },
+  ];
+  const rooms = [
+    { id: "r_101", name: "Room 101", capacity: 40 },
+    { id: "r_102", name: "Room 102", capacity: 40 },
+    { id: "r_lab", name: "Science Lab", capacity: 36 },
+    { id: "r_cmp", name: "Computer Lab", capacity: 30 },
+  ];
+  // pre-fill a handful of assignments so the app has life the moment sample is loaded
+  const assignments = [
+    ["c_6a","mon","p1","sub_mth","t_ak","r_101"],
+    ["c_6a","mon","p2","sub_eng","t_rs","r_101"],
+    ["c_6a","mon","p3","sub_sci","t_vn","r_lab"],
+    ["c_6a","mon","p4","sub_hin","t_pg","r_101"],
+    ["c_6a","mon","p5","sub_sst","t_dm","r_101"],
+    ["c_6a","tue","p1","sub_eng","t_rs","r_101"],
+    ["c_6a","tue","p2","sub_mth","t_ak","r_101"],
+    ["c_6b","mon","p1","sub_hin","t_pg","r_102"],
+    ["c_6b","mon","p2","sub_sst","t_dm","r_102"],
+    ["c_7a","mon","p1","sub_sci","t_vn","r_lab"],
+    ["c_7a","mon","p2","sub_mth","t_ak","r_102"],
+    ["c_8a","mon","p3","sub_cmp","t_ak","r_cmp"],
+  ].map(([classId, day, periodId, subjectId, teacherId, roomId]) =>
+    ({ id: uid("asg"), classId, day, periodId, subjectId, teacherId, roomId })
+  );
+  return {
+    school: { name: "Kendriya Vidyalaya No. 1", session: "2025-26" },
+    classes, teachers, subjects, periods, rooms, assignments,
+    meta: { createdAt: now, updatedAt: now }
+  };
+};
+
+/* ─────────────────────────────────────────────────────────────
+   [4]  App — the orchestrator
+   ───────────────────────────────────────────────────────────── */
+const App = {
+  store: null,
+  state: {
+    lang: localStorage.getItem("kvs_lang") || "en",
+    view: "dashboard",
+    ttScope: "class", ttTarget: null, ttViewMode: "week", ttDay: "mon", ttMonth: new Date().toISOString().slice(0,7),
+    editing: null,     // modal context
+    deferredInstall: null,
+  },
+
+  /* ── bootstrap ── */
+  boot() {
+    this.store = new Store(EMPTY_VAULT);
+    this.store.subscribe(() => this.render());
+    this.buildStars();
+    this.bindUI();
+    this.setLang(this.state.lang, /*silent*/true);
+    this.render();
+    this.registerSW();
+    setTimeout(() => { $("#boot").classList.add("done"); }, 1100);
+    this.updateTopbarDate();
+    setInterval(() => this.updateTopbarDate(), 60000);
+  },
+
+  buildStars() {
+    const host = $("#stars");
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < 40; i++) {
+      const s = document.createElement("span");
+      s.style.top  = Math.random()*100 + "%";
+      s.style.left = Math.random()*100 + "%";
+      s.style.setProperty("--d", (2 + Math.random()*4) + "s");
+      s.style.animationDelay = (Math.random()*4) + "s";
+      s.style.opacity = (0.3 + Math.random()*0.7);
+      frag.append(s);
+    }
+    host.append(frag);
+  },
+
+  updateTopbarDate() {
+    const el = $("#topbar-date");
+    if (!el) return;
+    const d = new Date();
+    const opts = { weekday: "long", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" };
+    const locale = this.state.lang === "hi" ? "hi-IN" : "en-IN";
+    el.textContent = d.toLocaleDateString(locale, opts);
+  },
+
+  /* ── UI bindings ── */
+  bindUI() {
+    // Nav
+    $$(".nav-item").forEach(btn => btn.addEventListener("click", () => this.go(btn.dataset.view)));
+    $$("[data-go]").forEach(btn => btn.addEventListener("click", () => this.go(btn.dataset.go)));
+
+    // Hamburger
+    $("#hamburger").addEventListener("click", () => {
+      $("#sidebar").classList.toggle("open");
+      document.body.classList.toggle("sidebar-open");
+    });
+    document.addEventListener("click", (e) => {
+      if (window.innerWidth <= 980 && document.body.classList.contains("sidebar-open")) {
+        if (!e.target.closest(".sidebar") && !e.target.closest("#hamburger")) {
+          $("#sidebar").classList.remove("open");
+          document.body.classList.remove("sidebar-open");
+        }
+      }
+    });
+
+    // Language
+    $$(".lang-switch button").forEach(b => b.addEventListener("click", () => this.setLang(b.dataset.lang)));
+
+    // New buttons
+    $$("[data-new]").forEach(b => b.addEventListener("click", () => this.openForm(b.dataset.new)));
+
+    // Sample seed
+    $("#btn-seed").addEventListener("click", () => {
+      this.store.replace(SAMPLE_VAULT());
+      this.toast(t("toast.sample"), "success");
+    });
+
+    // Timetable controls
+    $("#tt-view").addEventListener("change", (e) => { this.state.ttViewMode = e.target.value; this.renderTimetable(); });
+    $("#tt-scope").addEventListener("change", (e) => {
+      this.state.ttScope = e.target.value;
+      this.state.ttTarget = null;
+      this.populateTTTarget();
+      this.renderTimetable();
+    });
+    $("#tt-target").addEventListener("change", (e) => { this.state.ttTarget = e.target.value; this.renderTimetable(); });
+    $("#tt-day").addEventListener("change", (e) => { this.state.ttDay = e.target.value; this.renderTimetable(); });
+    $("#tt-month").addEventListener("change", (e) => { this.state.ttMonth = e.target.value; this.renderTimetable(); });
+
+    // Export buttons
+    $("#btn-export-pdf").addEventListener("click", () => this.exportPDF());
+    $("#btn-export-xlsx").addEventListener("click", () => this.exportXLSX());
+    $("#btn-print").addEventListener("click", () => window.print());
+    $("#btn-clear-tt").addEventListener("click", () => this.confirmClearTimetable());
+
+    // Backup
+    $("#btn-export-json").addEventListener("click", () => this.exportJSON());
+    $("#btn-import-json").addEventListener("click", () => $("#file-import").click());
+    $("#file-import").addEventListener("change", (e) => this.importJSON(e.target.files[0]));
+    $("#btn-wipe").addEventListener("click", () => this.confirmWipe());
+
+    // Modal
+    $("#modal-close").addEventListener("click", () => this.closeModal());
+    $("#modal-backdrop").addEventListener("click", (e) => {
+      if (e.target.id === "modal-backdrop") this.closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && $("#modal-backdrop").classList.contains("open")) this.closeModal();
+    });
+
+    // PWA install prompt
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      this.state.deferredInstall = e;
+      setTimeout(() => $("#install-banner").classList.add("show"), 2500);
+    });
+    $("#install-go").addEventListener("click", async () => {
+      if (!this.state.deferredInstall) return;
+      this.state.deferredInstall.prompt();
+      const { outcome } = await this.state.deferredInstall.userChoice;
+      if (outcome === "accepted") this.toast(t("toast.installed"), "success");
+      this.state.deferredInstall = null;
+      $("#install-banner").classList.remove("show");
+    });
+    $("#install-dismiss").addEventListener("click", () => $("#install-banner").classList.remove("show"));
+
+    // 3D tilt for panels
+    this.bindTilt();
+  },
+
+  bindTilt() {
+    document.addEventListener("mousemove", (e) => {
+      $$(".panel.tilt").forEach(p => {
+        const rect = p.getBoundingClientRect();
+        if (e.clientX < rect.left - 40 || e.clientX > rect.right + 40 || e.clientY < rect.top - 40 || e.clientY > rect.bottom + 40) {
+          p.style.transform = ""; return;
+        }
+        const x = (e.clientX - rect.left) / rect.width - .5;
+        const y = (e.clientY - rect.top) / rect.height - .5;
+        p.style.transform = `perspective(1200px) rotateX(${-y*2}deg) rotateY(${x*2}deg) translateY(-2px)`;
+      });
+    });
+  },
+
+  /* ── navigation ── */
+  go(view) {
+    if (!view) return;
+    this.state.view = view;
+    $$(".view").forEach(v => v.classList.toggle("active", v.dataset.view === view));
+    $$(".nav-item").forEach(n => n.classList.toggle("active", n.dataset.view === view));
+    $("#topbar-title").innerHTML = `<span>${t("nav." + view)}</span> <span class="subtle">· <span id="topbar-date">${$("#topbar-date")?.textContent || ""}</span></span>`;
+    this.updateTopbarDate();
+    if (window.innerWidth <= 980) {
+      $("#sidebar").classList.remove("open");
+      document.body.classList.remove("sidebar-open");
+    }
+    this.render();
+  },
+
+  /* ── language ── */
+  setLang(lang, silent = false) {
+    this.state.lang = lang;
+    localStorage.setItem("kvs_lang", lang);
+    document.documentElement.lang = lang;
+    $$(".lang-switch button").forEach(b => b.classList.toggle("on", b.dataset.lang === lang));
+    $$("[data-i18n]").forEach(el => {
+      // Skip elements that contain child elements — replacing textContent would nuke them
+      if (el.children && el.children.length > 0) return;
+      el.textContent = t(el.dataset.i18n);
+    });
+    this.updateTopbarDate();
+    this.render();
+    if (!silent) this.toast(t("toast.lang"), "info");
+  },
+
+  /* ── render master ── */
+  render() {
+    this.renderDashboard();
+    this.populateTTTarget();
+    this.renderTimetable();
+    this.renderList("classes");
+    this.renderList("teachers");
+    this.renderList("subjects");
+    this.renderList("periods");
+    this.renderList("rooms");
+    this.renderBackup();
+  },
+
+  /* ── DASHBOARD ── */
+  renderDashboard() {
+    const s = this.store.state;
+    const stats = [
+      { label: t("stat.classes"),  value: s.classes.length,  color: "var(--cyan)" },
+      { label: t("stat.teachers"), value: s.teachers.length, color: "var(--amber)" },
+      { label: t("stat.subjects"), value: s.subjects.length, color: "var(--violet)" },
+      { label: t("stat.periods"),  value: s.periods.length,  color: "var(--lime)" },
+      { label: t("stat.rooms"),    value: s.rooms.length,    color: "var(--rose)" },
+      { label: t("stat.assigned"), value: s.assignments.length, color: "var(--saffron)" },
+    ];
+    const host = $("#stat-grid");
+    host.innerHTML = "";
+    stats.forEach(st => {
+      host.append(h("div", { class: "stat", style: `--accent:${st.color}` },
+        h("div", { class: "stat-label" }, st.label),
+        h("div", { class: "stat-value" }, st.value)
+      ));
+    });
+
+    // Pulse
+    $("#pulse-date").textContent = new Date().toLocaleDateString(this.state.lang === "hi" ? "hi-IN" : "en-IN", { day:"2-digit", month:"short", year:"numeric" });
+    const pulseBody = $("#pulse-body");
+    pulseBody.innerHTML = "";
+    if (!s.assignments.length) {
+      pulseBody.append(h("div", { class: "empty" },
+        h("span", { class: "emo" }, "◔"),
+        t("dash.activity.empty")
+      ));
+    } else {
+      // group assignments by day, show a mini strip
+      const byDay = {};
+      s.assignments.forEach(a => { (byDay[a.day] = byDay[a.day] || []).push(a); });
+      const strip = h("div", { class: "grid-fluid" });
+      DAYS.forEach(d => {
+        const count = (byDay[d] || []).length;
+        strip.append(h("div", { class: "stat", style: `--accent:var(--cyan)` },
+          h("div", { class: "stat-label" }, t("days." + d)),
+          h("div", { class: "stat-value" }, count),
+          h("div", { class: "stat-meta" }, `${s.classes.length} × ${s.periods.filter(p=>!p.isBreak).length} = ${s.classes.length * s.periods.filter(p=>!p.isBreak).length} slots max`)
+        ));
+      });
+      pulseBody.append(strip);
+    }
+
+    // Conflicts
+    const clashes = this.detectConflicts();
+    const cEl = $("#conflict-body");
+    cEl.innerHTML = "";
+    if (!clashes.length) {
+      cEl.textContent = t("dash.conflicts.empty");
+    } else {
+      clashes.forEach(c => {
+        const teacher = s.teachers.find(x => x.id === c.teacherId);
+        const cls1 = s.classes.find(x => x.id === c.a.classId);
+        const cls2 = s.classes.find(x => x.id === c.b.classId);
+        const per = s.periods.find(x => x.id === c.a.periodId);
+        cEl.append(h("div", { class: "chip rose", style: "margin:3px 4px 3px 0" },
+          `${teacher?.name || "?"} · ${t("days." + c.a.day)} · ${per?.label || "?"} · ${cls1?.name}-${cls1?.section} ↔ ${cls2?.name}-${cls2?.section}`
+        ));
+      });
+    }
+  },
+
+  detectConflicts() {
+    const map = {};
+    const clashes = [];
+    this.store.state.assignments.forEach(a => {
+      const key = a.teacherId + "|" + a.day + "|" + a.periodId;
+      if (map[key]) clashes.push({ teacherId: a.teacherId, a: map[key], b: a });
+      else map[key] = a;
+    });
+    return clashes;
+  },
+
+  /* ── TIMETABLE ── */
+  populateTTTarget() {
+    const s = this.store.state;
+    const sel = $("#tt-target");
+    sel.innerHTML = "";
+    const label = $("#tt-target-label");
+    label.textContent = t(this.state.ttScope === "class" ? "nav.classes" : "nav.teachers");
+    const list = this.state.ttScope === "class" ? s.classes : s.teachers;
+    list.forEach(x => {
+      const labelText = this.state.ttScope === "class" ? `${x.name} - ${x.section}` : `${x.name} (${x.code})`;
+      sel.append(h("option", { value: x.id }, labelText));
+    });
+    if (!list.find(x => x.id === this.state.ttTarget)) this.state.ttTarget = list[0]?.id || null;
+    if (this.state.ttTarget) sel.value = this.state.ttTarget;
+
+    // Day selector for Day view
+    const dSel = $("#tt-day");
+    dSel.innerHTML = "";
+    DAYS.forEach(d => dSel.append(h("option", { value: d }, t("days." + d))));
+    dSel.value = this.state.ttDay;
+
+    // visibility of filter fields
+    $("#tt-day-field").style.display   = this.state.ttViewMode === "day"   ? "" : "none";
+    $("#tt-month-field").style.display = this.state.ttViewMode === "month" ? "" : "none";
+    if (this.state.ttViewMode === "month") $("#tt-month").value = this.state.ttMonth;
+  },
+
+  renderTimetable() {
+    const s = this.store.state;
+    const wrap = $("#tt-wrap");
+    wrap.innerHTML = "";
+
+    if (!s.classes.length || !s.teachers.length || !s.subjects.length || !s.periods.length) {
+      wrap.append(h("div", { class: "empty" },
+        h("span", { class: "emo" }, "◇"),
+        t("tt.empty")
+      ));
+      return;
+    }
+    if (!this.state.ttTarget) return;
+
+    const conflictKeys = new Set(this.detectConflicts().flatMap(c => [c.a.id, c.b.id]));
+    const mode = this.state.ttViewMode;
+    const days = mode === "day" ? [this.state.ttDay] : DAYS;
+
+    const table = h("table", { class: "timetable" });
+    const thead = h("thead");
+    const headRow = h("tr",
+      {},
+      h("th", {}, mode === "day" ? t("tt.view.day") : t("tt.scope") === t("tt.scope.class") ? t("tt.day") : t("tt.day"))
+    );
+    s.periods.forEach(p => {
+      headRow.append(h("th", {},
+        p.label,
+        h("span", { class: "per-time" }, `${p.start}–${p.end}`)
+      ));
+    });
+    thead.append(headRow);
+    table.append(thead);
+
+    const tbody = h("tbody");
+    days.forEach(day => {
+      const row = h("tr", {},
+        h("th", {}, t("days." + day))
+      );
+      s.periods.forEach(per => {
+        if (per.isBreak) {
+          row.append(h("td", {}, h("div", { class: "slot break" }, t("break"))));
+          return;
+        }
+        // Match assignment depending on scope
+        const asg = s.assignments.find(a => {
+          if (a.day !== day || a.periodId !== per.id) return false;
+          return this.state.ttScope === "class"
+            ? a.classId   === this.state.ttTarget
+            : a.teacherId === this.state.ttTarget;
+        });
+        const td = h("td");
+        const slot = h("div", { class: "slot" });
+        if (asg) {
+          const subj    = s.subjects.find(x => x.id === asg.subjectId);
+          const teacher = s.teachers.find(x => x.id === asg.teacherId);
+          const cls     = s.classes.find(x => x.id === asg.classId);
+          const room    = s.rooms.find(x => x.id === asg.roomId);
+          slot.classList.add("filled");
+          if (conflictKeys.has(asg.id)) slot.classList.add("conflict");
+          if (subj) slot.style.setProperty("--slot-color", subj.color || "var(--cyan)");
+          slot.append(h("div", { class: "subj" }, subj?.name || "?"));
+          if (this.state.ttScope === "class") {
+            slot.append(h("div", { class: "teacher" }, "◉ " + (teacher?.name || "?")));
+          } else {
+            slot.append(h("div", { class: "teacher" }, "▣ " + (cls ? `${cls.name}-${cls.section}` : "?")));
+          }
+          if (room) slot.append(h("div", { class: "room" }, room.name));
+          if (conflictKeys.has(asg.id)) slot.append(h("span", { class: "conflict-tag" }, t("conflict")));
+          slot.addEventListener("click", () => this.openSlotModal(day, per.id, asg));
+        } else {
+          slot.append(h("div", { class: "placeholder" }, "+ " + t("tt.slot.tap")));
+          slot.addEventListener("click", () => this.openSlotModal(day, per.id, null));
+        }
+        td.append(slot);
+        row.append(td);
+      });
+      tbody.append(row);
+    });
+    table.append(tbody);
+    wrap.append(table);
+  },
+
+  openSlotModal(day, periodId, existing) {
+    const s = this.store.state;
+    if (this.state.ttScope !== "class") { // editing only makes sense per-class
+      this.toast("Switch to 'By Class' scope to edit slots.", "info");
+      return;
+    }
+    const classId = this.state.ttTarget;
+    const per = s.periods.find(p => p.id === periodId);
+    const cls = s.classes.find(c => c.id === classId);
+
+    const body = h("div", { class: "row" });
+
+    const subjField = h("div", { class: "field" },
+      h("label", {}, t("f.slot.subject")),
+      h("select", { class: "select", id: "slot-subject" },
+        h("option", { value: "" }, t("f.slot.none")),
+        ...s.subjects.map(sb => h("option", { value: sb.id }, sb.name))
+      )
+    );
+    const teacherField = h("div", { class: "field" },
+      h("label", {}, t("f.slot.teacher")),
+      h("select", { class: "select", id: "slot-teacher" },
+        h("option", { value: "" }, t("f.slot.none")),
+        ...s.teachers.map(tc => h("option", { value: tc.id }, `${tc.name} (${tc.code})`))
+      )
+    );
+    const roomField = h("div", { class: "field" },
+      h("label", {}, t("f.slot.room")),
+      h("select", { class: "select", id: "slot-room" },
+        h("option", { value: "" }, t("f.slot.none")),
+        ...s.rooms.map(r => h("option", { value: r.id }, r.name))
+      )
+    );
+    body.append(subjField, teacherField, roomField);
+
+    this.showModal({
+      title: t("modal.assign"),
+      sub: `${cls?.name}-${cls?.section} · ${t("days." + day)} · ${per?.label} (${per?.start}–${per?.end})`,
+      body,
+      onMount: () => {
+        if (existing) {
+          $("#slot-subject").value = existing.subjectId || "";
+          $("#slot-teacher").value = existing.teacherId || "";
+          $("#slot-room").value    = existing.roomId || "";
+        }
+      },
+      actions: [
+        existing && { label: t("modal.delete"), cls: "btn danger", onClick: () => {
+          this.store.mutate(st => { st.assignments = st.assignments.filter(a => a.id !== existing.id); st.meta.updatedAt = Date.now(); });
+          this.toast(t("toast.deleted"), "success");
+          this.closeModal();
+        }},
+        { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
+        { label: t("modal.save"), cls: "btn primary", onClick: () => {
+          const subjectId = $("#slot-subject").value;
+          const teacherId = $("#slot-teacher").value;
+          const roomId    = $("#slot-room").value;
+          if (!subjectId || !teacherId) { this.toast("Subject & Teacher required", "error"); return; }
+          this.store.mutate(st => {
+            // remove any existing assignment for same class/day/period
+            st.assignments = st.assignments.filter(a => !(a.classId === classId && a.day === day && a.periodId === periodId));
+            const rec = {
+              id: existing?.id || uid("asg"),
+              classId, day, periodId, subjectId, teacherId, roomId: roomId || null
+            };
+            st.assignments.push(rec);
+            st.meta.updatedAt = Date.now();
+          });
+          // check for clash
+          const hasClash = this.detectConflicts().some(c => c.a.teacherId === teacherId || c.b.teacherId === teacherId);
+          this.toast(hasClash ? t("toast.clash") : t("toast.saved"), hasClash ? "error" : "success");
+          this.closeModal();
+        }}
+      ].filter(Boolean)
+    });
+  },
+
+  /* ── LISTS (generic CRUD) ── */
+  renderList(kind) {
+    const s = this.store.state;
+    const host = $(`#${kind}-body`);
+    if (!host) return;
+    host.innerHTML = "";
+    const items = s[kind] || [];
+    if (!items.length) {
+      host.append(h("div", { class: "empty" },
+        h("span", { class: "emo" }, "∅"),
+        t("t.empty." + (kind === "classes" ? "class" : kind === "teachers" ? "teacher" : kind === "subjects" ? "subject" : kind === "periods" ? "period" : "room"))
+      ));
+      return;
+    }
+    const table = h("table", { class: "data-table" });
+    const thead = h("thead"); const trHead = h("tr");
+    const cols = this.listColumns(kind);
+    cols.forEach(c => trHead.append(h("th", {}, c.label())));
+    trHead.append(h("th", { class: "action-col" }, ""));
+    thead.append(trHead); table.append(thead);
+
+    const tbody = h("tbody");
+    items.forEach(it => {
+      const tr = h("tr");
+      cols.forEach(c => tr.append(h("td", { html: c.render(it) })));
+      tr.append(h("td", { class: "action-col" },
+        h("button", {
+          class: "icon-btn",
+          onClick: () => this.openForm(this.kindSingular(kind), it)
+        }, h("span", { html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>' })),
+        h("button", {
+          class: "icon-btn danger",
+          onClick: () => this.confirmDelete(kind, it)
+        }, h("span", { html: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-2 14a2 2 0 01-2 2H9a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>' }))
+      ));
+      tbody.append(tr);
+    });
+    table.append(tbody);
+    host.append(table);
+  },
+
+  listColumns(kind) {
+    const s = this.store.state;
+    switch (kind) {
+      case "classes":
+        return [
+          { label: () => t("f.class.name"),     render: (x) => `<strong>${this.escape(x.name)} - ${this.escape(x.section)}</strong>` },
+          { label: () => t("f.class.strength"), render: (x) => `<span class="muted mono">${x.strength || "—"}</span>` },
+        ];
+      case "teachers":
+        return [
+          { label: () => t("f.teacher.name"), render: (x) => `<strong>${this.escape(x.name)}</strong>` },
+          { label: () => t("f.teacher.code"), render: (x) => `<span class="chip cyan mono">${this.escape(x.code)}</span>` },
+          { label: () => t("f.teacher.subjects"), render: (x) => (x.subjects || []).map(sid => {
+              const sb = s.subjects.find(b => b.id === sid);
+              return sb ? `<span class="chip" style="color:${sb.color};border-color:${sb.color}55;background:${sb.color}15">${this.escape(sb.name)}</span>` : "";
+            }).join(" ") || '<span class="muted tiny">—</span>' },
+        ];
+      case "subjects":
+        return [
+          { label: () => t("f.subject.name"),  render: (x) => `<span class="chip" style="color:${x.color};border-color:${x.color}55;background:${x.color}15"><strong>${this.escape(x.name)}</strong></span>` },
+          { label: () => t("f.subject.code"),  render: (x) => `<span class="mono muted">${this.escape(x.code)}</span>` },
+        ];
+      case "periods":
+        return [
+          { label: () => t("f.period.label"), render: (x) => x.isBreak
+            ? `<span class="chip amber">${this.escape(x.label)} · ${t("break")}</span>`
+            : `<strong>${this.escape(x.label)}</strong>` },
+          { label: () => t("f.period.start"), render: (x) => `<span class="mono">${x.start}</span>` },
+          { label: () => t("f.period.end"),   render: (x) => `<span class="mono">${x.end}</span>` },
+        ];
+      case "rooms":
+        return [
+          { label: () => t("f.room.name"),     render: (x) => `<strong>${this.escape(x.name)}</strong>` },
+          { label: () => t("f.room.capacity"), render: (x) => `<span class="muted mono">${x.capacity || "—"}</span>` },
+        ];
+    }
+  },
+
+  kindSingular(k) { return { classes:"class", teachers:"teacher", subjects:"subject", periods:"period", rooms:"room" }[k]; },
+  kindPlural(k)   { return { class:"classes", teacher:"teachers", subject:"subjects", period:"periods", room:"rooms" }[k]; },
+
+  escape(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); },
+
+  /* ── FORM modal ── */
+  openForm(kind, existing = null) {
+    const s = this.store.state;
+    const body = h("div", { class: "row" });
+
+    if (kind === "class") {
+      body.append(
+        this.field("name", t("f.class.name"), "input", existing?.name || "", { placeholder: "VI, VII, VIII…" }),
+        this.field("section", t("f.class.section"), "input", existing?.section || "A"),
+        this.field("strength", t("f.class.strength"), "input", existing?.strength || "", { type: "number", min: 1 }),
+      );
+    } else if (kind === "teacher") {
+      const subsCheckbox = h("div", { class: "flex wrap", id: "tch-subjects" });
+      s.subjects.forEach(sb => {
+        const checked = existing?.subjects?.includes(sb.id);
+        subsCheckbox.append(
+          h("label", { class: "chip", style: `cursor:pointer;color:${sb.color};border-color:${sb.color}55;${checked?`background:${sb.color}30;`:''}` },
+            h("input", { type: "checkbox", value: sb.id, checked: checked || null, style: "margin-right:6px" }),
+            sb.name
+          )
+        );
+      });
+      body.append(
+        this.field("name", t("f.teacher.name"), "input", existing?.name || ""),
+        this.field("code", t("f.teacher.code"), "input", existing?.code || "", { maxLength: 6, style: "text-transform:uppercase" }),
+        h("div", { class: "field" },
+          h("label", {}, t("f.teacher.subjects")),
+          subsCheckbox
+        )
+      );
+    } else if (kind === "subject") {
+      body.append(
+        this.field("name", t("f.subject.name"), "input", existing?.name || ""),
+        this.field("code", t("f.subject.code"), "input", existing?.code || "", { maxLength: 5, style: "text-transform:uppercase" }),
+        this.field("color", t("f.subject.color"), "input", existing?.color || "#00e5ff", { type: "color" }),
+      );
+    } else if (kind === "period") {
+      body.append(
+        this.field("label", t("f.period.label"), "input", existing?.label || "", { placeholder: "P1, P2, Break…" }),
+        h("div", { class: "row cols-2" },
+          this.field("start", t("f.period.start"), "input", existing?.start || "08:00", { type: "time" }),
+          this.field("end",   t("f.period.end"),   "input", existing?.end   || "08:40", { type: "time" }),
+        ),
+        h("label", { class: "flex", style: "cursor:pointer" },
+          h("input", { type: "checkbox", id: "f-isBreak", checked: existing?.isBreak || null, style: "margin-right:8px" }),
+          t("f.period.break")
+        )
+      );
+    } else if (kind === "room") {
+      body.append(
+        this.field("name", t("f.room.name"), "input", existing?.name || ""),
+        this.field("capacity", t("f.room.capacity"), "input", existing?.capacity || "", { type: "number", min: 1 }),
+      );
+    }
+
+    this.showModal({
+      title: t((existing ? "modal.edit." : "modal.new.") + kind),
+      sub: "",
+      body,
+      actions: [
+        { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
+        { label: t("modal.save"), cls: "btn primary", onClick: () => this.saveForm(kind, existing) }
+      ]
+    });
+  },
+
+  field(name, label, type = "input", value = "", attrs = {}) {
+    return h("div", { class: "field" },
+      h("label", {}, label),
+      h(type, Object.assign({ class: type === "input" ? "input" : "select", id: `f-${name}`, value }, attrs))
+    );
+  },
+
+  saveForm(kind, existing) {
+    const s = this.store.state;
+    let record; const now = Date.now();
+    if (kind === "class") {
+      record = {
+        id: existing?.id || uid("cls"),
+        name:    $("#f-name").value.trim() || "Class",
+        section: $("#f-section").value.trim() || "A",
+        strength: +$("#f-strength").value || 0
+      };
+    } else if (kind === "teacher") {
+      const checked = $$("#tch-subjects input[type=checkbox]").filter(c => c.checked).map(c => c.value);
+      record = {
+        id: existing?.id || uid("tch"),
+        name: $("#f-name").value.trim() || "Teacher",
+        code: ($("#f-code").value || "").toUpperCase().trim() || "T" + Math.floor(Math.random()*99),
+        subjects: checked
+      };
+    } else if (kind === "subject") {
+      record = {
+        id: existing?.id || uid("sub"),
+        name: $("#f-name").value.trim() || "Subject",
+        code: ($("#f-code").value || "").toUpperCase().trim() || "SUB",
+        color: $("#f-color").value || "#00e5ff"
+      };
+    } else if (kind === "period") {
+      record = {
+        id: existing?.id || uid("per"),
+        label: $("#f-label").value.trim() || "P?",
+        start: $("#f-start").value || "08:00",
+        end:   $("#f-end").value   || "08:40",
+        isBreak: $("#f-isBreak").checked
+      };
+    } else if (kind === "room") {
+      record = {
+        id: existing?.id || uid("rm"),
+        name: $("#f-name").value.trim() || "Room",
+        capacity: +$("#f-capacity").value || 0
+      };
+    }
+    const plural = this.kindPlural(kind);
+    this.store.mutate(st => {
+      const arr = st[plural];
+      if (existing) {
+        const i = arr.findIndex(x => x.id === existing.id);
+        if (i > -1) arr[i] = record;
+      } else {
+        arr.push(record);
+      }
+      st.meta.updatedAt = now;
+    });
+    this.toast(t("toast.saved"), "success");
+    this.closeModal();
+  },
+
+  confirmDelete(kindPlural, item) {
+    const singular = this.kindSingular(kindPlural);
+    this.showModal({
+      title: t("modal.del.title"),
+      sub: t("modal.del.sub"),
+      body: h("div", {}, h("span", { class: "chip rose" }, (item.name || item.label) + (item.section ? ` - ${item.section}` : ""))),
+      actions: [
+        { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
+        { label: t("modal.delete"), cls: "btn danger", onClick: () => {
+          this.store.mutate(st => {
+            st[kindPlural] = st[kindPlural].filter(x => x.id !== item.id);
+            // cascade: clean assignments referencing deleted entity
+            st.assignments = st.assignments.filter(a =>
+              a.classId  !== item.id &&
+              a.teacherId!== item.id &&
+              a.subjectId!== item.id &&
+              a.periodId !== item.id &&
+              a.roomId   !== item.id
+            );
+            // also clean teacher.subjects references to a deleted subject
+            if (singular === "subject") {
+              st.teachers.forEach(t => { t.subjects = (t.subjects || []).filter(s => s !== item.id); });
+            }
+            st.meta.updatedAt = Date.now();
+          });
+          this.toast(t("toast.deleted"), "success");
+          this.closeModal();
+        }}
+      ]
+    });
+  },
+
+  /* ── EXPORT ── */
+  exportPDF() {
+    if (!window.jspdf) { this.toast("PDF engine not available offline yet", "error"); return; }
+    const s = this.store.state;
+    if (!this.state.ttTarget) { this.toast("Pick a class/teacher first", "error"); return; }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+    const isClass = this.state.ttScope === "class";
+    const target = isClass ? s.classes.find(c=>c.id===this.state.ttTarget) : s.teachers.find(t=>t.id===this.state.ttTarget);
+    if (!target) return;
+    const title = isClass ? `${target.name} - ${target.section}` : `${target.name} (${target.code})`;
+    // header bar
+    doc.setFillColor(5, 7, 13); doc.rect(0, 0, 297, 22, "F");
+    doc.setTextColor(255,255,255);
+    doc.setFont("helvetica","bold"); doc.setFontSize(16);
+    doc.text(s.school.name || "Kendriya Vidyalaya", 14, 10);
+    doc.setFontSize(10); doc.setFont("helvetica","normal");
+    doc.text(`${s.school.session || ""} · ${title} · ${new Date().toLocaleDateString()}`, 14, 17);
+    doc.setTextColor(255, 171, 61); doc.text("KVS TIMETABLE NEXUS", 230, 12);
+    doc.setTextColor(150); doc.setFontSize(8); doc.text("by Aayush Singh", 238, 17);
+
+    const head = [[ "Day", ...s.periods.map(p => `${p.label}\n${p.start}-${p.end}`) ]];
+    const body = DAYS.map(d => {
+      const row = [ d.toUpperCase() ];
+      s.periods.forEach(p => {
+        if (p.isBreak) { row.push("— BREAK —"); return; }
+        const a = s.assignments.find(x => x.day===d && x.periodId===p.id && (isClass ? x.classId===target.id : x.teacherId===target.id));
+        if (!a) { row.push(""); return; }
+        const sub = s.subjects.find(x=>x.id===a.subjectId);
+        const tc  = s.teachers.find(x=>x.id===a.teacherId);
+        const cl  = s.classes.find(x=>x.id===a.classId);
+        const rm  = s.rooms.find(x=>x.id===a.roomId);
+        const lines = [ sub?.name || "?" ];
+        lines.push(isClass ? (tc?.name || "") : (cl ? `${cl.name}-${cl.section}` : ""));
+        if (rm) lines.push(rm.name);
+        row.push(lines.join("\n"));
+      });
+      return row;
+    });
+
+    doc.autoTable({
+      head, body,
+      startY: 28,
+      theme: "grid",
+      styles: { font: "helvetica", fontSize: 8, cellPadding: 3, textColor: 30, lineColor: [180,180,180], lineWidth: 0.2 },
+      headStyles: { fillColor: [10,14,24], textColor: 255, fontStyle: "bold", halign: "center", valign: "middle" },
+      columnStyles: { 0: { fillColor: [235,240,250], fontStyle: "bold", halign:"center", valign:"middle", cellWidth: 22 } },
+      didParseCell: (data) => {
+        if (data.section === "body" && data.column.index > 0) {
+          const txt = data.cell.text.join(" ");
+          if (txt.includes("BREAK")) { data.cell.styles.fillColor = [255,240,215]; data.cell.styles.textColor = [170,100,0]; data.cell.styles.fontStyle = "italic"; }
+        }
+      }
+    });
+
+    doc.setFontSize(8); doc.setTextColor(130);
+    doc.text(`Generated by KVS Nexus · Aayush Singh · ${new Date().toLocaleString()}`, 14, 205);
+    doc.save(`KVS_Timetable_${title.replace(/\s+/g,"_")}.pdf`);
+    this.toast(t("toast.pdf"), "success");
+  },
+
+  exportXLSX() {
+    if (!window.XLSX) { this.toast("Excel engine not available", "error"); return; }
+    const s = this.store.state;
+    const isClass = this.state.ttScope === "class";
+    const wb = XLSX.utils.book_new();
+
+    const buildSheet = (target) => {
+      const header = ["Day", ...s.periods.map(p => `${p.label} (${p.start}-${p.end})`)];
+      const rows = [header];
+      DAYS.forEach(d => {
+        const row = [d.toUpperCase()];
+        s.periods.forEach(p => {
+          if (p.isBreak) { row.push("BREAK"); return; }
+          const a = s.assignments.find(x => x.day===d && x.periodId===p.id && (isClass ? x.classId===target.id : x.teacherId===target.id));
+          if (!a) { row.push(""); return; }
+          const sub = s.subjects.find(x=>x.id===a.subjectId);
+          const tc  = s.teachers.find(x=>x.id===a.teacherId);
+          const cl  = s.classes.find(x=>x.id===a.classId);
+          const rm  = s.rooms.find(x=>x.id===a.roomId);
+          const lines = [ sub?.name || "?" ];
+          lines.push(isClass ? (tc?.name || "") : (cl ? `${cl.name}-${cl.section}` : ""));
+          if (rm) lines.push(rm.name);
+          row.push(lines.join(" / "));
+        });
+        rows.push(row);
+      });
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      ws["!cols"] = [{ wch: 10 }, ...s.periods.map(() => ({ wch: 22 }))];
+      return ws;
+    };
+
+    // export either one sheet (current target) or all classes
+    const list = isClass ? s.classes : s.teachers;
+    const curr = list.find(x => x.id === this.state.ttTarget);
+    if (curr) {
+      const name = isClass ? `${curr.name}-${curr.section}` : `${curr.code}`;
+      XLSX.utils.book_append_sheet(wb, buildSheet(curr), name.substring(0, 30));
+    }
+    // also append a summary sheet listing everything
+    const summary = [["KVS Timetable Nexus — Export"], [], ["School", s.school.name], ["Session", s.school.session], ["Generated", new Date().toLocaleString()], ["Author", "Aayush Singh"]];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), "README");
+    XLSX.writeFile(wb, `KVS_Timetable_${Date.now()}.xlsx`);
+    this.toast(t("toast.xlsx"), "success");
+  },
+
+  exportJSON() {
+    const data = { __v: 1, exportedAt: new Date().toISOString(), app: "KVS Nexus", author: "Aayush Singh", data: this.store.state };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = h("a", { href: url, download: `kvs_vault_${today()}.json` });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    this.toast(t("toast.exported"), "success");
+  },
+
+  importJSON(file) {
+    if (!file) return;
+    const fr = new FileReader();
+    fr.onload = (e) => {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        const next = parsed.data || parsed; // accept both wrapped + unwrapped
+        if (!next.classes || !next.periods) throw new Error("Invalid");
+        this.store.replace(next);
+        this.toast(t("toast.imported"), "success");
+      } catch { this.toast(t("toast.err.import"), "error"); }
+    };
+    fr.readAsText(file);
+    $("#file-import").value = "";
+  },
+
+  confirmWipe() {
+    this.showModal({
+      title: t("modal.wipe.title"),
+      sub: t("modal.wipe.sub"),
+      body: h("div", { class: "chip rose" }, "⚠ " + t("modal.wipe.title")),
+      actions: [
+        { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
+        { label: t("backup.wipe"),  cls: "btn danger", onClick: () => {
+          this.store.reset(EMPTY_VAULT);
+          this.toast(t("toast.wiped"), "success");
+          this.closeModal();
+        }}
+      ]
+    });
+  },
+
+  confirmClearTimetable() {
+    this.showModal({
+      title: t("modal.clear.title"),
+      sub: t("modal.clear.sub"),
+      body: h("div", { class: "chip amber" }, "◈ " + (this.state.ttScope === "class" ? "By Class" : "By Teacher")),
+      actions: [
+        { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
+        { label: t("tt.clear"),     cls: "btn danger", onClick: () => {
+          const tgt = this.state.ttTarget;
+          this.store.mutate(st => {
+            st.assignments = st.assignments.filter(a =>
+              this.state.ttScope === "class" ? a.classId !== tgt : a.teacherId !== tgt
+            );
+            st.meta.updatedAt = Date.now();
+          });
+          this.toast(t("toast.cleared"), "success");
+          this.closeModal();
+        }}
+      ]
+    });
+  },
+
+  renderBackup() {
+    const bytes = this.store.bytes();
+    const kb = (bytes / 1024).toFixed(2);
+    const s = this.store.state;
+    $("#storage-info").textContent =
+      `${kb} KB · ${s.classes.length} classes · ${s.teachers.length} teachers · ${s.subjects.length} subjects · ${s.assignments.length} assignments · updated ${new Date(s.meta.updatedAt).toLocaleString()}`;
+  },
+
+  /* ── MODAL engine ── */
+  showModal({ title, sub, body, actions, onMount }) {
+    $("#modal-title").textContent = title;
+    $("#modal-sub").textContent = sub || "";
+    const host = $("#modal-body"); host.innerHTML = "";
+    host.append(body);
+    const foot = $("#modal-foot"); foot.innerHTML = "";
+    (actions || []).forEach(a => {
+      foot.append(h("button", { class: a.cls, onClick: a.onClick }, a.label));
+    });
+    $("#modal-backdrop").classList.add("open");
+    onMount && onMount();
+  },
+  closeModal() { $("#modal-backdrop").classList.remove("open"); },
+
+  /* ── TOAST engine ── */
+  toast(msg, type = "info") {
+    const el = h("div", { class: `toast ${type}` },
+      h("span", { class: "dot" }),
+      msg
+    );
+    $("#toasts").append(el);
+    setTimeout(() => el.remove(), 3100);
+  },
+
+  /* ── PWA Service Worker (registered from inline blob) ── */
+  registerSW() {
+    if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
+    try {
+      const swCode = `
+        const CACHE = "kvs-nexus-v1";
+        self.addEventListener("install", (e) => {
+          e.waitUntil(caches.open(CACHE).then(c => c.add(self.registration.scope)));
+          self.skipWaiting();
+        });
+        self.addEventListener("activate", (e) => { e.waitUntil(self.clients.claim()); });
+        self.addEventListener("fetch", (e) => {
+          const req = e.request;
+          if (req.method !== "GET") return;
+          e.respondWith(
+            caches.match(req).then(cached => cached || fetch(req).then(res => {
+              const copy = res.clone();
+              caches.open(CACHE).then(c => c.put(req, copy)).catch(()=>{});
+              return res;
+            }).catch(() => caches.match(self.registration.scope)))
+          );
+        });
+      `;
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const url  = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(url).catch(() => {/* silent */});
+
+      // Inline manifest via data URI for add-to-home-screen
+      const manifest = {
+        name: "KVS Timetable Nexus",
+        short_name: "KVS Nexus",
+        description: "Offline timetable engine for Kendriya Vidyalaya schools · by Aayush Singh",
+        start_url: ".",
+        scope: ".",
+        display: "standalone",
+        orientation: "any",
+        background_color: "#05070d",
+        theme_color: "#05070d",
+        icons: [
+          { src: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0' stop-color='%2300e5ff'/><stop offset='1' stop-color='%23ff9933'/></linearGradient></defs><rect width='192' height='192' rx='42' fill='%23070a12'/><path d='M44 42h22v42l36-42h28L92 94l42 52h-28L66 104v42H44z' fill='url(%23g)'/></svg>", sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" },
+          { src: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0' stop-color='%2300e5ff'/><stop offset='1' stop-color='%23ff9933'/></linearGradient></defs><rect width='512' height='512' rx='110' fill='%23070a12'/><path d='M120 112h58v112l96-112h74L248 250l112 138h-74L178 278v110h-58z' fill='url(%23g)'/></svg>", sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
+        ]
+      };
+      const manifestUrl = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" }));
+      const link = document.createElement("link");
+      link.rel = "manifest";
+      link.href = manifestUrl;
+      document.head.append(link);
+    } catch (e) { console.warn("SW/Manifest failed:", e); }
+  }
+};
+
+/* ─────────────────────────────────────────────────────────────
+   [5]  Ignition
+   ───────────────────────────────────────────────────────────── */
+window.addEventListener("DOMContentLoaded", () => App.boot());
+</script>
+</body>
+</html>
