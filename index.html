@@ -888,6 +888,9 @@
   .tiny { font-size: 11px; }
   .grid-fluid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
   .flex { display: flex; gap: 10px; align-items: center; }
+  .col  { display: flex; flex-direction: column; gap: 10px; }
+  .compact-tbl th, .compact-tbl td { padding: 6px 8px !important; font-size: 13px; }
+  .compact-tbl input.input { padding: 4px 8px; font-size: 13px; }
   .flex.wrap { flex-wrap: wrap; }
 
   /* Scanline flourish on primary buttons */
@@ -1182,6 +1185,57 @@
       <section class="view" data-view="backup">
         <div class="panel tilt">
           <div class="panel-head">
+            <h3><span class="dot" style="background:var(--cyan);box-shadow:0 0 10px var(--cyan)"></span> <span data-i18n="settings.title">School Settings</span></h3>
+            <div id="school-preview" class="chip cyan" style="font-weight:600">—</div>
+          </div>
+          <p class="muted" data-i18n="settings.lead">These details appear at the top of every exported PDF and Excel timetable. Fill them in and press <strong>Save School Details</strong> below.</p>
+          <div class="row cols-2" style="margin-top:14px">
+            <div class="field">
+              <label data-i18n="settings.school">School Name</label>
+              <input type="text" class="input" id="f-school-name" placeholder="e.g. Kendriya Vidyalaya, Sector-24 Noida" />
+            </div>
+            <div class="field">
+              <label data-i18n="settings.session">Academic Session</label>
+              <input type="text" class="input" id="f-school-session" placeholder="e.g. 2026-27" />
+            </div>
+          </div>
+          <div class="row cols-2">
+            <div class="field">
+              <label data-i18n="settings.principal">Principal's Name (optional)</label>
+              <input type="text" class="input" id="f-school-principal" placeholder="e.g. Dr. S.K. Sharma" />
+            </div>
+            <div class="field">
+              <label data-i18n="settings.maxperday">Teacher's Max Periods / Day</label>
+              <input type="number" class="input" id="f-school-maxperday" min="1" max="12" value="6" />
+            </div>
+          </div>
+          <div class="field" style="margin-top:6px">
+            <label data-i18n="settings.compliance">KVS Compliance Rules</label>
+            <div class="flex wrap" style="gap:14px;margin-top:6px">
+              <label class="flex" style="gap:6px;cursor:pointer">
+                <input type="checkbox" id="f-enforce-pe-block" checked />
+                <span data-i18n="settings.peblock">PE Block Periods (P1-2 / P7-8 rotation per HQ circular)</span>
+              </label>
+              <label class="flex" style="gap:6px;cursor:pointer">
+                <input type="checkbox" id="f-pin-yoga" checked />
+                <span data-i18n="settings.pinyoga">Yoga on Wednesday · Period 2</span>
+              </label>
+              <label class="flex" style="gap:6px;cursor:pointer">
+                <input type="checkbox" id="f-pin-cca" checked />
+                <span data-i18n="settings.pincca">CCA / CLA on Saturday · Period 1-2</span>
+              </label>
+            </div>
+          </div>
+          <div class="field" style="margin-top:14px">
+            <button class="btn primary" id="btn-save-school">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              <span data-i18n="settings.save">Save School Details</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="panel tilt" style="margin-top:18px">
+          <div class="panel-head">
             <h3><span class="dot"></span> <span data-i18n="backup.title">Vault & Sync</span></h3>
           </div>
           <p class="muted" data-i18n="backup.lead">Everything you create stays on this device — encrypted into LocalStorage. Export a vault file to move it to another phone or laptop.</p>
@@ -1331,6 +1385,108 @@ const today = () => new Date().toISOString().slice(0, 10);
 const pad = (n) => String(n).padStart(2, "0");
 
 /* ─────────────────────────────────────────────────────────────
+   KVS period distribution presets (from KVS HQ circulars)
+   Keys use subject *codes* (case-insensitive) for matching.
+   ───────────────────────────────────────────────────────────── */
+const ROMAN = { I:1, II:2, III:3, IV:4, V:5, VI:6, VII:7, VIII:8, IX:9, X:10, XI:11, XII:12 };
+function classGradeNumber(cls) {
+  if (!cls || !cls.name) return null;
+  const n = String(cls.name).trim().toUpperCase();
+  if (ROMAN[n] != null) return ROMAN[n];
+  const num = parseInt(n, 10);
+  return isNaN(num) ? null : num;
+}
+function gradeBucket(g) {
+  if (g == null) return "6-8";
+  if (g <= 2)  return "1-2";
+  if (g <= 5)  return "3-5";
+  if (g <= 8)  return "6-8";
+  if (g === 9) return "9";
+  if (g === 10) return "10";
+  return "11-12";
+}
+/* weekly-period targets per KVS guideline, keyed by subject CODE */
+const KVS_PRESETS = {
+  "1-2":   { HIN:10, ENG:10, MTH:10, GAR:4,  ART:6,  PE:4,  LIB:2, CLA:2 },
+  "3-5":   { HIN:7,  ENG:7,  MTH:10, WAU:8,  ART:5,  PE:5,  LIB:2, DL:2,  CLA:2 },
+  "6-8":   { HIN:5,  ENG:5,  SNK:3,  MTH:7,  SCI:6,  SST:6, ART:3, PE:3,  VE:4, LIB:2, DL:2, CLA:2 },
+  "9":     { HIN:5,  ENG:5,  MTH:7,  SCI:7,  SST:5,  IDA:2, ART:4, PE:4,  VE:4, LIB:1, DL:2, CLA:2 },
+  "10":    { HIN:7,  ENG:7,  MTH:7,  SCI:7,  SST:7,  ART:2, PE:4,  VE:2,  LIB:1, DL:2, CLA:2 }, // older Annexure-III retained for X
+  "11-12": { ENG:6,  HIN:6,  PHY:9,  CHM:9,  BIO:9,  CS:9,  IP:9,  MTH:9, BST:9, ACC:9, ECO:9, HIS:9, GEO:9, LIB:1, WE:1, PE:4, CLA:2 }
+};
+/* XI–XII stream presets — total must = 48 over 6 days × 8 periods */
+const STREAM_PRESETS = {
+  "science_pcm": { ENG:6, HIN:6, PHY:9, CHM:9, MTH:9, PE:4, LIB:1, WE:1, CLA:2, _extra:1 },
+  "science_pcb": { ENG:6, HIN:6, PHY:9, CHM:9, BIO:9, PE:4, LIB:1, WE:1, CLA:2, _extra:1 },
+  "commerce":    { ENG:6, HIN:6, ACC:9, BST:9, ECO:9, MTH:9, PE:4, LIB:1, WE:1, CLA:2, _minus:6 }, // Math optional; if not wanted, replace with IP
+  "commerce_ip": { ENG:6, HIN:6, ACC:9, BST:9, ECO:9, IP:9, PE:4, LIB:1, WE:1, CLA:2, _minus:6 },
+  "humanities":  { ENG:6, HIN:6, HIS:9, GEO:9, ECO:9, PE:4, LIB:1, WE:1, CLA:2, _extra:1 }
+};
+/* Remove private keys before use */
+function cleanPreset(p) { const o = {}; for (const k in p) if (!k.startsWith("_")) o[k] = p[k]; return o; }
+/* subject-code aliases — normalises common variants to canonical code */
+const CODE_ALIAS = {
+  "MAT":"MTH", "MATH":"MTH", "MATHS":"MTH", "MATHEMATICS":"MTH",
+  "SCI":"SCI", "SCIENCE":"SCI",
+  "SST":"SST", "SS":"SST", "SOCIAL":"SST", "SOCIALSCIENCE":"SST",
+  "HIN":"HIN", "HINDI":"HIN",
+  "ENG":"ENG", "ENGLISH":"ENG",
+  "SKT":"SNK", "SNK":"SNK", "SANSKRIT":"SNK",
+  "CMP":"DL",  "COMP":"DL", "COMPUTER":"DL", "COMPUTERLITERACY":"DL", "CL":"DL",
+  "AI":"DL",
+  "ART":"ART", "AE":"ART", "ARTS":"ART",
+  "PE":"PE",  "PHE":"PE", "PHYSED":"PE", "SPORTS":"PE", "GAMES":"PE", "YOGA":"PE",
+  "LIB":"LIB", "LIBRARY":"LIB",
+  "VE":"VE",  "WE":"VE",  "WORK":"VE", "VOC":"VE", "VOCATIONAL":"VE",
+  "CLA":"CLA", "CCA":"CLA",
+  "GAR":"GAR", "GARDEN":"GAR", "GARDENING":"GAR",
+  "WAU":"WAU", "EVS":"WAU", "ENV":"WAU", "WORLD":"WAU",
+  "IDA":"IDA",
+  "PHY":"PHY", "PHYSICS":"PHY",
+  "CHM":"CHM", "CHEM":"CHM", "CHEMISTRY":"CHM", "CY":"CHM",
+  "BIO":"BIO", "BIOLOGY":"BIO",
+  "CS":"CS",   "IP":"IP",
+  "BST":"BST", "BUSINESS":"BST",
+  "ACC":"ACC", "ACCOUNT":"ACC", "ACCOUNTANCY":"ACC",
+  "ECO":"ECO", "ECONOMICS":"ECO",
+  "HIS":"HIS", "HISTORY":"HIS",
+  "GEO":"GEO", "GEOGRAPHY":"GEO"
+};
+function canonicalCode(raw) {
+  if (!raw) return "";
+  const u = String(raw).toUpperCase().replace(/[^A-Z]/g,"");
+  return CODE_ALIAS[u] || u;
+}
+function presetPeriodsForClass(cls, subject) {
+  const bucket = gradeBucket(classGradeNumber(cls));
+  const preset = KVS_PRESETS[bucket] || {};
+  const code = canonicalCode(subject.code || subject.name);
+  return preset[code] || 0; // 0 means "not suggested for this grade"
+}
+
+/* ─────────────────────────────────────────────────────────────
+   PE BLOCK ROTATION — as per KVS HQ Sports Cell 2018 circular
+   "Proposed Model Time Table as Block Period for Sports/Yoga"
+   Shift-I: morning block = P1+P2, afternoon block = P7+P8
+   Each grade gets ONE morning block and ONE afternoon block per week.
+   ───────────────────────────────────────────────────────────── */
+const PE_BLOCK_ROTATION = {
+  // grade -> [{ day, slot: "morning" | "afternoon" }]
+  6:  [{ day: "mon", slot: "morning" },   { day: "wed", slot: "afternoon" }],
+  7:  [{ day: "mon", slot: "afternoon" }, { day: "thu", slot: "morning" }],
+  8:  [{ day: "tue", slot: "morning" },   { day: "thu", slot: "afternoon" }],
+  9:  [{ day: "tue", slot: "afternoon" }, { day: "fri", slot: "morning" }],
+  10: [{ day: "wed", slot: "morning" },   { day: "fri", slot: "afternoon" }],
+  11: [{ day: "sat", slot: "morning" }],
+  12: [{ day: "sat", slot: "afternoon" }]
+};
+/* Yoga on Wednesday P2, CCA on Saturday P1-P2 — seen in user's reference class timetable */
+const PINNED_SLOTS = {
+  yoga: { day: "wed", periodIndex: 1 },          // 0-indexed → P2
+  cca:  { day: "sat", periodIndices: [0, 1] }    // P1 + P2
+};
+
+/* ─────────────────────────────────────────────────────────────
    [1]  Internationalisation — English / Hindi dictionaries
    ───────────────────────────────────────────────────────────── */
 const I18N = {
@@ -1367,6 +1523,31 @@ const I18N = {
     "backup.lead":"Everything you create stays on this device — stored in LocalStorage. Export a vault file to move it to another phone or laptop.",
     "backup.export":"Export Vault (.json)", "backup.import":"Import Vault", "backup.wipe":"Wipe Device",
     "backup.storage":"Storage Footprint",
+    "settings.title":"School Settings",
+    "settings.lead":"These details will appear at the top of every exported PDF and Excel timetable.",
+    "settings.school":"School Name", "settings.session":"Academic Session", "settings.principal":"Principal's Name (optional)",
+    "settings.save":"Save School Details",
+    "modal.next":"Next →",
+    "modal.autogen.choose":"Which class do you want to generate the timetable for?",
+    "modal.autogen.allclasses":"All classes at once",
+    "modal.autogen.all":"Generate timetable for {n} classes",
+    "modal.autogen.one":"Generate timetable for class {c}",
+    "modal.autogen.kvs":"KVS suggested periods (per week) · Grade",
+    "modal.autogen.kvsall":"KVS preset periods will be used automatically for each class based on its grade. Uncheck any subject you do not want.",
+    "modal.autogen.perweek":"Periods / week",
+    "modal.autogen.use":"Include?", "modal.autogen.incl":"Include", "modal.autogen.skip":"Skip",
+    "modal.autogen.streamtitle":"Select Stream",
+    "modal.autogen.streaminfo":"XI/XII classes need a stream selection. Subject allocations will match the chosen stream.",
+    "stream.science_pcm":"Science (PCM — Physics, Chemistry, Maths)",
+    "stream.science_pcb":"Science (PCB — Physics, Chemistry, Biology)",
+    "stream.commerce":"Commerce (with Maths)",
+    "stream.commerce_ip":"Commerce (with Informatics Practices)",
+    "stream.humanities":"Humanities / Arts",
+    "settings.maxperday":"Teacher's Max Periods per Day",
+    "settings.compliance":"KVS Compliance Rules",
+    "settings.peblock":"PE Block Periods (P1-2 / P7-8 rotation per HQ circular)",
+    "settings.pinyoga":"Yoga on Wednesday · Period 2",
+    "settings.pincca":"CCA / CLA on Saturday · Period 1-2",
     "about.title":"About the Developer",
     "about.role":"Developer · KVS Timetable Maker",
     "about.edu":"Education", "about.edu.field":"Artificial Intelligence, Robotics & Drones",
@@ -1381,6 +1562,7 @@ const I18N = {
     "install.title":"Install Nexus", "install.sub":"Add to home screen for an app-like experience", "install.go":"Install",
     "modal.cancel":"Cancel", "modal.save":"Save", "modal.delete":"Delete", "modal.confirm":"Confirm",
     "f.class.name":"Class Name", "f.class.section":"Section", "f.class.strength":"Strength",
+    "f.class.teacher":"Class Teacher", "f.class.noteacher":"No class teacher", "f.class.alreadyct":"already class teacher of",
     "f.teacher.name":"Teacher Name", "f.teacher.code":"Code", "f.teacher.subjects":"Subjects Taught",
     "f.subject.name":"Subject Name", "f.subject.code":"Code", "f.subject.color":"Accent Colour",
     "f.period.label":"Label", "f.period.start":"Start Time", "f.period.end":"End Time", "f.period.break":"This is a break period",
@@ -1405,9 +1587,16 @@ const I18N = {
     "modal.autogen.warn":"This will replace all current assignments",
     "modal.autogen.info":"The engine will distribute subjects across the week and make sure no teacher is scheduled for two classes at the same time. Cells where no teacher is free will be left empty.",
     "toast.saved":"Saved", "toast.deleted":"Deleted", "toast.imported":"Vault imported", "toast.exported":"Vault exported",
+    "toast.school.saved":"School details saved",
     "toast.wiped":"Device wiped", "toast.sample":"Sample KVS data loaded", "toast.clash":"Teacher clash detected",
     "toast.cleared":"Timetable cleared", "toast.err.import":"Import failed — invalid file",
     "toast.lang":"Language switched", "toast.pdf":"PDF ready", "toast.xlsx":"Excel ready", "toast.installed":"App installed",
+    "toast.pick":"Pick a class or teacher first",
+    "toast.pdf.fallback":"PDF library unavailable · opening Print → Save as PDF",
+    "toast.xlsx.fallback":"Excel library unavailable · exporting as CSV instead",
+    "toast.csv":"CSV ready (opens in Excel)",
+    "toast.pdf.err":"PDF error", "toast.xlsx.err":"Excel error",
+    "settings.notset":"Not set — tap Save below",
     "toast.theme.light":"Light mode on", "toast.theme.dark":"Dark mode on",
     "toast.autogen.need":"Add this first", "toast.autogen.nosubj":"Assign subjects to teachers first",
     "toast.autogen.done":"Auto-generated · {n} slots filled",
@@ -1449,6 +1638,31 @@ const I18N = {
     "backup.lead":"सभी डेटा इसी उपकरण पर सुरक्षित — LocalStorage में। दूसरे फ़ोन/लैपटॉप में ले जाने के लिए तिजोरी फ़ाइल निर्यात करें।",
     "backup.export":"तिजोरी निर्यात (.json)", "backup.import":"तिजोरी आयात", "backup.wipe":"उपकरण पूर्ण रीसेट",
     "backup.storage":"संग्रहण प्रयोग",
+    "settings.title":"विद्यालय सेटिंग्स",
+    "settings.lead":"ये विवरण प्रत्येक निर्यात की गई PDF और Excel समय सारणी के शीर्ष पर दिखेंगे।",
+    "settings.school":"विद्यालय का नाम", "settings.session":"शैक्षणिक सत्र", "settings.principal":"प्राचार्य का नाम (वैकल्पिक)",
+    "settings.save":"विद्यालय विवरण सहेजें",
+    "modal.next":"आगे →",
+    "modal.autogen.choose":"किस कक्षा की समय सारणी बनानी है?",
+    "modal.autogen.allclasses":"सभी कक्षाएँ एक साथ",
+    "modal.autogen.all":"{n} कक्षाओं की समय सारणी बनाएँ",
+    "modal.autogen.one":"कक्षा {c} की समय सारणी बनाएँ",
+    "modal.autogen.kvs":"KVS अनुशंसित कालांश (प्रति सप्ताह) · कक्षा",
+    "modal.autogen.kvsall":"प्रत्येक कक्षा के लिए उसके स्तर के अनुसार KVS मानक कालांश स्वतः प्रयुक्त होंगे। किसी विषय को हटाने हेतु अनचेक करें।",
+    "modal.autogen.perweek":"कालांश / सप्ताह",
+    "modal.autogen.use":"शामिल?", "modal.autogen.incl":"शामिल", "modal.autogen.skip":"हटाएँ",
+    "modal.autogen.streamtitle":"स्ट्रीम चुनें",
+    "modal.autogen.streaminfo":"XI/XII कक्षाओं के लिए स्ट्रीम आवश्यक है। विषय आवंटन चुने गए स्ट्रीम के अनुसार होगा।",
+    "stream.science_pcm":"विज्ञान (PCM — भौतिकी, रसायन, गणित)",
+    "stream.science_pcb":"विज्ञान (PCB — भौतिकी, रसायन, जीव विज्ञान)",
+    "stream.commerce":"वाणिज्य (गणित सहित)",
+    "stream.commerce_ip":"वाणिज्य (IP सहित)",
+    "stream.humanities":"मानविकी / कला",
+    "settings.maxperday":"शिक्षक का अधिकतम दैनिक कालांश",
+    "settings.compliance":"KVS अनुपालन नियम",
+    "settings.peblock":"PE ब्लॉक कालांश (HQ परिपत्र के अनुसार P1-2 / P7-8)",
+    "settings.pinyoga":"योग — बुधवार · कालांश 2",
+    "settings.pincca":"CCA / CLA — शनिवार · कालांश 1-2",
     "about.title":"डेवलपर के बारे में",
     "about.role":"डेवलपर · KVS समय सारणी निर्माता",
     "about.edu":"शिक्षा", "about.edu.field":"कृत्रिम बुद्धिमत्ता, रोबोटिक्स व ड्रोन",
@@ -1463,6 +1677,7 @@ const I18N = {
     "install.title":"Nexus इंस्टॉल करें", "install.sub":"ऐप-जैसा अनुभव — होम स्क्रीन पर जोड़ें", "install.go":"इंस्टॉल",
     "modal.cancel":"रद्द", "modal.save":"सहेजें", "modal.delete":"हटाएँ", "modal.confirm":"पुष्टि करें",
     "f.class.name":"कक्षा नाम", "f.class.section":"वर्ग", "f.class.strength":"विद्यार्थी संख्या",
+    "f.class.teacher":"कक्षा शिक्षक", "f.class.noteacher":"कक्षा शिक्षक नहीं", "f.class.alreadyct":"पहले से कक्षा शिक्षक",
     "f.teacher.name":"शिक्षक नाम", "f.teacher.code":"कोड", "f.teacher.subjects":"पढ़ाए जाने वाले विषय",
     "f.subject.name":"विषय नाम", "f.subject.code":"कोड", "f.subject.color":"एक्सेंट रंग",
     "f.period.label":"लेबल", "f.period.start":"प्रारम्भ समय", "f.period.end":"समाप्ति समय", "f.period.break":"यह विराम कालांश है",
@@ -1487,9 +1702,16 @@ const I18N = {
     "modal.autogen.warn":"यह वर्तमान नियुक्तियाँ बदल देगा",
     "modal.autogen.info":"इंजन विषयों को पूरे सप्ताह में वितरित करेगा और सुनिश्चित करेगा कि कोई शिक्षक एक समय में दो कक्षाओं में नियुक्त न हो। जहाँ कोई शिक्षक उपलब्ध नहीं होगा, वह खण्ड रिक्त रहेगा।",
     "toast.saved":"सहेजा गया", "toast.deleted":"हटाया गया", "toast.imported":"तिजोरी आयात हुई", "toast.exported":"तिजोरी निर्यात हुई",
+    "toast.school.saved":"विद्यालय विवरण सहेजे गए",
     "toast.wiped":"उपकरण रीसेट", "toast.sample":"नमूना डेटा लोड हुआ", "toast.clash":"शिक्षक टकराव",
     "toast.cleared":"समय सारणी साफ़", "toast.err.import":"आयात विफल — अमान्य फ़ाइल",
     "toast.lang":"भाषा बदली", "toast.pdf":"PDF तैयार", "toast.xlsx":"Excel तैयार", "toast.installed":"ऐप स्थापित",
+    "toast.pick":"पहले कक्षा या शिक्षक चुनें",
+    "toast.pdf.fallback":"PDF लाइब्रेरी अनुपलब्ध · प्रिंट → PDF में सहेजें खुल रहा है",
+    "toast.xlsx.fallback":"Excel लाइब्रेरी अनुपलब्ध · CSV में निर्यात",
+    "toast.csv":"CSV तैयार (Excel में खुलता है)",
+    "toast.pdf.err":"PDF त्रुटि", "toast.xlsx.err":"Excel त्रुटि",
+    "settings.notset":"सेट नहीं — नीचे सहेजें दबाएँ",
     "toast.theme.light":"उज्ज्वल मोड चालू", "toast.theme.dark":"श्याम मोड चालू",
     "toast.autogen.need":"पहले यह जोड़ें", "toast.autogen.nosubj":"पहले शिक्षकों को विषय सौंपें",
     "toast.autogen.done":"स्वतः निर्मित · {n} खण्ड भरे",
@@ -1541,7 +1763,12 @@ class Store {
 const DAYS = ["mon","tue","wed","thu","fri","sat"]; // KVS typically operates Mon–Sat
 
 const EMPTY_VAULT = {
-  school:   { name: "Kendriya Vidyalaya", session: "2025-26" },
+  school:   { name: "Kendriya Vidyalaya", session: "2026-27", principal: "", teacherMaxPerDay: 6 },
+  settings: {
+    enforcePEBlock: true,   // force PE into P1-2 / P7-8 block pattern per HQ circular
+    pinYoga: true,          // Wed P2 Yoga for every class
+    pinCCA:  true           // Sat P1-P2 CCA for every class
+  },
   classes:  [],
   teachers: [],
   subjects: [],
@@ -1573,10 +1800,10 @@ const SAMPLE_VAULT = () => {
     { id: "t_jk", name: "Sh. J. Khan",     code: "JK", subjects: ["sub_pe","sub_art"] },
   ];
   const classes = [
-    { id: "c_6a", name: "VI",   section: "A", strength: 38 },
-    { id: "c_6b", name: "VI",   section: "B", strength: 36 },
-    { id: "c_7a", name: "VII",  section: "A", strength: 40 },
-    { id: "c_8a", name: "VIII", section: "A", strength: 34 },
+    { id: "c_6a", name: "VI",   section: "A", strength: 38, classTeacherId: "t_pg" },
+    { id: "c_6b", name: "VI",   section: "B", strength: 36, classTeacherId: "t_rs" },
+    { id: "c_7a", name: "VII",  section: "A", strength: 40, classTeacherId: "t_vn" },
+    { id: "c_8a", name: "VIII", section: "A", strength: 34, classTeacherId: "t_ak" },
   ];
   const periods = [
     { id: "p1", label: "P1", start: "08:00", end: "08:40", isBreak: false },
@@ -1612,7 +1839,8 @@ const SAMPLE_VAULT = () => {
     ({ id: uid("asg"), classId, day, periodId, subjectId, teacherId, roomId })
   );
   return {
-    school: { name: "Kendriya Vidyalaya No. 1", session: "2025-26" },
+    school: { name: "Kendriya Vidyalaya No. 1", session: "2026-27", principal: "Dr. S. K. Sharma", teacherMaxPerDay: 6 },
+    settings: { enforcePEBlock: true, pinYoga: true, pinCCA: true },
     classes, teachers, subjects, periods, rooms, assignments,
     meta: { createdAt: now, updatedAt: now }
   };
@@ -1741,6 +1969,24 @@ const App = {
     $("#btn-import-json").addEventListener("click", () => $("#file-import").click());
     $("#file-import").addEventListener("change", (e) => this.importJSON(e.target.files[0]));
     $("#btn-wipe").addEventListener("click", () => this.confirmWipe());
+
+    // School settings save
+    $("#btn-save-school")?.addEventListener("click", () => {
+      this.store.mutate(st => {
+        st.school = st.school || {};
+        st.school.name      = $("#f-school-name").value.trim() || "Kendriya Vidyalaya";
+        st.school.session   = $("#f-school-session").value.trim() || "";
+        st.school.principal = $("#f-school-principal").value.trim() || "";
+        const max = parseInt($("#f-school-maxperday").value, 10);
+        st.school.teacherMaxPerDay = (max > 0 && max <= 12) ? max : 6;
+        st.settings = st.settings || {};
+        st.settings.enforcePEBlock = $("#f-enforce-pe-block").checked;
+        st.settings.pinYoga        = $("#f-pin-yoga").checked;
+        st.settings.pinCCA         = $("#f-pin-cca").checked;
+        st.meta.updatedAt = Date.now();
+      });
+      this.toast(t("toast.school.saved"), "success");
+    });
 
     // Modal
     $("#modal-close").addEventListener("click", () => this.closeModal());
@@ -2138,6 +2384,10 @@ const App = {
         return [
           { label: () => t("f.class.name"),     render: (x) => `<strong>${this.escape(x.name)} - ${this.escape(x.section)}</strong>` },
           { label: () => t("f.class.strength"), render: (x) => `<span class="muted mono">${x.strength || "—"}</span>` },
+          { label: () => t("f.class.teacher"),  render: (x) => {
+              const ct = s.teachers.find(tc => tc.id === x.classTeacherId);
+              return ct ? `<span class="chip cyan">${this.escape(ct.name)} (${this.escape(ct.code)})</span>` : '<span class="muted tiny">—</span>';
+            } },
         ];
       case "teachers":
         return [
@@ -2180,10 +2430,26 @@ const App = {
     const body = h("div", { class: "row" });
 
     if (kind === "class") {
+      // Build teacher dropdown for class-teacher selection
+      const ctSelect = h("select", { class: "select", id: "f-classTeacher" });
+      ctSelect.append(h("option", { value: "" }, "— " + t("f.class.noteacher") + " —"));
+      s.teachers.forEach(tc => {
+        // Check if this teacher is already class-teacher of another class
+        const conflictCls = s.classes.find(c => c.id !== existing?.id && c.classTeacherId === tc.id);
+        const label = tc.name + " (" + tc.code + ")" + (conflictCls ? ` · ${t("f.class.alreadyct")}: ${conflictCls.name}-${conflictCls.section}` : "");
+        const opt = h("option", { value: tc.id }, label);
+        if (existing?.classTeacherId === tc.id) opt.setAttribute("selected", "");
+        if (conflictCls) opt.setAttribute("disabled", "");
+        ctSelect.append(opt);
+      });
       body.append(
         this.field("name", t("f.class.name"), "input", existing?.name || "", { placeholder: "VI, VII, VIII…" }),
         this.field("section", t("f.class.section"), "input", existing?.section || "A"),
         this.field("strength", t("f.class.strength"), "input", existing?.strength || "", { type: "number", min: 1 }),
+        h("div", { class: "field" },
+          h("label", {}, t("f.class.teacher")),
+          ctSelect
+        )
       );
     } else if (kind === "teacher") {
       const subsCheckbox = h("div", { class: "flex wrap", id: "tch-subjects" });
@@ -2255,7 +2521,8 @@ const App = {
         id: existing?.id || uid("cls"),
         name:    $("#f-name").value.trim() || "Class",
         section: $("#f-section").value.trim() || "A",
-        strength: +$("#f-strength").value || 0
+        strength: +$("#f-strength").value || 0,
+        classTeacherId: $("#f-classTeacher")?.value || null
       };
     } else if (kind === "teacher") {
       const checked = $$("#tch-subjects input[type=checkbox]").filter(c => c.checked).map(c => c.value);
@@ -2336,24 +2603,53 @@ const App = {
 
   /* ── EXPORT ── */
   exportPDF() {
-    if (!window.jspdf) { this.toast("PDF engine not available offline yet", "error"); return; }
     const s = this.store.state;
-    if (!this.state.ttTarget) { this.toast("Pick a class/teacher first", "error"); return; }
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+    if (!this.state.ttTarget) { this.toast(t("toast.pick"), "error"); return; }
+    // If jsPDF or autoTable not loaded (offline / CDN blocked), fall back to browser print-to-PDF
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      this.toast(t("toast.pdf.fallback"), "info");
+      setTimeout(() => window.print(), 400);
+      return;
+    }
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      if (typeof doc.autoTable !== "function") {
+        // autotable plugin missing — fall back to print
+        this.toast(t("toast.pdf.fallback"), "info");
+        setTimeout(() => window.print(), 400);
+        return;
+      }
+      this._buildPDF(doc, s);
+    } catch (err) {
+      console.error("PDF error:", err);
+      this.toast(t("toast.pdf.err") + ": " + (err.message || err), "error");
+    }
+  },
+
+  _buildPDF(doc, s) {
     const isClass = this.state.ttScope === "class";
     const target = isClass ? s.classes.find(c=>c.id===this.state.ttTarget) : s.teachers.find(t=>t.id===this.state.ttTarget);
     if (!target) return;
-    const title = isClass ? `${target.name} - ${target.section}` : `${target.name} (${target.code})`;
-    // header bar
-    doc.setFillColor(5, 7, 13); doc.rect(0, 0, 297, 22, "F");
+    const title = isClass ? `Class ${target.name} - ${target.section}` : `${target.name} (${target.code})`;
+    const schoolName = s.school?.name || "Kendriya Vidyalaya";
+    const session    = s.school?.session || "";
+    const principal  = s.school?.principal || "";
+    const classTeacher = isClass && target.classTeacherId ? s.teachers.find(tc => tc.id === target.classTeacherId) : null;
+
+    doc.setFillColor(5, 7, 13); doc.rect(0, 0, 297, 26, "F");
     doc.setTextColor(255,255,255);
-    doc.setFont("helvetica","bold"); doc.setFontSize(16);
-    doc.text(s.school.name || "Kendriya Vidyalaya", 14, 10);
-    doc.setFontSize(10); doc.setFont("helvetica","normal");
-    doc.text(`${s.school.session || ""} · ${title} · ${new Date().toLocaleDateString()}`, 14, 17);
-    doc.setTextColor(255, 171, 61); doc.text("KVS TIMETABLE NEXUS", 230, 12);
-    doc.setTextColor(150); doc.setFontSize(8); doc.text("by Aayush Singh", 238, 17);
+    doc.setFont("helvetica","bold"); doc.setFontSize(18);
+    doc.text(schoolName, 148.5, 11, { align: "center" });
+    doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(200, 220, 255);
+    const sub1 = [session ? `Session ${session}` : "", title].filter(Boolean).join("   ·   ");
+    doc.text(sub1, 148.5, 18, { align: "center" });
+    doc.setFontSize(9); doc.setTextColor(160, 180, 210);
+    const sub2parts = [];
+    if (classTeacher) sub2parts.push(`Class Teacher: ${classTeacher.name} (${classTeacher.code})`);
+    if (principal)    sub2parts.push(`Principal: ${principal}`);
+    sub2parts.push(`Generated: ${new Date().toLocaleDateString()}`);
+    doc.text(sub2parts.join("   ·   "), 148.5, 23, { align: "center" });
 
     const head = [[ "Day", ...s.periods.map(p => `${p.label}\n${p.start}-${p.end}`) ]];
     const body = DAYS.map(d => {
@@ -2376,7 +2672,7 @@ const App = {
 
     doc.autoTable({
       head, body,
-      startY: 28,
+      startY: 32,
       theme: "grid",
       styles: { font: "helvetica", fontSize: 8, cellPadding: 3, textColor: 30, lineColor: [180,180,180], lineWidth: 0.2 },
       headStyles: { fillColor: [10,14,24], textColor: 255, fontStyle: "bold", halign: "center", valign: "middle" },
@@ -2389,40 +2685,147 @@ const App = {
       }
     });
 
+    if (isClass) {
+      const dayTeachers = {};
+      DAYS.forEach(d => {
+        const set = new Set();
+        s.assignments.filter(a => a.classId === target.id && a.day === d).forEach(a => set.add(a.teacherId));
+        dayTeachers[d] = set.size;
+      });
+      const endY = doc.lastAutoTable?.finalY || 180;
+      if (endY < 190) {
+        doc.setFontSize(8); doc.setTextColor(60);
+        doc.setFont("helvetica","bold");
+        doc.text("Teachers per day:", 14, endY + 6);
+        doc.setFont("helvetica","normal");
+        const line = DAYS.map(d => `${d.toUpperCase()}: ${dayTeachers[d]}`).join("   ·   ");
+        doc.text(line, 50, endY + 6);
+      }
+    }
+
     doc.setFontSize(8); doc.setTextColor(130);
-    doc.text(`Generated by KVS Nexus · Aayush Singh · ${new Date().toLocaleString()}`, 14, 205);
-    doc.save(`KVS_Timetable_${title.replace(/\s+/g,"_")}.pdf`);
+    doc.text(`${schoolName} · Generated ${new Date().toLocaleString()} · Made by Aayush Singh`, 14, 205);
+    doc.save(`${schoolName.replace(/\s+/g,"_")}_${title.replace(/\s+/g,"_")}.pdf`);
     this.toast(t("toast.pdf"), "success");
   },
 
   exportXLSX() {
-    if (!window.XLSX) { this.toast("Excel engine not available", "error"); return; }
     const s = this.store.state;
+    if (!this.state.ttTarget) { this.toast(t("toast.pick"), "error"); return; }
+    if (!window.XLSX) {
+      // Offline / CDN blocked → fall back to simple CSV
+      this.toast(t("toast.xlsx.fallback"), "info");
+      this._exportCSV(s);
+      return;
+    }
+    try {
+      this._buildXLSX(s);
+    } catch (err) {
+      console.error("Excel error:", err);
+      this.toast(t("toast.xlsx.err") + ": " + (err.message || err), "error");
+      this._exportCSV(s); // still give user a download
+    }
+  },
+
+  _exportCSV(s) {
+    const isClass = this.state.ttScope === "class";
+    const target = isClass ? s.classes.find(c=>c.id===this.state.ttTarget) : s.teachers.find(t=>t.id===this.state.ttTarget);
+    if (!target) return;
+    const title = isClass ? `Class ${target.name} - ${target.section}` : `${target.name} (${target.code})`;
+    const schoolName = s.school?.name || "Kendriya Vidyalaya";
+    const classTeacher = isClass && target.classTeacherId ? s.teachers.find(tc => tc.id === target.classTeacherId) : null;
+    const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const lines = [];
+    lines.push(esc(schoolName));
+    lines.push(esc(`Session: ${s.school?.session || "—"}   ·   ${title}`));
+    const line3parts = [];
+    if (classTeacher)         line3parts.push(`Class Teacher: ${classTeacher.name} (${classTeacher.code})`);
+    if (s.school?.principal)  line3parts.push(`Principal: ${s.school.principal}`);
+    line3parts.push(`Generated: ${new Date().toLocaleDateString()}`);
+    lines.push(esc(line3parts.join("   ·   ")));
+    lines.push("");
+    lines.push(["Day", ...s.periods.map(p => `${p.label} (${p.start}-${p.end})`)].map(esc).join(","));
+    DAYS.forEach(d => {
+      const row = [d.toUpperCase()];
+      s.periods.forEach(p => {
+        if (p.isBreak) { row.push("BREAK"); return; }
+        const a = s.assignments.find(x => x.day===d && x.periodId===p.id && (isClass ? x.classId===target.id : x.teacherId===target.id));
+        if (!a) { row.push(""); return; }
+        const sub = s.subjects.find(x=>x.id===a.subjectId);
+        const tc  = s.teachers.find(x=>x.id===a.teacherId);
+        const cl  = s.classes.find(x=>x.id===a.classId);
+        const parts = [sub?.name || "?"];
+        parts.push(isClass ? (tc?.name || "") : (cl ? `${cl.name}-${cl.section}` : ""));
+        row.push(parts.join(" / "));
+      });
+      lines.push(row.map(esc).join(","));
+    });
+    const csv = "\uFEFF" + lines.join("\r\n"); // BOM so Excel reads UTF-8
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = h("a", { href: url, download: `${schoolName.replace(/\s+/g,"_")}_${title.replace(/\s+/g,"_")}.csv` });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    this.toast(t("toast.csv"), "success");
+  },
+
+  _buildXLSX(s) {
     const isClass = this.state.ttScope === "class";
     const wb = XLSX.utils.book_new();
 
     const buildSheet = (target) => {
+      const isClassSheet = isClass;
+      const title = isClassSheet ? `Class ${target.name} - ${target.section}` : `${target.name} (${target.code})`;
+      const classTeacher = isClassSheet && target.classTeacherId ? s.teachers.find(tc => tc.id === target.classTeacherId) : null;
+      // Header block
+      const rows = [];
+      rows.push([s.school?.name || "Kendriya Vidyalaya"]);
+      rows.push([`Session: ${s.school?.session || "—"}    ·    ${title}`]);
+      const line3 = [];
+      if (classTeacher)         line3.push(`Class Teacher: ${classTeacher.name} (${classTeacher.code})`);
+      if (s.school?.principal)  line3.push(`Principal: ${s.school.principal}`);
+      line3.push(`Generated: ${new Date().toLocaleDateString()}`);
+      rows.push([line3.join("    ·    ")]);
+      rows.push([]); // blank
+      // Table
       const header = ["Day", ...s.periods.map(p => `${p.label} (${p.start}-${p.end})`)];
-      const rows = [header];
+      rows.push(header);
       DAYS.forEach(d => {
         const row = [d.toUpperCase()];
         s.periods.forEach(p => {
           if (p.isBreak) { row.push("BREAK"); return; }
-          const a = s.assignments.find(x => x.day===d && x.periodId===p.id && (isClass ? x.classId===target.id : x.teacherId===target.id));
+          const a = s.assignments.find(x => x.day===d && x.periodId===p.id && (isClassSheet ? x.classId===target.id : x.teacherId===target.id));
           if (!a) { row.push(""); return; }
           const sub = s.subjects.find(x=>x.id===a.subjectId);
           const tc  = s.teachers.find(x=>x.id===a.teacherId);
           const cl  = s.classes.find(x=>x.id===a.classId);
           const rm  = s.rooms.find(x=>x.id===a.roomId);
           const lines = [ sub?.name || "?" ];
-          lines.push(isClass ? (tc?.name || "") : (cl ? `${cl.name}-${cl.section}` : ""));
+          lines.push(isClassSheet ? (tc?.name || "") : (cl ? `${cl.name}-${cl.section}` : ""));
           if (rm) lines.push(rm.name);
           row.push(lines.join(" / "));
         });
         rows.push(row);
       });
+      // Teachers-per-day footer (class mode)
+      if (isClassSheet) {
+        rows.push([]);
+        const dayTeachers = DAYS.map(d => {
+          const set = new Set();
+          s.assignments.filter(a => a.classId === target.id && a.day === d).forEach(a => set.add(a.teacherId));
+          return `${d.toUpperCase()}: ${set.size}`;
+        });
+        rows.push(["Teachers per day:", ...dayTeachers]);
+      }
       const ws = XLSX.utils.aoa_to_sheet(rows);
       ws["!cols"] = [{ wch: 10 }, ...s.periods.map(() => ({ wch: 22 }))];
+      // Merge the top 3 header rows across all columns
+      const totalCols = 1 + s.periods.length;
+      ws["!merges"] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: totalCols - 1 } },
+        { s: { r: 1, c: 0 }, e: { r: 1, c: totalCols - 1 } },
+        { s: { r: 2, c: 0 }, e: { r: 2, c: totalCols - 1 } },
+      ];
       return ws;
     };
 
@@ -2434,9 +2837,17 @@ const App = {
       XLSX.utils.book_append_sheet(wb, buildSheet(curr), name.substring(0, 30));
     }
     // also append a summary sheet listing everything
-    const summary = [["KVS Timetable Nexus — Export"], [], ["School", s.school.name], ["Session", s.school.session], ["Generated", new Date().toLocaleString()], ["Author", "Aayush Singh"]];
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), "README");
-    XLSX.writeFile(wb, `KVS_Timetable_${Date.now()}.xlsx`);
+    const summary = [
+      ["KVS Timetable Maker — Export"], [],
+      ["School",     s.school?.name || "—"],
+      ["Session",    s.school?.session || "—"],
+      ["Principal",  s.school?.principal || "—"],
+      ["Generated",  new Date().toLocaleString()],
+      ["Developer",  "Aayush Singh (M.Tech, IIT Delhi)"]
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), "School Info");
+    const sname = (s.school?.name || "KVS").replace(/\s+/g,"_");
+    XLSX.writeFile(wb, `${sname}_Timetable_${Date.now()}.xlsx`);
     this.toast(t("toast.xlsx"), "success");
   },
 
@@ -2515,111 +2926,359 @@ const App = {
       this.toast(t("toast.autogen.need") + ": " + missing.join(", "), "danger");
       return;
     }
-    // Check at least one teacher has at least one subject
-    const hasQualified = s.teachers.some(tc => (tc.subjects || []).length > 0);
-    if (!hasQualified) {
+    if (!s.teachers.some(tc => (tc.subjects || []).length)) {
       this.toast(t("toast.autogen.nosubj"), "danger");
       return;
     }
+
+    // Step 1 — ask which class(es)
+    const classOpts = h("div", { class: "col", style: "gap:8px" });
+    classOpts.append(h("div", { class: "tiny muted", style: "margin-bottom:6px" }, t("modal.autogen.choose")));
+    const classSelect = h("select", { class: "select", id: "ag-class" });
+    classSelect.append(h("option", { value: "__all__" }, t("modal.autogen.allclasses") + " (" + s.classes.length + ")"));
+    s.classes.forEach(c => classSelect.append(h("option", { value: c.id }, `${c.name} - ${c.section}`)));
+    classOpts.append(classSelect);
+    classOpts.append(h("div", { class: "tiny muted", style: "margin-top:10px;line-height:1.5" }, t("modal.autogen.info")));
+
     this.showModal({
       title: t("modal.autogen.title"),
       sub: t("modal.autogen.sub"),
-      body: h("div", { class: "col" },
-        h("div", { class: "chip amber", style: "margin-bottom:10px" }, "⚠ " + t("modal.autogen.warn")),
-        h("div", { class: "tiny muted", style: "line-height:1.5" }, t("modal.autogen.info"))
-      ),
+      body: classOpts,
       actions: [
         { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
-        { label: t("tt.autogen"),   cls: "btn primary", onClick: () => {
+        { label: t("modal.next"),   cls: "btn primary", onClick: () => {
+          const sel = $("#ag-class").value;
           this.closeModal();
-          setTimeout(() => this.autoGenerate(), 60);
+          setTimeout(() => this.autogenStep2(sel, {}), 80);
         }}
       ]
     });
   },
 
-  autoGenerate() {
+  autogenStep2(target, streamByClass) {
+    // Step 2 — for chosen class(es) show per-subject weekly-period picker pre-filled from KVS / stream presets
     const s = this.store.state;
+    const classes = target === "__all__" ? s.classes : [s.classes.find(c => c.id === target)].filter(Boolean);
+    if (!classes.length) return;
+    streamByClass = streamByClass || {};
+
+    // Intercept: if any XI/XII class doesn't have a stream yet, ask for it first
+    const needStream = classes.filter(c => {
+      const g = classGradeNumber(c);
+      return (g === 11 || g === 12) && !streamByClass[c.id];
+    });
+    if (needStream.length) {
+      this.autogenPickStream(target, streamByClass, needStream);
+      return;
+    }
+
+    // Build per-class desired-period map, merging KVS bucket preset with stream preset when applicable
+    const planDefault = {};   // cls.id -> { subject_code: count }
+    classes.forEach(cls => {
+      const g = classGradeNumber(cls);
+      if ((g === 11 || g === 12) && streamByClass[cls.id]) {
+        planDefault[cls.id] = cleanPreset(STREAM_PRESETS[streamByClass[cls.id]]);
+      } else {
+        const bucket = gradeBucket(g);
+        planDefault[cls.id] = { ...(KVS_PRESETS[bucket] || {}) };
+      }
+    });
+    // Helper: given a subject object and a class, return suggested weekly count
+    const suggestFor = (cls, sub) => {
+      const wants = planDefault[cls.id] || {};
+      const code  = canonicalCode(sub.code || sub.name);
+      return wants[code] || 0;
+    };
+
+    const body = h("div", { class: "col" });
+    const headerText = target === "__all__"
+      ? t("modal.autogen.all").replace("{n}", classes.length)
+      : t("modal.autogen.one").replace("{c}", `${classes[0].name}-${classes[0].section}`);
+    body.append(h("div", { class: "chip cyan", style: "margin-bottom:14px" }, "◆ " + headerText));
+
+    // Single-class mode
+    if (classes.length === 1) {
+      const cls = classes[0];
+      const g = classGradeNumber(cls);
+      const bucketText = (g === 11 || g === 12)
+        ? `${g === 11 ? "XI" : "XII"} · ${t("stream." + streamByClass[cls.id])}`
+        : gradeBucket(g);
+      body.append(h("div", { class: "tiny muted", style: "margin-bottom:10px" }, t("modal.autogen.kvs") + " · " + bucketText));
+      const table = h("table", { class: "data-table compact-tbl" });
+      const thead = h("thead"); const trh = h("tr");
+      trh.append(h("th", {}, t("f.subject.name")), h("th", {}, t("modal.autogen.perweek")), h("th", {}, t("modal.autogen.use")));
+      thead.append(trh); table.append(thead);
+      const tbody = h("tbody");
+      s.subjects.forEach(sub => {
+        const sugg = suggestFor(cls, sub);
+        const tr = h("tr");
+        tr.append(h("td", {}, h("span", { class: "chip", style: `color:${sub.color};border-color:${sub.color}55;background:${sub.color}15` }, sub.name + " (" + sub.code + ")")));
+        tr.append(h("td", {}, h("input", { class: "input mono", id: `ag-p-${sub.id}`, type: "number", min: 0, max: 20, value: sugg, style: "width:80px;text-align:center" })));
+        const useCb = h("input", { type: "checkbox", id: `ag-u-${sub.id}`, checked: sugg > 0 ? "checked" : null });
+        tr.append(h("td", {}, h("label", { class: "flex", style: "gap:6px;cursor:pointer" }, useCb, sugg > 0 ? t("modal.autogen.incl") : t("modal.autogen.skip"))));
+        tbody.append(tr);
+      });
+      table.append(tbody);
+      body.append(table);
+    } else {
+      body.append(h("div", { class: "tiny muted", style: "margin-bottom:10px" }, t("modal.autogen.kvsall")));
+      const cbHost = h("div", { class: "flex wrap", style: "gap:8px" });
+      s.subjects.forEach(sub => {
+        const cb = h("input", { type: "checkbox", id: `ag-u-${sub.id}`, checked: "checked", style: "margin-right:6px" });
+        cbHost.append(h("label", { class: "chip", style: `cursor:pointer;color:${sub.color};border-color:${sub.color}55;background:${sub.color}15` }, cb, sub.name));
+      });
+      body.append(cbHost);
+    }
+
+    this.showModal({
+      title: t("modal.autogen.title"),
+      sub: headerText,
+      body,
+      actions: [
+        { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
+        { label: t("tt.autogen"),   cls: "btn primary", onClick: () => {
+          const plan = {}; // { clsId: { subId: count } }
+          classes.forEach(cls => {
+            plan[cls.id] = {};
+            s.subjects.forEach(sub => {
+              const use = $(`#ag-u-${sub.id}`)?.checked;
+              if (!use) return;
+              let n;
+              if (classes.length === 1) {
+                n = +$(`#ag-p-${sub.id}`).value || 0;
+              } else {
+                n = suggestFor(cls, sub);
+              }
+              if (n > 0) plan[cls.id][sub.id] = n;
+            });
+          });
+          this.closeModal();
+          setTimeout(() => this.autoGenerate(classes.map(c => c.id), plan), 80);
+        }}
+      ]
+    });
+  },
+
+  autogenPickStream(target, streamByClass, needStream) {
+    // Show a single modal listing each XI/XII class with a stream dropdown
+    const body = h("div", { class: "col" });
+    body.append(h("div", { class: "tiny muted", style: "margin-bottom:8px" }, t("modal.autogen.streaminfo")));
+    const selects = {};
+    needStream.forEach(cls => {
+      const row = h("div", { class: "field" });
+      row.append(h("label", {}, `${cls.name} - ${cls.section}`));
+      const sel = h("select", { class: "select" });
+      [
+        ["science_pcm",  t("stream.science_pcm")],
+        ["science_pcb",  t("stream.science_pcb")],
+        ["commerce",     t("stream.commerce")],
+        ["commerce_ip",  t("stream.commerce_ip")],
+        ["humanities",   t("stream.humanities")],
+      ].forEach(([v,l]) => sel.append(h("option", { value: v }, l)));
+      row.append(sel);
+      selects[cls.id] = sel;
+      body.append(row);
+    });
+    this.showModal({
+      title: t("modal.autogen.streamtitle"),
+      sub: "",
+      body,
+      actions: [
+        { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
+        { label: t("modal.next"),   cls: "btn primary", onClick: () => {
+          Object.entries(selects).forEach(([cid, sel]) => { streamByClass[cid] = sel.value; });
+          this.closeModal();
+          setTimeout(() => this.autogenStep2(target, streamByClass), 80);
+        }}
+      ]
+    });
+  },
+
+  autoGenerate(classIds, plan) {
+    const s = this.store.state;
+    const settings = s.settings || {};
     const nonBreak = s.periods.filter(p => !p.isBreak);
     if (!nonBreak.length) { this.toast(t("toast.autogen.nosubj"), "danger"); return; }
+    const totalSlotsPerClass = DAYS.length * nonBreak.length;
+    const maxPerDay = Math.max(1, Math.min(12, s.school?.teacherMaxPerDay || 6));
 
-    // Shuffle helper — Fisher-Yates
     const shuffle = (arr) => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; };
 
-    const assignments = [];
-    const busy = {};       // `${day}|${periodId}` -> Set<teacherId>
-    const classWeekly = {}; // classId -> { subjectId: count }
-    const classDaily  = {}; // classId -> day -> { subjectId: count }
-    s.classes.forEach(c => { classWeekly[c.id] = {}; classDaily[c.id] = {}; });
+    // ── Preserve assignments of classes NOT being regenerated ──
+    const keep = s.assignments.filter(a => !classIds.includes(a.classId));
+    // busy[day|periodId] -> Set<teacherId>
+    const busy = {};
+    // teacherDayCount[day|teacherId] -> number (hard cap = maxPerDay)
+    const tdc = {};
+    keep.forEach(a => {
+      const k = `${a.day}|${a.periodId}`;
+      (busy[k] = busy[k] || new Set()).add(a.teacherId);
+      const dk = `${a.day}|${a.teacherId}`;
+      tdc[dk] = (tdc[dk] || 0) + 1;
+    });
 
+    // Resolve subject codes → subject.id lookups
+    const subjByCode = {};
+    s.subjects.forEach(sb => { subjByCode[canonicalCode(sb.code || sb.name)] = sb.id; });
+    const PE_ID  = subjByCode["PE"];
+    const CLA_ID = subjByCode["CLA"];
+
+    // Identify PE slot pairs for a given grade based on HQ rotation
+    const getPEBlockSlots = (grade) => {
+      if (!settings.enforcePEBlock || !PE_ID) return [];
+      const rot = PE_BLOCK_ROTATION[grade] || [];
+      const out = [];
+      rot.forEach(r => {
+        const pair = r.slot === "morning"
+          ? [nonBreak[0], nonBreak[1]]                              // P1 + P2
+          : [nonBreak[nonBreak.length - 2], nonBreak[nonBreak.length - 1]]; // P7 + P8
+        if (pair[0] && pair[1]) out.push({ day: r.day, periods: pair });
+      });
+      return out;
+    };
+
+    const newAssignments = [];
     let roomIdx = 0;
-    const rooms = s.rooms.length ? s.rooms : [];
+    const rooms = s.rooms;
     let filled = 0, skipped = 0;
 
-    for (const cls of s.classes) {
-      for (const day of DAYS) {
-        if (!classDaily[cls.id][day]) classDaily[cls.id][day] = {};
-        for (const per of nonBreak) {
-          const key = `${day}|${per.id}`;
-          if (!busy[key]) busy[key] = new Set();
-          const busySet = busy[key];
+    // ── Helper: try to place one token (subjectId) for a class ──
+    const tryPlace = (cls, subjectId, candidateSlots, dayCount, { allowThird = false, preferredTeacherId = null } = {}) => {
+      for (const slot of candidateSlots) {
+        const already = newAssignments.find(a => a.classId === cls.id && a.day === slot.day && a.periodId === slot.period.id);
+        if (already) continue;
+        const dayUses = (dayCount[slot.day][subjectId] || 0);
+        if (!allowThird && dayUses >= 2) continue;
+        const key = `${slot.day}|${slot.period.id}`;
+        if (!busy[key]) busy[key] = new Set();
 
-          // Build candidate list: (teacher, subject) pairs
-          const candidates = [];
-          for (const tc of shuffle(s.teachers)) {
-            if (busySet.has(tc.id)) continue;
-            const subs = (tc.subjects || []).filter(sid => s.subjects.find(sb => sb.id === sid));
-            if (!subs.length) continue;
-            for (const sid of subs) {
-              const dayUses  = classDaily[cls.id][day][sid]  || 0;
-              if (dayUses >= 2) continue; // don't put same subject 3+ times in a day
-              const weekUses = classWeekly[cls.id][sid] || 0;
-              // lower score = better. Prefer less-used subjects globally, then less-used today.
-              const score = weekUses * 10 + dayUses * 5 + Math.random();
-              candidates.push({ teacherId: tc.id, subjectId: sid, score });
-            }
+        // Pick a qualified teacher who (a) teaches it (b) not busy at this slot (c) under daily cap
+        let teacherOpts = s.teachers.filter(tc => (tc.subjects || []).includes(subjectId)
+          && !busy[key].has(tc.id)
+          && (tdc[`${slot.day}|${tc.id}`] || 0) < maxPerDay);
+        if (!teacherOpts.length) continue;
+        // Preferred teacher first (e.g. class teacher, or PE-specific teacher)
+        teacherOpts = shuffle(teacherOpts).sort((a, b) => {
+          const pa = (a.id === preferredTeacherId) ? -2 : (a.id === cls.classTeacherId ? -1 : 0);
+          const pb = (b.id === preferredTeacherId) ? -2 : (b.id === cls.classTeacherId ? -1 : 0);
+          return pa - pb;
+        });
+        return { slot, teacherId: teacherOpts[0].id };
+      }
+      return null;
+    };
+
+    const commit = (cls, placement, subjectId, dayCount) => {
+      const key = `${placement.slot.day}|${placement.slot.period.id}`;
+      busy[key].add(placement.teacherId);
+      const dk = `${placement.slot.day}|${placement.teacherId}`;
+      tdc[dk] = (tdc[dk] || 0) + 1;
+      dayCount[placement.slot.day][subjectId] = (dayCount[placement.slot.day][subjectId] || 0) + 1;
+      const roomId = rooms.length ? rooms[roomIdx++ % rooms.length].id : null;
+      newAssignments.push({
+        id: uid("a"),
+        classId: cls.id,
+        day: placement.slot.day,
+        periodId: placement.slot.period.id,
+        subjectId,
+        teacherId: placement.teacherId,
+        roomId
+      });
+      filled++;
+    };
+
+    // ═══════════════════════════════════════════════════════
+    // PASS 1 — Pin special slots (PE blocks, Yoga, CCA) FIRST
+    // ═══════════════════════════════════════════════════════
+    for (const cid of classIds) {
+      const cls = s.classes.find(c => c.id === cid);
+      if (!cls) continue;
+      const grade = classGradeNumber(cls);
+      const subPlan = plan[cid] || {};
+      const dayCount = {}; DAYS.forEach(d => dayCount[d] = {});
+      cls.__dayCount = dayCount; // stash for pass 2
+
+      // --- PE block periods ---
+      if (settings.enforcePEBlock && PE_ID && subPlan[PE_ID]) {
+        const blocks = getPEBlockSlots(grade);
+        let placed = 0;
+        for (const block of blocks) {
+          for (const period of block.periods) {
+            const result = tryPlace(cls, PE_ID, [{ day: block.day, period }], dayCount, { allowThird: true });
+            if (result) { commit(cls, result, PE_ID, dayCount); placed++; }
           }
+        }
+        // Deduct what we placed from the plan so it's not double-booked in pass 2
+        subPlan[PE_ID] = Math.max(0, (subPlan[PE_ID] || 0) - placed);
+      }
 
-          if (!candidates.length) {
-            // Nothing fits strict rule — try once more allowing 3 same-subject per day but still no teacher clash
-            for (const tc of shuffle(s.teachers)) {
-              if (busySet.has(tc.id)) continue;
-              const subs = (tc.subjects || []).filter(sid => s.subjects.find(sb => sb.id === sid));
-              if (!subs.length) continue;
-              for (const sid of subs) {
-                const weekUses = classWeekly[cls.id][sid] || 0;
-                candidates.push({ teacherId: tc.id, subjectId: sid, score: weekUses * 10 + Math.random() });
-              }
-            }
-          }
-          if (!candidates.length) { skipped++; continue; }
-
-          candidates.sort((a,b) => a.score - b.score);
-          const pick = candidates[0];
-          const roomId = rooms.length ? rooms[roomIdx % rooms.length].id : null;
-          roomIdx++;
-
-          assignments.push({
-            id: uid("a"),
-            classId: cls.id,
-            day,
-            periodId: per.id,
-            subjectId: pick.subjectId,
-            teacherId: pick.teacherId,
-            roomId
-          });
-          busySet.add(pick.teacherId);
-          classWeekly[cls.id][pick.subjectId] = (classWeekly[cls.id][pick.subjectId] || 0) + 1;
-          classDaily [cls.id][day][pick.subjectId] = (classDaily [cls.id][day][pick.subjectId] || 0) + 1;
-          filled++;
+      // --- Yoga on Wed P2 (only if PE is in plan and user enabled it) ---
+      if (settings.pinYoga && PE_ID && subPlan[PE_ID] > 0) {
+        const yogaPeriod = nonBreak[PINNED_SLOTS.yoga.periodIndex];
+        if (yogaPeriod) {
+          const result = tryPlace(cls, PE_ID, [{ day: PINNED_SLOTS.yoga.day, period: yogaPeriod }], dayCount, { allowThird: true });
+          if (result) { commit(cls, result, PE_ID, dayCount); subPlan[PE_ID] -= 1; }
         }
       }
+
+      // --- CCA on Saturday P1-P2 ---
+      if (settings.pinCCA && CLA_ID && subPlan[CLA_ID]) {
+        const ccaPeriods = PINNED_SLOTS.cca.periodIndices.map(i => nonBreak[i]).filter(Boolean);
+        let placed = 0;
+        for (const p of ccaPeriods) {
+          if (subPlan[CLA_ID] <= 0) break;
+          const result = tryPlace(cls, CLA_ID, [{ day: PINNED_SLOTS.cca.day, period: p }], dayCount, { allowThird: true });
+          if (result) { commit(cls, result, CLA_ID, dayCount); subPlan[CLA_ID] -= 1; placed++; }
+        }
+      }
+
+      plan[cid] = subPlan; // write back adjusted plan
+    }
+
+    // ══════════════════════════════════════════
+    // PASS 2 — Fill remaining subjects normally
+    // ══════════════════════════════════════════
+    for (const cid of classIds) {
+      const cls = s.classes.find(c => c.id === cid);
+      if (!cls) continue;
+      const subPlan = plan[cid] || {};
+      const dayCount = cls.__dayCount || {};
+      DAYS.forEach(d => { if (!dayCount[d]) dayCount[d] = {}; });
+
+      // Bag of remaining tokens
+      const bag = [];
+      Object.entries(subPlan).forEach(([subId, count]) => { for (let i = 0; i < count; i++) bag.push(subId); });
+      if (bag.length > totalSlotsPerClass) bag.length = totalSlotsPerClass;
+
+      const slots = [];
+      DAYS.forEach(d => nonBreak.forEach(p => slots.push({ day: d, period: p })));
+      const bagShuffled = shuffle(bag);
+
+      for (const token of bagShuffled) {
+        let chosen = tryPlace(cls, token, shuffle(slots), dayCount, { allowThird: false });
+        if (!chosen) chosen = tryPlace(cls, token, shuffle(slots), dayCount, { allowThird: true });
+        if (!chosen) { skipped++; continue; }
+        commit(cls, chosen, token, dayCount);
+      }
+
+      delete cls.__dayCount;
     }
 
     this.store.mutate(st => {
-      st.assignments = assignments;
+      st.assignments = [...keep, ...newAssignments];
       st.meta.updatedAt = Date.now();
     });
+
+    if (classIds.length === 1) {
+      this.state.ttScope = "class";
+      this.state.ttTarget = classIds[0];
+      this.state.ttViewMode = "week";
+      this.populateTTTarget();
+      $("#tt-scope").value = "class";
+      $("#tt-target").value = classIds[0];
+      $("#tt-view").value = "week";
+      this.renderTimetable();
+    }
 
     let msg = t("toast.autogen.done").replace("{n}", filled);
     if (skipped > 0) msg += " · " + t("toast.autogen.skip").replace("{n}", skipped);
@@ -2632,6 +3291,28 @@ const App = {
     const s = this.store.state;
     $("#storage-info").textContent =
       `${kb} KB · ${s.classes.length} classes · ${s.teachers.length} teachers · ${s.subjects.length} subjects · ${s.assignments.length} assignments · updated ${new Date(s.meta.updatedAt).toLocaleString()}`;
+    // Populate school settings fields
+    const nameEl = $("#f-school-name");
+    const sessEl = $("#f-school-session");
+    const prinEl = $("#f-school-principal");
+    const maxEl  = $("#f-school-maxperday");
+    if (nameEl) nameEl.value = s.school?.name || "";
+    if (sessEl) sessEl.value = s.school?.session || "";
+    if (prinEl) prinEl.value = s.school?.principal || "";
+    if (maxEl)  maxEl.value  = s.school?.teacherMaxPerDay || 6;
+    const peBlk = $("#f-enforce-pe-block");
+    const yogCb = $("#f-pin-yoga");
+    const ccaCb = $("#f-pin-cca");
+    if (peBlk) peBlk.checked = s.settings?.enforcePEBlock !== false;
+    if (yogCb) yogCb.checked = s.settings?.pinYoga !== false;
+    if (ccaCb) ccaCb.checked = s.settings?.pinCCA !== false;
+    // Live preview of what will appear on exports
+    const prev = $("#school-preview");
+    if (prev) {
+      const bits = [s.school?.name || t("settings.notset")];
+      if (s.school?.session) bits.push(s.school.session);
+      prev.textContent = "⦿ " + bits.join(" · ");
+    }
   },
 
   /* ── MODAL engine ── */
