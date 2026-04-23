@@ -171,38 +171,71 @@
     position: fixed; inset: 0; z-index: 9999;
     display: grid; place-items: center;
     background: radial-gradient(circle at center, #0b1020, #020308 70%);
-    transition: opacity .6s var(--ease), visibility .6s;
+    transition: opacity .7s var(--ease), visibility .7s;
+    padding: 24px;
   }
   .boot.done { opacity: 0; visibility: hidden; }
-  .boot-core {
-    position: relative; width: 180px; height: 180px;
-    display: grid; place-items: center;
+  html[data-theme="light"] .boot {
+    background: radial-gradient(circle at center, #f4f7fd, #d6dded 70%);
   }
-  .boot-ring {
-    position: absolute; inset: 0; border-radius: 50%;
-    border: 1px solid rgba(0,229,255,.25);
-    animation: boot-spin 3s linear infinite;
+  .boot-welcome {
+    text-align: center;
+    max-width: 480px;
+    animation: boot-fade-in .9s var(--ease) both;
   }
-  .boot-ring:nth-child(2) { inset: 18px; border-color: rgba(255,122,41,.3); animation-duration: 4.2s; animation-direction: reverse; }
-  .boot-ring:nth-child(3) { inset: 36px; border-color: rgba(161,139,255,.3); animation-duration: 5.5s; }
-  .boot-ring::before {
-    content: ""; position: absolute; top: -3px; left: 50%;
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--cyan); box-shadow: 0 0 12px var(--cyan);
+  @keyframes boot-fade-in {
+    from { opacity: 0; transform: translateY(18px) scale(.97); }
+    to   { opacity: 1; transform: translateY(0)  scale(1); }
   }
-  @keyframes boot-spin { to { transform: rotate(360deg); } }
-  .boot-logo {
-    font-family: var(--font-display); font-weight: 800; font-size: 28px;
-    background: var(--grad-accent); -webkit-background-clip: text; background-clip: text; color: transparent;
-    letter-spacing: -1px;
+  .boot-mark {
+    display: inline-block;
+    font-family: var(--font-display); font-weight: 800; font-size: 44px;
+    background: linear-gradient(135deg, #00e5ff 0%, #a18bff 55%, #ff7a29 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    letter-spacing: -2px;
+    padding: 6px 22px; border-radius: 18px;
+    border: 1px solid rgba(0,229,255,.35);
+    box-shadow: 0 0 40px rgba(0,229,255,.2), 0 10px 40px rgba(0,0,0,.4);
+    margin-bottom: 22px;
   }
-  .boot-label {
-    position: absolute; bottom: -46px; left: 50%; transform: translateX(-50%);
-    font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px;
-    color: var(--text-2); text-transform: uppercase; white-space: nowrap;
+  html[data-theme="light"] .boot-mark {
+    border-color: rgba(0,145,168,.3);
+    box-shadow: 0 0 30px rgba(0,145,168,.15), 0 8px 30px rgba(30,60,120,.1);
   }
-  .boot-label::after { content: "▮"; color: var(--cyan); animation: blink 1s steps(2) infinite; margin-left: 4px; }
-  @keyframes blink { 50% { opacity: 0; } }
+  .boot-title {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(22px, 5vw, 34px); line-height: 1.2;
+    margin: 0 0 10px; color: #e9f1ff;
+    letter-spacing: -.5px;
+  }
+  html[data-theme="light"] .boot-title { color: #0f1627; }
+  .boot-sub {
+    margin: 0 0 26px;
+    font-family: var(--font-body); font-size: 15px;
+    color: #b7c3d9; letter-spacing: .3px;
+  }
+  html[data-theme="light"] .boot-sub { color: #3a4660; }
+  .boot-sub strong {
+    background: linear-gradient(135deg, #00e5ff 0%, #ff7a29 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    font-weight: 700;
+  }
+  .boot-bar {
+    width: 240px; max-width: 70vw; height: 3px;
+    margin: 0 auto;
+    background: rgba(130,180,255,.1);
+    border-radius: 99px; overflow: hidden;
+    position: relative;
+  }
+  .boot-bar span {
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, #00e5ff, #a18bff, #ff7a29);
+    transform: translateX(-100%);
+    animation: boot-fill 2.9s var(--ease) forwards;
+  }
+  @keyframes boot-fill {
+    to { transform: translateX(0); }
+  }
 
   /* ───────────────────── app shell ───────────────────── */
   .app {
@@ -718,6 +751,124 @@
     .install-banner { left: 12px; right: 12px; max-width: none; bottom: 12px; }
   }
 
+  /* ───────────────────── About panel ───────────────────── */
+  .about-panel { padding-bottom: 8px; }
+  .about-hero {
+    display: flex; align-items: center; gap: 18px;
+    padding: 18px 0 22px;
+    border-bottom: 1px dashed var(--stroke);
+    margin-bottom: 22px;
+  }
+  .about-avatar {
+    width: 72px; height: 72px; border-radius: 20px;
+    display: grid; place-items: center;
+    font-family: var(--font-display); font-weight: 800; font-size: 26px;
+    color: #0a0f1a;
+    background: var(--grad-accent);
+    box-shadow: 0 10px 30px rgba(0,229,255,.25), 0 0 0 1px var(--stroke-strong);
+    flex-shrink: 0;
+  }
+  .about-name {
+    font-family: var(--font-display); font-weight: 700;
+    font-size: clamp(24px, 4vw, 32px);
+    background: var(--grad-accent);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    letter-spacing: -.5px;
+    line-height: 1.1;
+  }
+  .about-role { color: var(--text-2); font-size: 13px; margin-top: 2px; }
+  .about-grid { gap: 14px; }
+  .about-card {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 16px; border-radius: var(--radius-m);
+    background: var(--surface-2);
+    border: 1px solid var(--stroke);
+    transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+  }
+  .about-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+  }
+  .about-card-icon {
+    width: 40px; height: 40px; flex-shrink: 0;
+    border-radius: 10px; display: grid; place-items: center;
+    background: var(--cyan-soft); color: var(--cyan);
+  }
+  .about-card-icon.amber { background: var(--amber-soft); color: var(--amber); }
+  .about-card-icon svg { width: 20px; height: 20px; }
+  .about-card-label {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--text-2);
+    margin-bottom: 4px;
+  }
+  .about-card-value {
+    font-family: var(--font-display); font-weight: 600; font-size: 16px;
+    color: var(--text-0); line-height: 1.3;
+    word-break: break-word;
+  }
+  a.about-mail {
+    display: inline-block;
+    color: var(--cyan); text-decoration: none;
+    border-bottom: 1px dashed var(--cyan-soft);
+  }
+  a.about-mail:hover { border-bottom-color: var(--cyan); }
+  .about-features { margin-top: 22px; padding-top: 18px; border-top: 1px dashed var(--stroke); }
+
+  /* ───────────────────── Theme toggle ───────────────────── */
+  .theme-toggle {
+    width: 40px; height: 40px; padding: 0;
+    display: grid; place-items: center;
+    background: var(--surface); color: var(--text-1);
+    border: 1px solid var(--stroke); border-radius: 10px;
+    cursor: pointer;
+    transition: all .3s var(--ease);
+    margin-right: 6px;
+  }
+  .theme-toggle:hover { color: var(--cyan); border-color: var(--stroke-strong); transform: rotate(20deg); }
+  .theme-toggle svg { width: 18px; height: 18px; }
+  html[data-theme="dark"]  .theme-toggle .moon-icon,
+  html[data-theme="light"] .theme-toggle .sun-icon { display: none; }
+
+  /* ───────────────────── Light theme palette ───────────────────── */
+  html[data-theme="light"] {
+    --bg-0: #eef2f9;
+    --bg-1: #ffffff;
+    --bg-2: #f5f8fd;
+    --bg-3: #e7ecf5;
+    --surface:   rgba(255, 255, 255, 0.88);
+    --surface-2: rgba(245, 248, 253, 0.75);
+    --stroke:        rgba(30, 60, 120, 0.10);
+    --stroke-strong: rgba(30, 60, 120, 0.22);
+    --text-0: #0f1627;
+    --text-1: #364056;
+    --text-2: #64708a;
+    --text-3: #9aa3b8;
+    --cyan:   #0097b0;
+    --cyan-soft:  rgba(0, 151, 176, 0.14);
+    --amber:  #d97706;
+    --amber-soft: rgba(217, 119, 6, 0.14);
+    --saffron:#e0620f;
+    --lime:   #4d8f1d;
+    --violet: #6758e0;
+    --rose:   #db3975;
+    --red:    #dc2626;
+    --grad-hero: radial-gradient(1200px 600px at 10% -10%, rgba(0,151,176,.12), transparent 60%),
+                 radial-gradient(900px 500px at 110% 10%, rgba(217,119,6,.09), transparent 60%),
+                 radial-gradient(700px 700px at 50% 120%, rgba(103,88,224,.07), transparent 60%);
+    --grad-accent:      linear-gradient(135deg, #0097b0 0%, #6758e0 55%, #e0620f 100%);
+    --grad-accent-soft: linear-gradient(135deg, rgba(0,151,176,.2), rgba(217,119,6,.18));
+    --shadow-soft: 0 6px 24px rgba(30, 60, 120, .08), 0 1px 0 rgba(255,255,255,.8) inset;
+    --shadow-pop:  0 18px 50px rgba(30, 60, 120, .16), 0 0 0 1px var(--stroke-strong) inset;
+    --shadow-glow: 0 0 0 1px rgba(0,151,176,.4), 0 0 20px rgba(0,151,176,.18);
+  }
+  html[data-theme="light"] body { color: var(--text-0); }
+  html[data-theme="light"] .cosmos { opacity: .4; }
+  html[data-theme="light"] .stars  { opacity: .18; }
+  html[data-theme="light"] .stars span { background: #6b7a96; box-shadow: 0 0 4px #9aa3b8; }
+  html[data-theme="light"] .slot.filled { color: var(--text-0); }
+  html[data-theme="light"] .timetable thead th,
+  html[data-theme="light"] .timetable tbody th { color: var(--text-0); }
+
   /* Print */
   @media print {
     .sidebar, .topbar, .hero-actions, .install-banner, .toasts, .panel-head .btn, .btn { display: none !important; }
@@ -757,12 +908,11 @@
 
 <!-- ═══════════════ BOOT SCREEN ═══════════════ -->
 <div class="boot" id="boot">
-  <div class="boot-core">
-    <div class="boot-ring"></div>
-    <div class="boot-ring"></div>
-    <div class="boot-ring"></div>
-    <div class="boot-logo">KVS</div>
-    <div class="boot-label">Initialising Nexus</div>
+  <div class="boot-welcome">
+    <div class="boot-mark">KVS</div>
+    <h1 class="boot-title">Welcome to Timetable Making</h1>
+    <p class="boot-sub">Developed by <strong>Aayush Singh</strong></p>
+    <div class="boot-bar"><span></span></div>
   </div>
 </div>
 
@@ -848,6 +998,10 @@
         <button class="on" data-lang="en">EN</button>
         <button data-lang="hi">हिं</button>
       </div>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme" title="Toggle light / dark mode">
+        <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
     </div>
 
     <!-- CONTENT -->
@@ -913,6 +1067,10 @@
           <div class="panel-head">
             <h3><span class="dot"></span> <span data-i18n="tt.title">Timetable Studio</span></h3>
             <div class="flex wrap">
+              <button class="btn small primary" id="btn-auto-gen">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                <span data-i18n="tt.autogen">Auto-Generate</span>
+              </button>
               <button class="btn small" id="btn-export-pdf">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                 PDF
@@ -1053,40 +1211,48 @@
 
       <!-- ░░░░░ ABOUT ░░░░░ -->
       <section class="view" data-view="about">
-        <div class="panel tilt">
+        <div class="panel tilt about-panel">
           <div class="panel-head">
-            <h3><span class="dot"></span> <span data-i18n="about.title">About Nexus</span></h3>
+            <h3><span class="dot"></span> <span data-i18n="about.title">About the Developer</span></h3>
           </div>
-          <p data-i18n="about.lead">KVS Timetable Nexus is a single-file, offline-first Progressive Web App engineered for Kendriya Vidyalaya campuses. It runs equally well on an iPhone, iPad, Android tablet, Windows laptop, or a school desktop — installable to the home screen, fully functional without internet.</p>
-          <div class="row cols-2" style="margin-top:16px">
+          <div class="about-hero">
+            <div class="about-avatar">AS</div>
             <div>
-              <div class="stat-label" data-i18n="about.built">Built With</div>
-              <div class="flex wrap" style="margin-top:8px">
-                <span class="chip cyan">HTML5</span>
-                <span class="chip amber">CSS3</span>
-                <span class="chip violet">JavaScript</span>
-                <span class="chip lime">LocalStorage</span>
-                <span class="chip rose">PWA</span>
+              <div class="about-name">Aayush Singh</div>
+              <div class="about-role" data-i18n="about.role">Developer · KVS Timetable Maker</div>
+            </div>
+          </div>
+          <div class="row cols-2 about-grid">
+            <div class="about-card">
+              <div class="about-card-icon cyan">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10L12 5 2 10l10 5 10-5z"/><path d="M6 12v5a9 9 0 0012 0v-5"/></svg>
+              </div>
+              <div>
+                <div class="about-card-label" data-i18n="about.edu">Education</div>
+                <div class="about-card-value">M.Tech · IIT Delhi</div>
+                <div class="tiny muted" data-i18n="about.edu.field">Artificial Intelligence, Robotics & Drones</div>
               </div>
             </div>
-            <div>
-              <div class="stat-label" data-i18n="about.author">Author</div>
-              <div style="font-family:var(--font-display);font-size:22px;font-weight:700;margin-top:6px;background:var(--grad-accent);-webkit-background-clip:text;background-clip:text;color:transparent">Aayush Singh</div>
-              <div class="tiny muted" data-i18n="about.role">Full-Stack Architect · UI Systems</div>
+            <div class="about-card">
+              <div class="about-card-icon amber">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div>
+                <div class="about-card-label" data-i18n="about.contact">Contact</div>
+                <a class="about-card-value about-mail" href="mailto:Aayushsingh1234512@gmail.com">Aayushsingh1234512@gmail.com</a>
+                <div class="tiny muted" data-i18n="about.mail.hint">Tap to open your email app</div>
+              </div>
             </div>
           </div>
-          <div class="row cols-3" style="margin-top:24px">
-            <div class="stat" style="--accent:var(--cyan)">
-              <div class="stat-label" data-i18n="about.f1.t">Offline Engine</div>
-              <div class="tiny muted" data-i18n="about.f1.d">Runs after first load without any network.</div>
-            </div>
-            <div class="stat" style="--accent:var(--amber)">
-              <div class="stat-label" data-i18n="about.f2.t">Conflict Radar</div>
-              <div class="tiny muted" data-i18n="about.f2.d">Detects teacher clashes across classes instantly.</div>
-            </div>
-            <div class="stat" style="--accent:var(--violet)">
-              <div class="stat-label" data-i18n="about.f3.t">Bilingual</div>
-              <div class="tiny muted" data-i18n="about.f3.d">Switch between English & हिन्दी at any time.</div>
+          <div class="about-features">
+            <div class="stat-label" data-i18n="about.features">What this app does</div>
+            <div class="flex wrap" style="margin-top:10px;gap:8px">
+              <span class="chip cyan" data-i18n="about.f1">Offline-first — works without internet</span>
+              <span class="chip amber" data-i18n="about.f2">Auto-generate timetable (no teacher clashes)</span>
+              <span class="chip violet" data-i18n="about.f3">Light / Dark mode</span>
+              <span class="chip lime" data-i18n="about.f4">Bilingual · English & हिन्दी</span>
+              <span class="chip rose" data-i18n="about.f5">PDF & Excel export</span>
+              <span class="chip cyan" data-i18n="about.f6">Installable on iPhone, Android, Windows</span>
             </div>
           </div>
         </div>
@@ -1185,7 +1351,7 @@ const I18N = {
     "dash.quick.title":"Quick Actions",
     "dash.quick.class":"+ Class", "dash.quick.teacher":"+ Teacher", "dash.quick.subject":"+ Subject", "dash.quick.period":"+ Period", "dash.quick.backup":"Backup",
     "stat.classes":"Classes", "stat.teachers":"Teachers", "stat.subjects":"Subjects", "stat.periods":"Periods", "stat.assigned":"Assignments", "stat.rooms":"Rooms",
-    "tt.title":"Timetable Studio", "tt.print":"Print", "tt.clear":"Clear",
+    "tt.title":"Timetable Studio", "tt.print":"Print", "tt.clear":"Clear", "tt.autogen":"Auto-Generate",
     "tt.view":"View", "tt.view.day":"Day", "tt.view.week":"Week", "tt.view.month":"Month",
     "tt.scope":"Scope", "tt.scope.class":"By Class", "tt.scope.teacher":"By Teacher",
     "tt.target":"Target", "tt.day":"Day", "tt.month":"Month",
@@ -1201,12 +1367,17 @@ const I18N = {
     "backup.lead":"Everything you create stays on this device — stored in LocalStorage. Export a vault file to move it to another phone or laptop.",
     "backup.export":"Export Vault (.json)", "backup.import":"Import Vault", "backup.wipe":"Wipe Device",
     "backup.storage":"Storage Footprint",
-    "about.title":"About Nexus",
-    "about.lead":"KVS Timetable Nexus is a single-file, offline-first Progressive Web App engineered for Kendriya Vidyalaya campuses. It runs equally well on an iPhone, iPad, Android tablet, Windows laptop, or a school desktop — installable to the home screen, fully functional without internet.",
-    "about.built":"Built With", "about.author":"Author", "about.role":"Full-Stack Architect · UI Systems",
-    "about.f1.t":"Offline Engine", "about.f1.d":"Runs after first load without any network.",
-    "about.f2.t":"Conflict Radar", "about.f2.d":"Detects teacher clashes across classes instantly.",
-    "about.f3.t":"Bilingual", "about.f3.d":"Switch between English & हिन्दी at any time.",
+    "about.title":"About the Developer",
+    "about.role":"Developer · KVS Timetable Maker",
+    "about.edu":"Education", "about.edu.field":"Artificial Intelligence, Robotics & Drones",
+    "about.contact":"Contact", "about.mail.hint":"Tap to open your email app",
+    "about.features":"What this app does",
+    "about.f1":"Offline-first — works without internet",
+    "about.f2":"Auto-generate timetable (no teacher clashes)",
+    "about.f3":"Light / Dark mode",
+    "about.f4":"Bilingual · English & हिन्दी",
+    "about.f5":"PDF & Excel export",
+    "about.f6":"Installable on iPhone, Android, Windows",
     "install.title":"Install Nexus", "install.sub":"Add to home screen for an app-like experience", "install.go":"Install",
     "modal.cancel":"Cancel", "modal.save":"Save", "modal.delete":"Delete", "modal.confirm":"Confirm",
     "f.class.name":"Class Name", "f.class.section":"Section", "f.class.strength":"Strength",
@@ -1229,10 +1400,18 @@ const I18N = {
     "modal.del.title":"Delete?", "modal.del.sub":"This cannot be undone.",
     "modal.wipe.title":"Wipe all data?", "modal.wipe.sub":"Every class, teacher, subject, period, room and assignment will be permanently erased.",
     "modal.clear.title":"Clear this timetable?", "modal.clear.sub":"All assignments for the current class / teacher scope will be removed.",
+    "modal.autogen.title":"Auto-generate timetable?",
+    "modal.autogen.sub":"Fill every class × day × period automatically.",
+    "modal.autogen.warn":"This will replace all current assignments",
+    "modal.autogen.info":"The engine will distribute subjects across the week and make sure no teacher is scheduled for two classes at the same time. Cells where no teacher is free will be left empty.",
     "toast.saved":"Saved", "toast.deleted":"Deleted", "toast.imported":"Vault imported", "toast.exported":"Vault exported",
     "toast.wiped":"Device wiped", "toast.sample":"Sample KVS data loaded", "toast.clash":"Teacher clash detected",
     "toast.cleared":"Timetable cleared", "toast.err.import":"Import failed — invalid file",
     "toast.lang":"Language switched", "toast.pdf":"PDF ready", "toast.xlsx":"Excel ready", "toast.installed":"App installed",
+    "toast.theme.light":"Light mode on", "toast.theme.dark":"Dark mode on",
+    "toast.autogen.need":"Add this first", "toast.autogen.nosubj":"Assign subjects to teachers first",
+    "toast.autogen.done":"Auto-generated · {n} slots filled",
+    "toast.autogen.skip":"{n} slots left empty (no free teacher)",
     "days.mon":"Monday", "days.tue":"Tuesday", "days.wed":"Wednesday", "days.thu":"Thursday", "days.fri":"Friday", "days.sat":"Saturday", "days.sun":"Sunday",
     "days.short.mon":"Mon", "days.short.tue":"Tue", "days.short.wed":"Wed", "days.short.thu":"Thu", "days.short.fri":"Fri", "days.short.sat":"Sat", "days.short.sun":"Sun",
     "break":"BREAK", "unassigned":"Unassigned", "conflict":"CLASH"
@@ -1254,7 +1433,7 @@ const I18N = {
     "dash.quick.title":"त्वरित क्रियाएँ",
     "dash.quick.class":"+ कक्षा", "dash.quick.teacher":"+ शिक्षक", "dash.quick.subject":"+ विषय", "dash.quick.period":"+ कालांश", "dash.quick.backup":"बैकअप",
     "stat.classes":"कक्षाएँ", "stat.teachers":"शिक्षक", "stat.subjects":"विषय", "stat.periods":"कालांश", "stat.assigned":"नियुक्तियाँ", "stat.rooms":"कक्ष",
-    "tt.title":"समय सारणी स्टूडियो", "tt.print":"प्रिंट", "tt.clear":"साफ़ करें",
+    "tt.title":"समय सारणी स्टूडियो", "tt.print":"प्रिंट", "tt.clear":"साफ़ करें", "tt.autogen":"स्वतः बनाएँ",
     "tt.view":"दृश्य", "tt.view.day":"दिन", "tt.view.week":"सप्ताह", "tt.view.month":"माह",
     "tt.scope":"क्षेत्र", "tt.scope.class":"कक्षा अनुसार", "tt.scope.teacher":"शिक्षक अनुसार",
     "tt.target":"लक्ष्य", "tt.day":"दिन", "tt.month":"माह",
@@ -1270,12 +1449,17 @@ const I18N = {
     "backup.lead":"सभी डेटा इसी उपकरण पर सुरक्षित — LocalStorage में। दूसरे फ़ोन/लैपटॉप में ले जाने के लिए तिजोरी फ़ाइल निर्यात करें।",
     "backup.export":"तिजोरी निर्यात (.json)", "backup.import":"तिजोरी आयात", "backup.wipe":"उपकरण पूर्ण रीसेट",
     "backup.storage":"संग्रहण प्रयोग",
-    "about.title":"Nexus के बारे में",
-    "about.lead":"KVS Timetable Nexus केन्द्रीय विद्यालयों के लिए बनाया गया एकल-फ़ाइल, ऑफ़लाइन-प्रथम प्रगतिशील वेब ऐप है। iPhone, iPad, Android टैबलेट, Windows लैपटॉप — सभी पर समान रूप से चलता है; होम स्क्रीन पर स्थापित किया जा सकता है, बिना इंटरनेट भी पूर्णतया कार्यरत।",
-    "about.built":"निर्मित", "about.author":"लेखक", "about.role":"फुल-स्टैक आर्किटेक्ट · यूआई सिस्टम",
-    "about.f1.t":"ऑफ़लाइन इंजन", "about.f1.d":"पहली बार लोड होने के बाद बिना नेटवर्क।",
-    "about.f2.t":"टकराव रडार", "about.f2.d":"शिक्षक टकराव तुरंत पहचानता है।",
-    "about.f3.t":"द्विभाषी", "about.f3.d":"English व हिन्दी में कभी भी स्विच करें।",
+    "about.title":"डेवलपर के बारे में",
+    "about.role":"डेवलपर · KVS समय सारणी निर्माता",
+    "about.edu":"शिक्षा", "about.edu.field":"कृत्रिम बुद्धिमत्ता, रोबोटिक्स व ड्रोन",
+    "about.contact":"संपर्क", "about.mail.hint":"ईमेल ऐप खोलने हेतु टैप करें",
+    "about.features":"यह ऐप क्या करता है",
+    "about.f1":"ऑफ़लाइन — बिना इंटरनेट कार्यरत",
+    "about.f2":"स्वतः समय सारणी (शिक्षक टकराव रहित)",
+    "about.f3":"उज्ज्वल / श्याम मोड",
+    "about.f4":"द्विभाषी · English व हिन्दी",
+    "about.f5":"PDF व Excel निर्यात",
+    "about.f6":"iPhone, Android, Windows पर इंस्टॉल",
     "install.title":"Nexus इंस्टॉल करें", "install.sub":"ऐप-जैसा अनुभव — होम स्क्रीन पर जोड़ें", "install.go":"इंस्टॉल",
     "modal.cancel":"रद्द", "modal.save":"सहेजें", "modal.delete":"हटाएँ", "modal.confirm":"पुष्टि करें",
     "f.class.name":"कक्षा नाम", "f.class.section":"वर्ग", "f.class.strength":"विद्यार्थी संख्या",
@@ -1298,10 +1482,18 @@ const I18N = {
     "modal.del.title":"हटाएँ?", "modal.del.sub":"यह क्रिया अपरिवर्तनीय है।",
     "modal.wipe.title":"सारा डेटा मिटाएँ?", "modal.wipe.sub":"हर कक्षा, शिक्षक, विषय, कालांश, कक्ष व नियुक्ति स्थायी रूप से हटा दी जाएगी।",
     "modal.clear.title":"यह समय सारणी साफ़ करें?", "modal.clear.sub":"वर्तमान क्षेत्र की सभी नियुक्तियाँ हटा दी जाएँगी।",
+    "modal.autogen.title":"स्वतः समय सारणी बनाएँ?",
+    "modal.autogen.sub":"प्रत्येक कक्षा × दिन × कालांश स्वचालित भरें।",
+    "modal.autogen.warn":"यह वर्तमान नियुक्तियाँ बदल देगा",
+    "modal.autogen.info":"इंजन विषयों को पूरे सप्ताह में वितरित करेगा और सुनिश्चित करेगा कि कोई शिक्षक एक समय में दो कक्षाओं में नियुक्त न हो। जहाँ कोई शिक्षक उपलब्ध नहीं होगा, वह खण्ड रिक्त रहेगा।",
     "toast.saved":"सहेजा गया", "toast.deleted":"हटाया गया", "toast.imported":"तिजोरी आयात हुई", "toast.exported":"तिजोरी निर्यात हुई",
     "toast.wiped":"उपकरण रीसेट", "toast.sample":"नमूना डेटा लोड हुआ", "toast.clash":"शिक्षक टकराव",
     "toast.cleared":"समय सारणी साफ़", "toast.err.import":"आयात विफल — अमान्य फ़ाइल",
     "toast.lang":"भाषा बदली", "toast.pdf":"PDF तैयार", "toast.xlsx":"Excel तैयार", "toast.installed":"ऐप स्थापित",
+    "toast.theme.light":"उज्ज्वल मोड चालू", "toast.theme.dark":"श्याम मोड चालू",
+    "toast.autogen.need":"पहले यह जोड़ें", "toast.autogen.nosubj":"पहले शिक्षकों को विषय सौंपें",
+    "toast.autogen.done":"स्वतः निर्मित · {n} खण्ड भरे",
+    "toast.autogen.skip":"{n} खण्ड रिक्त रहे (कोई मुक्त शिक्षक नहीं)",
     "days.mon":"सोमवार", "days.tue":"मंगलवार", "days.wed":"बुधवार", "days.thu":"गुरुवार", "days.fri":"शुक्रवार", "days.sat":"शनिवार", "days.sun":"रविवार",
     "days.short.mon":"सोम", "days.short.tue":"मंगल", "days.short.wed":"बुध", "days.short.thu":"गुरु", "days.short.fri":"शुक्र", "days.short.sat":"शनि", "days.short.sun":"रवि",
     "break":"विराम", "unassigned":"अनियुक्त", "conflict":"टकराव"
@@ -1441,6 +1633,10 @@ const App = {
 
   /* ── bootstrap ── */
   boot() {
+    // Restore theme early so boot screen matches
+    const savedTheme = localStorage.getItem("kvs_theme") || "dark";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+
     this.store = new Store(EMPTY_VAULT);
     this.store.subscribe(() => this.render());
     this.buildStars();
@@ -1448,9 +1644,15 @@ const App = {
     this.setLang(this.state.lang, /*silent*/true);
     this.render();
     this.registerSW();
-    setTimeout(() => { $("#boot").classList.add("done"); }, 1100);
+    setTimeout(() => { $("#boot").classList.add("done"); }, 3000);
     this.updateTopbarDate();
     setInterval(() => this.updateTopbarDate(), 60000);
+  },
+
+  setTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("kvs_theme", theme);
+    this.toast(t(theme === "light" ? "toast.theme.light" : "toast.theme.dark"), "info");
   },
 
   buildStars() {
@@ -1526,6 +1728,13 @@ const App = {
     $("#btn-export-xlsx").addEventListener("click", () => this.exportXLSX());
     $("#btn-print").addEventListener("click", () => window.print());
     $("#btn-clear-tt").addEventListener("click", () => this.confirmClearTimetable());
+    $("#btn-auto-gen").addEventListener("click", () => this.confirmAutoGen());
+
+    // Theme
+    $("#theme-toggle").addEventListener("click", () => {
+      const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      this.setTheme(next);
+    });
 
     // Backup
     $("#btn-export-json").addEventListener("click", () => this.exportJSON());
@@ -2293,6 +2502,128 @@ const App = {
         }}
       ]
     });
+  },
+
+  confirmAutoGen() {
+    const s = this.store.state;
+    const missing = [];
+    if (!s.classes.length)  missing.push(t("nav.classes"));
+    if (!s.teachers.length) missing.push(t("nav.teachers"));
+    if (!s.subjects.length) missing.push(t("nav.subjects"));
+    if (!s.periods.length)  missing.push(t("nav.periods"));
+    if (missing.length) {
+      this.toast(t("toast.autogen.need") + ": " + missing.join(", "), "danger");
+      return;
+    }
+    // Check at least one teacher has at least one subject
+    const hasQualified = s.teachers.some(tc => (tc.subjects || []).length > 0);
+    if (!hasQualified) {
+      this.toast(t("toast.autogen.nosubj"), "danger");
+      return;
+    }
+    this.showModal({
+      title: t("modal.autogen.title"),
+      sub: t("modal.autogen.sub"),
+      body: h("div", { class: "col" },
+        h("div", { class: "chip amber", style: "margin-bottom:10px" }, "⚠ " + t("modal.autogen.warn")),
+        h("div", { class: "tiny muted", style: "line-height:1.5" }, t("modal.autogen.info"))
+      ),
+      actions: [
+        { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
+        { label: t("tt.autogen"),   cls: "btn primary", onClick: () => {
+          this.closeModal();
+          setTimeout(() => this.autoGenerate(), 60);
+        }}
+      ]
+    });
+  },
+
+  autoGenerate() {
+    const s = this.store.state;
+    const nonBreak = s.periods.filter(p => !p.isBreak);
+    if (!nonBreak.length) { this.toast(t("toast.autogen.nosubj"), "danger"); return; }
+
+    // Shuffle helper — Fisher-Yates
+    const shuffle = (arr) => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; };
+
+    const assignments = [];
+    const busy = {};       // `${day}|${periodId}` -> Set<teacherId>
+    const classWeekly = {}; // classId -> { subjectId: count }
+    const classDaily  = {}; // classId -> day -> { subjectId: count }
+    s.classes.forEach(c => { classWeekly[c.id] = {}; classDaily[c.id] = {}; });
+
+    let roomIdx = 0;
+    const rooms = s.rooms.length ? s.rooms : [];
+    let filled = 0, skipped = 0;
+
+    for (const cls of s.classes) {
+      for (const day of DAYS) {
+        if (!classDaily[cls.id][day]) classDaily[cls.id][day] = {};
+        for (const per of nonBreak) {
+          const key = `${day}|${per.id}`;
+          if (!busy[key]) busy[key] = new Set();
+          const busySet = busy[key];
+
+          // Build candidate list: (teacher, subject) pairs
+          const candidates = [];
+          for (const tc of shuffle(s.teachers)) {
+            if (busySet.has(tc.id)) continue;
+            const subs = (tc.subjects || []).filter(sid => s.subjects.find(sb => sb.id === sid));
+            if (!subs.length) continue;
+            for (const sid of subs) {
+              const dayUses  = classDaily[cls.id][day][sid]  || 0;
+              if (dayUses >= 2) continue; // don't put same subject 3+ times in a day
+              const weekUses = classWeekly[cls.id][sid] || 0;
+              // lower score = better. Prefer less-used subjects globally, then less-used today.
+              const score = weekUses * 10 + dayUses * 5 + Math.random();
+              candidates.push({ teacherId: tc.id, subjectId: sid, score });
+            }
+          }
+
+          if (!candidates.length) {
+            // Nothing fits strict rule — try once more allowing 3 same-subject per day but still no teacher clash
+            for (const tc of shuffle(s.teachers)) {
+              if (busySet.has(tc.id)) continue;
+              const subs = (tc.subjects || []).filter(sid => s.subjects.find(sb => sb.id === sid));
+              if (!subs.length) continue;
+              for (const sid of subs) {
+                const weekUses = classWeekly[cls.id][sid] || 0;
+                candidates.push({ teacherId: tc.id, subjectId: sid, score: weekUses * 10 + Math.random() });
+              }
+            }
+          }
+          if (!candidates.length) { skipped++; continue; }
+
+          candidates.sort((a,b) => a.score - b.score);
+          const pick = candidates[0];
+          const roomId = rooms.length ? rooms[roomIdx % rooms.length].id : null;
+          roomIdx++;
+
+          assignments.push({
+            id: uid("a"),
+            classId: cls.id,
+            day,
+            periodId: per.id,
+            subjectId: pick.subjectId,
+            teacherId: pick.teacherId,
+            roomId
+          });
+          busySet.add(pick.teacherId);
+          classWeekly[cls.id][pick.subjectId] = (classWeekly[cls.id][pick.subjectId] || 0) + 1;
+          classDaily [cls.id][day][pick.subjectId] = (classDaily [cls.id][day][pick.subjectId] || 0) + 1;
+          filled++;
+        }
+      }
+    }
+
+    this.store.mutate(st => {
+      st.assignments = assignments;
+      st.meta.updatedAt = Date.now();
+    });
+
+    let msg = t("toast.autogen.done").replace("{n}", filled);
+    if (skipped > 0) msg += " · " + t("toast.autogen.skip").replace("{n}", skipped);
+    this.toast(msg, "success");
   },
 
   renderBackup() {
