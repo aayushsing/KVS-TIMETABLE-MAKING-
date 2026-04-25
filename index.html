@@ -44,35 +44,37 @@
      ═══════════════════════════════════════════════════════════════════ */
 
   :root {
-    --bg-0: #05070d;
-    --bg-1: #0a0e18;
-    --bg-2: #111623;
-    --bg-3: #1a2130;
-    --surface: rgba(18, 24, 38, 0.72);
-    --surface-2: rgba(26, 33, 48, 0.55);
-    --stroke: rgba(130, 180, 255, 0.14);
-    --stroke-strong: rgba(130, 180, 255, 0.28);
+    /* KVS theme — deep navy + saffron + gold (school crest palette) */
+    --bg-0: #07101e;
+    --bg-1: #0d1a2e;
+    --bg-2: #142139;
+    --bg-3: #1c2c47;
+    --surface: rgba(20, 33, 57, 0.78);
+    --surface-2: rgba(28, 44, 71, 0.55);
+    --stroke: rgba(255, 184, 77, 0.16);
+    --stroke-strong: rgba(255, 184, 77, 0.32);
 
-    --text-0: #e9f1ff;
-    --text-1: #b7c3d9;
-    --text-2: #7a8699;
-    --text-3: #4a5366;
+    --text-0: #f4ecd8;
+    --text-1: #d6cba6;
+    --text-2: #98927a;
+    --text-3: #5d5a4d;
 
-    --cyan: #00e5ff;
-    --cyan-soft: rgba(0, 229, 255, 0.18);
-    --amber: #ffab3d;
-    --amber-soft: rgba(255, 171, 61, 0.18);
+    /* KVS palette: saffron primary, gold secondary, navy contrast */
+    --cyan: #ffb84d;          /* repurposed as "primary" — KVS saffron-gold */
+    --cyan-soft: rgba(255, 184, 77, 0.18);
+    --amber: #ff7a29;         /* deep saffron — KVS logo orange */
+    --amber-soft: rgba(255, 122, 41, 0.18);
     --saffron: #ff7a29;
-    --lime: #9eff5a;
-    --violet: #a18bff;
-    --rose: #ff5d8f;
-    --red: #ff4d6d;
+    --lime: #c9b35a;          /* aged gold for accents */
+    --violet: #4a6fa5;        /* KV blazer navy */
+    --rose: #c9304a;          /* KVS shield red */
+    --red: #d64545;
 
-    --grad-hero: radial-gradient(1200px 600px at 10% -10%, rgba(0,229,255,.20), transparent 60%),
+    --grad-hero: radial-gradient(1200px 600px at 10% -10%, rgba(255,184,77,.22), transparent 60%),
                  radial-gradient(900px 500px at 110% 10%, rgba(255,122,41,.18), transparent 60%),
-                 radial-gradient(700px 700px at 50% 120%, rgba(161,139,255,.14), transparent 60%);
-    --grad-accent: linear-gradient(135deg, #00e5ff 0%, #a18bff 55%, #ff7a29 100%);
-    --grad-accent-soft: linear-gradient(135deg, rgba(0,229,255,.25), rgba(255,122,41,.25));
+                 radial-gradient(700px 700px at 50% 120%, rgba(74,111,165,.16), transparent 60%);
+    --grad-accent: linear-gradient(135deg, #ffb84d 0%, #ff7a29 55%, #c9304a 100%);
+    --grad-accent-soft: linear-gradient(135deg, rgba(255,184,77,.25), rgba(255,122,41,.25));
 
     --radius-s: 8px;
     --radius-m: 14px;
@@ -829,37 +831,37 @@
   html[data-theme="dark"]  .theme-toggle .moon-icon,
   html[data-theme="light"] .theme-toggle .sun-icon { display: none; }
 
-  /* ───────────────────── Light theme palette ───────────────────── */
+  /* ───────────────────── Light theme palette (KVS school colors) ───────────────────── */
   html[data-theme="light"] {
-    --bg-0: #eef2f9;
+    --bg-0: #fdf7e9;
     --bg-1: #ffffff;
-    --bg-2: #f5f8fd;
-    --bg-3: #e7ecf5;
-    --surface:   rgba(255, 255, 255, 0.88);
-    --surface-2: rgba(245, 248, 253, 0.75);
+    --bg-2: #fbf3dd;
+    --bg-3: #f5e9c4;
+    --surface:   rgba(255, 255, 255, 0.92);
+    --surface-2: rgba(253, 247, 233, 0.78);
     --stroke:        rgba(30, 60, 120, 0.10);
     --stroke-strong: rgba(30, 60, 120, 0.22);
-    --text-0: #0f1627;
-    --text-1: #364056;
-    --text-2: #64708a;
-    --text-3: #9aa3b8;
-    --cyan:   #0097b0;
-    --cyan-soft:  rgba(0, 151, 176, 0.14);
-    --amber:  #d97706;
-    --amber-soft: rgba(217, 119, 6, 0.14);
-    --saffron:#e0620f;
-    --lime:   #4d8f1d;
-    --violet: #6758e0;
-    --rose:   #db3975;
-    --red:    #dc2626;
-    --grad-hero: radial-gradient(1200px 600px at 10% -10%, rgba(0,151,176,.12), transparent 60%),
-                 radial-gradient(900px 500px at 110% 10%, rgba(217,119,6,.09), transparent 60%),
-                 radial-gradient(700px 700px at 50% 120%, rgba(103,88,224,.07), transparent 60%);
-    --grad-accent:      linear-gradient(135deg, #0097b0 0%, #6758e0 55%, #e0620f 100%);
-    --grad-accent-soft: linear-gradient(135deg, rgba(0,151,176,.2), rgba(217,119,6,.18));
+    --text-0: #1c2c47;
+    --text-1: #3a4a66;
+    --text-2: #6e7383;
+    --text-3: #a3a8b3;
+    --cyan:   #b8730a;        /* warm gold-bronze */
+    --cyan-soft:  rgba(184, 115, 10, 0.16);
+    --amber:  #d44a0a;        /* deep saffron */
+    --amber-soft: rgba(212, 74, 10, 0.14);
+    --saffron:#d44a0a;
+    --lime:   #8a7820;        /* olive gold */
+    --violet: #2a4880;        /* KV blazer navy */
+    --rose:   #a8253b;
+    --red:    #c52727;
+    --grad-hero: radial-gradient(1200px 600px at 10% -10%, rgba(212,74,10,.10), transparent 60%),
+                 radial-gradient(900px 500px at 110% 10%, rgba(184,115,10,.10), transparent 60%),
+                 radial-gradient(700px 700px at 50% 120%, rgba(42,72,128,.06), transparent 60%);
+    --grad-accent:      linear-gradient(135deg, #b8730a 0%, #d44a0a 55%, #a8253b 100%);
+    --grad-accent-soft: linear-gradient(135deg, rgba(184,115,10,.2), rgba(212,74,10,.18));
     --shadow-soft: 0 6px 24px rgba(30, 60, 120, .08), 0 1px 0 rgba(255,255,255,.8) inset;
     --shadow-pop:  0 18px 50px rgba(30, 60, 120, .16), 0 0 0 1px var(--stroke-strong) inset;
-    --shadow-glow: 0 0 0 1px rgba(0,151,176,.4), 0 0 20px rgba(0,151,176,.18);
+    --shadow-glow: 0 0 0 1px rgba(212,74,10,.4), 0 0 20px rgba(212,74,10,.18);
   }
   html[data-theme="light"] body { color: var(--text-0); }
   html[data-theme="light"] .cosmos { opacity: .4; }
@@ -1224,6 +1226,10 @@
                 <input type="checkbox" id="f-pin-cca" checked />
                 <span data-i18n="settings.pincca">CCA / CLA on Saturday · Period 1-2</span>
               </label>
+              <label class="flex" style="gap:6px;cursor:pointer">
+                <input type="checkbox" id="f-ct-p1" checked />
+                <span data-i18n="settings.ctp1">Class Teacher takes Period 1 every day</span>
+              </label>
             </div>
           </div>
           <div class="field" style="margin-top:14px">
@@ -1416,11 +1422,12 @@ const KVS_PRESETS = {
 };
 /* XI–XII stream presets — total must = 48 over 6 days × 8 periods */
 const STREAM_PRESETS = {
-  "science_pcm": { ENG:6, HIN:6, PHY:9, CHM:9, MTH:9, PE:4, LIB:1, WE:1, CLA:2, _extra:1 },
-  "science_pcb": { ENG:6, HIN:6, PHY:9, CHM:9, BIO:9, PE:4, LIB:1, WE:1, CLA:2, _extra:1 },
-  "commerce":    { ENG:6, HIN:6, ACC:9, BST:9, ECO:9, MTH:9, PE:4, LIB:1, WE:1, CLA:2, _minus:6 }, // Math optional; if not wanted, replace with IP
-  "commerce_ip": { ENG:6, HIN:6, ACC:9, BST:9, ECO:9, IP:9, PE:4, LIB:1, WE:1, CLA:2, _minus:6 },
-  "humanities":  { ENG:6, HIN:6, HIS:9, GEO:9, ECO:9, PE:4, LIB:1, WE:1, CLA:2, _extra:1 }
+  "science_pcm":  { ENG:6, HIN:6, PHY:9, CHM:9, MTH:9, PE:4, LIB:1, WE:1, CLA:2, _extra:1 },
+  "science_pcb":  { ENG:6, HIN:6, PHY:9, CHM:9, BIO:9, PE:4, LIB:1, WE:1, CLA:2, _extra:1 },
+  "science_pcmb": { ENG:6, HIN:6, PHY:9, CHM:9, MTH:9, BIO:9, PE:2, LIB:1, WE:1, CLA:2, _minus:7 }, // overflow — students drop one elective in practice
+  "commerce":     { ENG:6, HIN:6, ACC:9, BST:9, ECO:9, MTH:9, PE:4, LIB:1, WE:1, CLA:2, _minus:6 },
+  "commerce_ip":  { ENG:6, HIN:6, ACC:9, BST:9, ECO:9, IP:9, PE:4, LIB:1, WE:1, CLA:2, _minus:6 },
+  "humanities":   { ENG:6, HIN:6, HIS:9, GEO:9, ECO:9, PE:4, LIB:1, WE:1, CLA:2, _extra:1 }
 };
 /* Remove private keys before use */
 function cleanPreset(p) { const o = {}; for (const k in p) if (!k.startsWith("_")) o[k] = p[k]; return o; }
@@ -1540,6 +1547,7 @@ const I18N = {
     "modal.autogen.streaminfo":"XI/XII classes need a stream selection. Subject allocations will match the chosen stream.",
     "stream.science_pcm":"Science (PCM — Physics, Chemistry, Maths)",
     "stream.science_pcb":"Science (PCB — Physics, Chemistry, Biology)",
+    "stream.science_pcmb":"Science (PCMB — Physics, Chemistry, Maths, Biology)",
     "stream.commerce":"Commerce (with Maths)",
     "stream.commerce_ip":"Commerce (with Informatics Practices)",
     "stream.humanities":"Humanities / Arts",
@@ -1548,6 +1556,12 @@ const I18N = {
     "settings.peblock":"PE Block Periods (P1-2 / P7-8 rotation per HQ circular)",
     "settings.pinyoga":"Yoga on Wednesday · Period 2",
     "settings.pincca":"CCA / CLA on Saturday · Period 1-2",
+    "settings.ctp1":"Class Teacher takes Period 1 every day",
+    "modal.autogen.pattern":"Daily Pattern",
+    "modal.autogen.pattern.jumble":"Jumbled (KVS-style)",
+    "modal.autogen.pattern.jumble.d":"Different subjects each day · varied per period · per KVS guidelines",
+    "modal.autogen.pattern.repeat":"Same Mon-Sat",
+    "modal.autogen.pattern.repeat.d":"Identical period structure across all six days",
     "about.title":"About the Developer",
     "about.role":"Developer · KVS Timetable Maker",
     "about.edu":"Education", "about.edu.field":"Artificial Intelligence, Robotics & Drones",
@@ -1563,7 +1577,11 @@ const I18N = {
     "modal.cancel":"Cancel", "modal.save":"Save", "modal.delete":"Delete", "modal.confirm":"Confirm",
     "f.class.name":"Class Name", "f.class.section":"Section", "f.class.strength":"Strength",
     "f.class.teacher":"Class Teacher", "f.class.noteacher":"No class teacher", "f.class.alreadyct":"already class teacher of",
-    "f.teacher.name":"Teacher Name", "f.teacher.code":"Code", "f.teacher.subjects":"Subjects Taught",
+    "f.teacher.name":"Teacher Name", "f.teacher.code":"Code", "f.teacher.subjects":"Subjects Taught (general)",
+    "f.teacher.subjects.hint":"What this teacher can teach across all classes by default.",
+    "f.teacher.overrides":"Per-Class Subject Mapping",
+    "f.teacher.overrides.hint":"Override the general list for specific classes (e.g. teaches Math in Class 7 but Computer in Class 8). Leave a class as-is to inherit the general list above.",
+    "f.teacher.overrides.noclasses":"Add some classes first to map per-class subjects.",
     "f.subject.name":"Subject Name", "f.subject.code":"Code", "f.subject.color":"Accent Colour",
     "f.period.label":"Label", "f.period.start":"Start Time", "f.period.end":"End Time", "f.period.break":"This is a break period",
     "f.room.name":"Room Name", "f.room.capacity":"Capacity",
@@ -1655,6 +1673,7 @@ const I18N = {
     "modal.autogen.streaminfo":"XI/XII कक्षाओं के लिए स्ट्रीम आवश्यक है। विषय आवंटन चुने गए स्ट्रीम के अनुसार होगा।",
     "stream.science_pcm":"विज्ञान (PCM — भौतिकी, रसायन, गणित)",
     "stream.science_pcb":"विज्ञान (PCB — भौतिकी, रसायन, जीव विज्ञान)",
+    "stream.science_pcmb":"विज्ञान (PCMB — भौतिकी, रसायन, गणित, जीव विज्ञान)",
     "stream.commerce":"वाणिज्य (गणित सहित)",
     "stream.commerce_ip":"वाणिज्य (IP सहित)",
     "stream.humanities":"मानविकी / कला",
@@ -1663,6 +1682,16 @@ const I18N = {
     "settings.peblock":"PE ब्लॉक कालांश (HQ परिपत्र के अनुसार P1-2 / P7-8)",
     "settings.pinyoga":"योग — बुधवार · कालांश 2",
     "settings.pincca":"CCA / CLA — शनिवार · कालांश 1-2",
+    "settings.ctp1":"कक्षा शिक्षक प्रतिदिन कालांश 1 पढ़ाएँ",
+    "modal.autogen.pattern":"दैनिक पैटर्न",
+    "modal.autogen.pattern.jumble":"मिश्रित (KVS शैली)",
+    "modal.autogen.pattern.jumble.d":"प्रत्येक दिन भिन्न विषय · KVS दिशानिर्देशों के अनुसार विविधता",
+    "modal.autogen.pattern.repeat":"सोमवार-शनिवार समान",
+    "modal.autogen.pattern.repeat.d":"छः दिनों में समान कालांश संरचना",
+    "f.teacher.subjects.hint":"यह शिक्षक डिफ़ॉल्ट रूप से सभी कक्षाओं में क्या पढ़ा सकता है।",
+    "f.teacher.overrides":"प्रति-कक्षा विषय मानचित्रण",
+    "f.teacher.overrides.hint":"विशिष्ट कक्षाओं हेतु सामान्य सूची को ओवरराइड करें (जैसे कक्षा 7 में गणित परंतु कक्षा 8 में कंप्यूटर)। ओवरराइड न करने पर ऊपर की सामान्य सूची लागू होगी।",
+    "f.teacher.overrides.noclasses":"प्रति-कक्षा विषय मानचित्रण हेतु पहले कुछ कक्षाएँ जोड़ें।",
     "about.title":"डेवलपर के बारे में",
     "about.role":"डेवलपर · KVS समय सारणी निर्माता",
     "about.edu":"शिक्षा", "about.edu.field":"कृत्रिम बुद्धिमत्ता, रोबोटिक्स व ड्रोन",
@@ -1767,7 +1796,8 @@ const EMPTY_VAULT = {
   settings: {
     enforcePEBlock: true,   // force PE into P1-2 / P7-8 block pattern per HQ circular
     pinYoga: true,          // Wed P2 Yoga for every class
-    pinCCA:  true           // Sat P1-P2 CCA for every class
+    pinCCA:  true,          // Sat P1-P2 CCA for every class
+    ctTakesP1: true         // class teacher takes period 1 every day for their class
   },
   classes:  [],
   teachers: [],
@@ -1840,7 +1870,7 @@ const SAMPLE_VAULT = () => {
   );
   return {
     school: { name: "Kendriya Vidyalaya No. 1", session: "2026-27", principal: "Dr. S. K. Sharma", teacherMaxPerDay: 6 },
-    settings: { enforcePEBlock: true, pinYoga: true, pinCCA: true },
+    settings: { enforcePEBlock: true, pinYoga: true, pinCCA: true, ctTakesP1: true },
     classes, teachers, subjects, periods, rooms, assignments,
     meta: { createdAt: now, updatedAt: now }
   };
@@ -1983,6 +2013,7 @@ const App = {
         st.settings.enforcePEBlock = $("#f-enforce-pe-block").checked;
         st.settings.pinYoga        = $("#f-pin-yoga").checked;
         st.settings.pinCCA         = $("#f-pin-cca").checked;
+        st.settings.ctTakesP1      = $("#f-ct-p1").checked;
         st.meta.updatedAt = Date.now();
       });
       this.toast(t("toast.school.saved"), "success");
@@ -2467,9 +2498,52 @@ const App = {
         this.field("code", t("f.teacher.code"), "input", existing?.code || "", { maxLength: 6, style: "text-transform:uppercase" }),
         h("div", { class: "field" },
           h("label", {}, t("f.teacher.subjects")),
+          h("div", { class: "tiny muted", style: "margin-bottom:6px" }, t("f.teacher.subjects.hint")),
           subsCheckbox
         )
       );
+
+      // Per-class override section
+      const overrideHost = h("div", { class: "field" });
+      overrideHost.append(
+        h("label", {}, t("f.teacher.overrides")),
+        h("div", { class: "tiny muted", style: "margin-bottom:8px;line-height:1.5" }, t("f.teacher.overrides.hint"))
+      );
+      const overrideTable = h("div", { id: "tch-overrides", class: "col", style: "gap:6px;max-height:240px;overflow-y:auto;padding:8px;background:var(--surface-2);border:1px solid var(--stroke);border-radius:10px" });
+      const existingOverrides = existing?.classSubjects || {};
+      if (s.classes.length === 0) {
+        overrideTable.append(h("div", { class: "tiny muted" }, t("f.teacher.overrides.noclasses")));
+      } else {
+        s.classes.forEach(cls => {
+          const row = h("div", { class: "flex wrap", style: "gap:6px;align-items:center;padding:4px 0" });
+          row.append(h("strong", { class: "mono", style: "min-width:70px;font-size:13px" }, `${cls.name}-${cls.section}`));
+          // For each subject, render a tiny chip the teacher can toggle
+          const chipBox = h("div", { class: "flex wrap", style: "gap:4px;flex:1" });
+          s.subjects.forEach(sb => {
+            const inherited = (existing?.subjects || []).includes(sb.id);
+            // If override exists for this class, use it; else inherit from general
+            const overrideSubs = existingOverrides[cls.id];
+            const isChecked = overrideSubs ? overrideSubs.includes(sb.id) : inherited;
+            const cb = h("input", {
+              type: "checkbox",
+              "data-cls": cls.id,
+              "data-sub": sb.id,
+              "data-inherited": inherited ? "1" : "0",
+              checked: isChecked ? "checked" : null,
+              style: "margin-right:4px"
+            });
+            const chip = h("label", {
+              class: "chip tiny",
+              style: `cursor:pointer;font-size:11px;padding:3px 6px;color:${sb.color};border-color:${sb.color}55;${isChecked ? `background:${sb.color}25` : ""}`
+            }, cb, sb.code);
+            chipBox.append(chip);
+          });
+          row.append(chipBox);
+          overrideTable.append(row);
+        });
+      }
+      overrideHost.append(overrideTable);
+      body.append(overrideHost);
     } else if (kind === "subject") {
       body.append(
         this.field("name", t("f.subject.name"), "input", existing?.name || ""),
@@ -2526,11 +2600,28 @@ const App = {
       };
     } else if (kind === "teacher") {
       const checked = $$("#tch-subjects input[type=checkbox]").filter(c => c.checked).map(c => c.value);
+      // Read per-class overrides — only store entries that DIFFER from inherited general assignment
+      const classSubjects = {};
+      const overrideInputs = $$("#tch-overrides input[type=checkbox]");
+      const byClass = {};
+      overrideInputs.forEach(cb => {
+        const clsId = cb.dataset.cls, subId = cb.dataset.sub;
+        if (!byClass[clsId]) byClass[clsId] = { picked: [], inherited: [] };
+        if (cb.checked) byClass[clsId].picked.push(subId);
+        if (cb.dataset.inherited === "1") byClass[clsId].inherited.push(subId);
+      });
+      Object.entries(byClass).forEach(([clsId, info]) => {
+        // Compare picked vs inherited; only store override if they differ
+        const a = [...info.picked].sort().join(",");
+        const b = [...info.inherited].sort().join(",");
+        if (a !== b) classSubjects[clsId] = info.picked;
+      });
       record = {
         id: existing?.id || uid("tch"),
         name: $("#f-name").value.trim() || "Teacher",
         code: ($("#f-code").value || "").toUpperCase().trim() || "T" + Math.floor(Math.random()*99),
-        subjects: checked
+        subjects: checked,
+        classSubjects
       };
     } else if (kind === "subject") {
       record = {
@@ -2931,14 +3022,31 @@ const App = {
       return;
     }
 
-    // Step 1 — ask which class(es)
+    // Step 1 — ask which class(es) + repetition pattern
     const classOpts = h("div", { class: "col", style: "gap:8px" });
     classOpts.append(h("div", { class: "tiny muted", style: "margin-bottom:6px" }, t("modal.autogen.choose")));
     const classSelect = h("select", { class: "select", id: "ag-class" });
     classSelect.append(h("option", { value: "__all__" }, t("modal.autogen.allclasses") + " (" + s.classes.length + ")"));
     s.classes.forEach(c => classSelect.append(h("option", { value: c.id }, `${c.name} - ${c.section}`)));
     classOpts.append(classSelect);
-    classOpts.append(h("div", { class: "tiny muted", style: "margin-top:10px;line-height:1.5" }, t("modal.autogen.info")));
+
+    // Repeat-pattern picker
+    classOpts.append(h("div", { class: "tiny muted", style: "margin-top:14px;margin-bottom:4px" }, t("modal.autogen.pattern")));
+    const patternBox = h("div", { class: "flex wrap", style: "gap:10px" });
+    [
+      ["jumble",  t("modal.autogen.pattern.jumble"),  t("modal.autogen.pattern.jumble.d"),  true],
+      ["repeat",  t("modal.autogen.pattern.repeat"),  t("modal.autogen.pattern.repeat.d"),  false],
+    ].forEach(([val, lbl, desc, isDefault]) => {
+      const id = `ag-pat-${val}`;
+      const radio = h("input", { type: "radio", name: "ag-pattern", id, value: val, checked: isDefault ? "checked" : null });
+      patternBox.append(h("label", { class: "chip", style: "cursor:pointer;align-items:flex-start;flex-direction:column;padding:10px 14px;gap:4px;flex:1;min-width:160px" },
+        h("span", { class: "flex", style: "gap:6px" }, radio, h("strong", {}, lbl)),
+        h("span", { class: "tiny muted", style: "margin-left:22px" }, desc)
+      ));
+    });
+    classOpts.append(patternBox);
+
+    classOpts.append(h("div", { class: "tiny muted", style: "margin-top:12px;line-height:1.5" }, t("modal.autogen.info")));
 
     this.showModal({
       title: t("modal.autogen.title"),
@@ -2948,19 +3056,21 @@ const App = {
         { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
         { label: t("modal.next"),   cls: "btn primary", onClick: () => {
           const sel = $("#ag-class").value;
+          const pat = ($$("input[name=ag-pattern]").find(r => r.checked) || {}).value || "jumble";
           this.closeModal();
-          setTimeout(() => this.autogenStep2(sel, {}), 80);
+          setTimeout(() => this.autogenStep2(sel, {}, pat), 80);
         }}
       ]
     });
   },
 
-  autogenStep2(target, streamByClass) {
+  autogenStep2(target, streamByClass, pattern) {
     // Step 2 — for chosen class(es) show per-subject weekly-period picker pre-filled from KVS / stream presets
     const s = this.store.state;
     const classes = target === "__all__" ? s.classes : [s.classes.find(c => c.id === target)].filter(Boolean);
     if (!classes.length) return;
     streamByClass = streamByClass || {};
+    pattern = pattern || "jumble";
 
     // Intercept: if any XI/XII class doesn't have a stream yet, ask for it first
     const needStream = classes.filter(c => {
@@ -2968,7 +3078,7 @@ const App = {
       return (g === 11 || g === 12) && !streamByClass[c.id];
     });
     if (needStream.length) {
-      this.autogenPickStream(target, streamByClass, needStream);
+      this.autogenPickStream(target, streamByClass, needStream, pattern);
       return;
     }
 
@@ -3053,13 +3163,13 @@ const App = {
             });
           });
           this.closeModal();
-          setTimeout(() => this.autoGenerate(classes.map(c => c.id), plan), 80);
+          setTimeout(() => this.autoGenerate(classes.map(c => c.id), plan, pattern), 80);
         }}
       ]
     });
   },
 
-  autogenPickStream(target, streamByClass, needStream) {
+  autogenPickStream(target, streamByClass, needStream, pattern) {
     // Show a single modal listing each XI/XII class with a stream dropdown
     const body = h("div", { class: "col" });
     body.append(h("div", { class: "tiny muted", style: "margin-bottom:8px" }, t("modal.autogen.streaminfo")));
@@ -3071,6 +3181,7 @@ const App = {
       [
         ["science_pcm",  t("stream.science_pcm")],
         ["science_pcb",  t("stream.science_pcb")],
+        ["science_pcmb", t("stream.science_pcmb")],
         ["commerce",     t("stream.commerce")],
         ["commerce_ip",  t("stream.commerce_ip")],
         ["humanities",   t("stream.humanities")],
@@ -3088,28 +3199,27 @@ const App = {
         { label: t("modal.next"),   cls: "btn primary", onClick: () => {
           Object.entries(selects).forEach(([cid, sel]) => { streamByClass[cid] = sel.value; });
           this.closeModal();
-          setTimeout(() => this.autogenStep2(target, streamByClass), 80);
+          setTimeout(() => this.autogenStep2(target, streamByClass, pattern), 80);
         }}
       ]
     });
   },
 
-  autoGenerate(classIds, plan) {
+  autoGenerate(classIds, plan, pattern) {
     const s = this.store.state;
     const settings = s.settings || {};
     const nonBreak = s.periods.filter(p => !p.isBreak);
     if (!nonBreak.length) { this.toast(t("toast.autogen.nosubj"), "danger"); return; }
     const totalSlotsPerClass = DAYS.length * nonBreak.length;
     const maxPerDay = Math.max(1, Math.min(12, s.school?.teacherMaxPerDay || 6));
+    pattern = pattern || "jumble"; // "jumble" | "repeat"
 
     const shuffle = (arr) => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; };
 
     // ── Preserve assignments of classes NOT being regenerated ──
     const keep = s.assignments.filter(a => !classIds.includes(a.classId));
-    // busy[day|periodId] -> Set<teacherId>
-    const busy = {};
-    // teacherDayCount[day|teacherId] -> number (hard cap = maxPerDay)
-    const tdc = {};
+    const busy = {};   // `${day}|${periodId}` -> Set<teacherId>
+    const tdc  = {};   // `${day}|${teacherId}` -> count
     keep.forEach(a => {
       const k = `${a.day}|${a.periodId}`;
       (busy[k] = busy[k] || new Set()).add(a.teacherId);
@@ -3117,24 +3227,34 @@ const App = {
       tdc[dk] = (tdc[dk] || 0) + 1;
     });
 
-    // Resolve subject codes → subject.id lookups
     const subjByCode = {};
     s.subjects.forEach(sb => { subjByCode[canonicalCode(sb.code || sb.name)] = sb.id; });
     const PE_ID  = subjByCode["PE"];
     const CLA_ID = subjByCode["CLA"];
 
-    // Identify PE slot pairs for a given grade based on HQ rotation
     const getPEBlockSlots = (grade) => {
       if (!settings.enforcePEBlock || !PE_ID) return [];
       const rot = PE_BLOCK_ROTATION[grade] || [];
       const out = [];
       rot.forEach(r => {
         const pair = r.slot === "morning"
-          ? [nonBreak[0], nonBreak[1]]                              // P1 + P2
-          : [nonBreak[nonBreak.length - 2], nonBreak[nonBreak.length - 1]]; // P7 + P8
+          ? [nonBreak[0], nonBreak[1]]
+          : [nonBreak[nonBreak.length - 2], nonBreak[nonBreak.length - 1]];
         if (pair[0] && pair[1]) out.push({ day: r.day, periods: pair });
       });
       return out;
+    };
+
+    /* Per-class teacher resolver — respects per-class subject overrides:
+       teacher.classSubjects = { [classId]: [subjectId, ...] }
+       If a teacher has a classSubjects entry for THIS class, only those subjects count.
+       If they have NO entry for this class, fall back to teacher.subjects (general). */
+    const teachesForClass = (tc, subjectId, classId) => {
+      const cs = tc.classSubjects || {};
+      if (Object.prototype.hasOwnProperty.call(cs, classId)) {
+        return (cs[classId] || []).includes(subjectId);
+      }
+      return (tc.subjects || []).includes(subjectId);
     };
 
     const newAssignments = [];
@@ -3142,8 +3262,7 @@ const App = {
     const rooms = s.rooms;
     let filled = 0, skipped = 0;
 
-    // ── Helper: try to place one token (subjectId) for a class ──
-    const tryPlace = (cls, subjectId, candidateSlots, dayCount, { allowThird = false, preferredTeacherId = null } = {}) => {
+    const tryPlace = (cls, subjectId, candidateSlots, dayCount, { allowThird = false, preferredTeacherId = null, forceTeacherId = null } = {}) => {
       for (const slot of candidateSlots) {
         const already = newAssignments.find(a => a.classId === cls.id && a.day === slot.day && a.periodId === slot.period.id);
         if (already) continue;
@@ -3152,17 +3271,25 @@ const App = {
         const key = `${slot.day}|${slot.period.id}`;
         if (!busy[key]) busy[key] = new Set();
 
-        // Pick a qualified teacher who (a) teaches it (b) not busy at this slot (c) under daily cap
-        let teacherOpts = s.teachers.filter(tc => (tc.subjects || []).includes(subjectId)
-          && !busy[key].has(tc.id)
-          && (tdc[`${slot.day}|${tc.id}`] || 0) < maxPerDay);
-        if (!teacherOpts.length) continue;
-        // Preferred teacher first (e.g. class teacher, or PE-specific teacher)
-        teacherOpts = shuffle(teacherOpts).sort((a, b) => {
-          const pa = (a.id === preferredTeacherId) ? -2 : (a.id === cls.classTeacherId ? -1 : 0);
-          const pb = (b.id === preferredTeacherId) ? -2 : (b.id === cls.classTeacherId ? -1 : 0);
-          return pa - pb;
-        });
+        let teacherOpts;
+        if (forceTeacherId) {
+          const tc = s.teachers.find(t => t.id === forceTeacherId);
+          if (!tc) continue;
+          if (busy[key].has(tc.id)) continue;
+          if ((tdc[`${slot.day}|${tc.id}`] || 0) >= maxPerDay) continue;
+          teacherOpts = [tc];
+        } else {
+          teacherOpts = s.teachers.filter(tc =>
+            teachesForClass(tc, subjectId, cls.id)
+            && !busy[key].has(tc.id)
+            && (tdc[`${slot.day}|${tc.id}`] || 0) < maxPerDay);
+          if (!teacherOpts.length) continue;
+          teacherOpts = shuffle(teacherOpts).sort((a, b) => {
+            const pa = (a.id === preferredTeacherId) ? -2 : (a.id === cls.classTeacherId ? -1 : 0);
+            const pb = (b.id === preferredTeacherId) ? -2 : (b.id === cls.classTeacherId ? -1 : 0);
+            return pa - pb;
+          });
+        }
         return { slot, teacherId: teacherOpts[0].id };
       }
       return null;
@@ -3187,8 +3314,21 @@ const App = {
       filled++;
     };
 
+    // Find a subject id this class teacher actually teaches FOR THIS CLASS
+    const findCTSubjectId = (cls) => {
+      if (!cls.classTeacherId) return null;
+      const tc = s.teachers.find(t => t.id === cls.classTeacherId);
+      if (!tc) return null;
+      const subPlan = plan[cls.id] || {};
+      // Prefer subjects in this class's plan that the CT teaches
+      for (const subId of Object.keys(subPlan)) {
+        if (subPlan[subId] > 0 && teachesForClass(tc, subId, cls.id)) return subId;
+      }
+      return null;
+    };
+
     // ═══════════════════════════════════════════════════════
-    // PASS 1 — Pin special slots (PE blocks, Yoga, CCA) FIRST
+    // PASS 1 — Pin special slots: P1 for class teacher, PE blocks, Yoga, CCA
     // ═══════════════════════════════════════════════════════
     for (const cid of classIds) {
       const cls = s.classes.find(c => c.id === cid);
@@ -3196,7 +3336,23 @@ const App = {
       const grade = classGradeNumber(cls);
       const subPlan = plan[cid] || {};
       const dayCount = {}; DAYS.forEach(d => dayCount[d] = {});
-      cls.__dayCount = dayCount; // stash for pass 2
+      cls.__dayCount = dayCount;
+
+      // --- Class teacher takes P1 every day (if class teacher is set and teaches a subject in plan) ---
+      if (settings.ctTakesP1 !== false) {
+        const ctSubId = findCTSubjectId(cls);
+        if (ctSubId && nonBreak[0]) {
+          const p1 = nonBreak[0];
+          for (const day of DAYS) {
+            // Skip Wednesday P2-yoga conflict — P1 not affected, OK
+            const result = tryPlace(cls, ctSubId, [{ day, period: p1 }], dayCount, { allowThird: true, forceTeacherId: cls.classTeacherId });
+            if (result) {
+              commit(cls, result, ctSubId, dayCount);
+              subPlan[ctSubId] = Math.max(0, (subPlan[ctSubId] || 0) - 1);
+            }
+          }
+        }
+      }
 
       // --- PE block periods ---
       if (settings.enforcePEBlock && PE_ID && subPlan[PE_ID]) {
@@ -3208,11 +3364,10 @@ const App = {
             if (result) { commit(cls, result, PE_ID, dayCount); placed++; }
           }
         }
-        // Deduct what we placed from the plan so it's not double-booked in pass 2
         subPlan[PE_ID] = Math.max(0, (subPlan[PE_ID] || 0) - placed);
       }
 
-      // --- Yoga on Wed P2 (only if PE is in plan and user enabled it) ---
+      // --- Yoga on Wed P2 ---
       if (settings.pinYoga && PE_ID && subPlan[PE_ID] > 0) {
         const yogaPeriod = nonBreak[PINNED_SLOTS.yoga.periodIndex];
         if (yogaPeriod) {
@@ -3224,44 +3379,79 @@ const App = {
       // --- CCA on Saturday P1-P2 ---
       if (settings.pinCCA && CLA_ID && subPlan[CLA_ID]) {
         const ccaPeriods = PINNED_SLOTS.cca.periodIndices.map(i => nonBreak[i]).filter(Boolean);
-        let placed = 0;
         for (const p of ccaPeriods) {
           if (subPlan[CLA_ID] <= 0) break;
           const result = tryPlace(cls, CLA_ID, [{ day: PINNED_SLOTS.cca.day, period: p }], dayCount, { allowThird: true });
-          if (result) { commit(cls, result, CLA_ID, dayCount); subPlan[CLA_ID] -= 1; placed++; }
+          if (result) { commit(cls, result, CLA_ID, dayCount); subPlan[CLA_ID] -= 1; }
         }
       }
 
-      plan[cid] = subPlan; // write back adjusted plan
+      plan[cid] = subPlan;
     }
 
     // ══════════════════════════════════════════
-    // PASS 2 — Fill remaining subjects normally
+    // PASS 2 — Fill remaining slots
     // ══════════════════════════════════════════
-    for (const cid of classIds) {
-      const cls = s.classes.find(c => c.id === cid);
-      if (!cls) continue;
-      const subPlan = plan[cid] || {};
-      const dayCount = cls.__dayCount || {};
-      DAYS.forEach(d => { if (!dayCount[d]) dayCount[d] = {}; });
+    if (pattern === "repeat") {
+      // "repeat" = generate Monday's plan, then mirror it across Tue-Sat (all 6 days identical pattern)
+      for (const cid of classIds) {
+        const cls = s.classes.find(c => c.id === cid);
+        if (!cls) continue;
+        const subPlan = plan[cid] || {};
+        const dayCount = cls.__dayCount || {}; DAYS.forEach(d => { if (!dayCount[d]) dayCount[d] = {}; });
 
-      // Bag of remaining tokens
-      const bag = [];
-      Object.entries(subPlan).forEach(([subId, count]) => { for (let i = 0; i < count; i++) bag.push(subId); });
-      if (bag.length > totalSlotsPerClass) bag.length = totalSlotsPerClass;
+        const allDays = DAYS; // mon..sat — all six
+        const day1 = allDays[0]; // monday
 
-      const slots = [];
-      DAYS.forEach(d => nonBreak.forEach(p => slots.push({ day: d, period: p })));
-      const bagShuffled = shuffle(bag);
+        // Build per-day token set: spread weekly-period count evenly across 6 days
+        const tokens = [];
+        Object.entries(subPlan).forEach(([subId, count]) => {
+          const perDaySub = Math.max(1, Math.round(count / DAYS.length));
+          for (let i = 0; i < perDaySub; i++) tokens.push(subId);
+        });
 
-      for (const token of bagShuffled) {
-        let chosen = tryPlace(cls, token, shuffle(slots), dayCount, { allowThird: false });
-        if (!chosen) chosen = tryPlace(cls, token, shuffle(slots), dayCount, { allowThird: true });
-        if (!chosen) { skipped++; continue; }
-        commit(cls, chosen, token, dayCount);
+        // Place template tokens on Monday in any open non-pinned slot
+        for (const token of shuffle(tokens)) {
+          const slotsDay1 = nonBreak.map(period => ({ day: day1, period }));
+          const placement = tryPlace(cls, token, shuffle(slotsDay1), dayCount, { allowThird: false });
+          if (!placement) continue;
+          commit(cls, placement, token, dayCount);
+          // Mirror this exact period to every other day (Tue..Sat) — each gets its own teacher pick to avoid clashes
+          const periodId = placement.slot.period.id;
+          for (const d of allDays.slice(1)) {
+            const result = tryPlace(cls, token, [{ day: d, period: nonBreak.find(p => p.id === periodId) }], dayCount, { allowThird: true });
+            if (result) commit(cls, result, token, dayCount);
+          }
+        }
+
+        delete cls.__dayCount;
       }
+    } else {
+      // "jumble" = original behavior — shuffle bag across all slots
+      for (const cid of classIds) {
+        const cls = s.classes.find(c => c.id === cid);
+        if (!cls) continue;
+        const subPlan = plan[cid] || {};
+        const dayCount = cls.__dayCount || {};
+        DAYS.forEach(d => { if (!dayCount[d]) dayCount[d] = {}; });
 
-      delete cls.__dayCount;
+        const bag = [];
+        Object.entries(subPlan).forEach(([subId, count]) => { for (let i = 0; i < count; i++) bag.push(subId); });
+        if (bag.length > totalSlotsPerClass) bag.length = totalSlotsPerClass;
+
+        const slots = [];
+        DAYS.forEach(d => nonBreak.forEach(p => slots.push({ day: d, period: p })));
+        const bagShuffled = shuffle(bag);
+
+        for (const token of bagShuffled) {
+          let chosen = tryPlace(cls, token, shuffle(slots), dayCount, { allowThird: false });
+          if (!chosen) chosen = tryPlace(cls, token, shuffle(slots), dayCount, { allowThird: true });
+          if (!chosen) { skipped++; continue; }
+          commit(cls, chosen, token, dayCount);
+        }
+
+        delete cls.__dayCount;
+      }
     }
 
     this.store.mutate(st => {
@@ -3306,6 +3496,8 @@ const App = {
     if (peBlk) peBlk.checked = s.settings?.enforcePEBlock !== false;
     if (yogCb) yogCb.checked = s.settings?.pinYoga !== false;
     if (ccaCb) ccaCb.checked = s.settings?.pinCCA !== false;
+    const ctP1Cb = $("#f-ct-p1");
+    if (ctP1Cb) ctP1Cb.checked = s.settings?.ctTakesP1 !== false;
     // Live preview of what will appear on exports
     const prev = $("#school-preview");
     if (prev) {
