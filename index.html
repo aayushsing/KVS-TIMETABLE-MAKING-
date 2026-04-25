@@ -1136,7 +1136,13 @@
         <div class="panel">
           <div class="panel-head">
             <h3><span class="dot"></span> <span data-i18n="classes.title">Classes Registry</span></h3>
-            <button class="btn primary small" data-new="class"><span data-i18n="classes.add">+ Add Class</span></button>
+            <div class="flex" style="gap:8px">
+              <button class="btn small" id="btn-bulk-class">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                <span data-i18n="classes.bulk">Bulk Add</span>
+              </button>
+              <button class="btn primary small" data-new="class"><span data-i18n="classes.add">+ Add Class</span></button>
+            </div>
           </div>
           <div id="classes-body"></div>
         </div>
@@ -1527,7 +1533,20 @@ const I18N = {
     "tt.target":"Target", "tt.day":"Day", "tt.month":"Month",
     "tt.empty":"Add classes, teachers, subjects and periods to begin designing.",
     "tt.slot.tap":"Tap to assign",
-    "classes.title":"Classes Registry", "classes.add":"+ Add Class",
+    "classes.title":"Classes Registry", "classes.add":"+ Add Class", "classes.bulk":"Bulk Add",
+    "modal.bulk.title":"Bulk Add Classes",
+    "modal.bulk.sub":"Add a whole grade range with multiple sections in one go.",
+    "modal.bulk.lead":"Pick the grade range and which sections each grade should have. The app will create one class per grade × section combination — for example VI-A, VI-B, VII-A, VII-B…",
+    "modal.bulk.from":"From Grade",
+    "modal.bulk.to":"To Grade",
+    "modal.bulk.sections":"Sections",
+    "modal.bulk.sections.hint":"Tap to toggle which sections each grade has.",
+    "modal.bulk.strength":"Default Strength (per class)",
+    "modal.bulk.willadd":"Will add",
+    "modal.bulk.nothing":"Nothing to add — pick at least one grade and one section.",
+    "modal.bulk.skip":"{n} already exist (skipped)",
+    "modal.bulk.go":"Add All",
+    "modal.bulk.added":"Added {n} classes — scroll down to see them",
     "teachers.title":"Teachers Registry", "teachers.add":"+ Add Teacher",
     "subjects.title":"Subjects Registry", "subjects.add":"+ Add Subject",
     "periods.title":"Period Engine", "periods.add":"+ Add Period",
@@ -1672,7 +1691,20 @@ const I18N = {
     "tt.target":"लक्ष्य", "tt.day":"दिन", "tt.month":"माह",
     "tt.empty":"कक्षा, शिक्षक, विषय और कालांश जोड़कर प्रारम्भ करें।",
     "tt.slot.tap":"असाइन करने हेतु टैप करें",
-    "classes.title":"कक्षा रजिस्टर", "classes.add":"+ कक्षा जोड़ें",
+    "classes.title":"कक्षा रजिस्टर", "classes.add":"+ कक्षा जोड़ें", "classes.bulk":"एकसाथ जोड़ें",
+    "modal.bulk.title":"एकसाथ कक्षाएँ जोड़ें",
+    "modal.bulk.sub":"एक ही बार में पूरी कक्षा-श्रेणी और कई वर्ग जोड़ें।",
+    "modal.bulk.lead":"कक्षा-श्रेणी और वर्ग चुनें। ऐप प्रत्येक संयोजन हेतु एक कक्षा बनाएगा — जैसे VI-A, VI-B, VII-A, VII-B…",
+    "modal.bulk.from":"से (कक्षा)",
+    "modal.bulk.to":"तक (कक्षा)",
+    "modal.bulk.sections":"वर्ग",
+    "modal.bulk.sections.hint":"प्रत्येक कक्षा में कौन-से वर्ग होंगे, चयन करें।",
+    "modal.bulk.strength":"प्रति कक्षा डिफ़ॉल्ट विद्यार्थी संख्या",
+    "modal.bulk.willadd":"जोड़े जाएँगे",
+    "modal.bulk.nothing":"कुछ भी जोड़ने हेतु नहीं — कम से कम एक कक्षा व एक वर्ग चुनें।",
+    "modal.bulk.skip":"{n} पहले से मौजूद (छोड़े गए)",
+    "modal.bulk.go":"सभी जोड़ें",
+    "modal.bulk.added":"{n} कक्षाएँ जोड़ी गईं — नीचे स्क्रॉल करें",
     "teachers.title":"शिक्षक रजिस्टर", "teachers.add":"+ शिक्षक जोड़ें",
     "subjects.title":"विषय रजिस्टर", "subjects.add":"+ विषय जोड़ें",
     "periods.title":"कालांश इंजन", "periods.add":"+ कालांश जोड़ें",
@@ -2005,6 +2037,7 @@ const App = {
 
     // New buttons
     $$("[data-new]").forEach(b => b.addEventListener("click", () => this.openForm(b.dataset.new)));
+    $("#btn-bulk-class")?.addEventListener("click", () => this.openBulkAddClasses());
 
     // Sample seed
     $("#btn-seed").addEventListener("click", () => {
@@ -2499,6 +2532,115 @@ const App = {
   escape(s) { return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); },
 
   /* ── FORM modal ── */
+  openBulkAddClasses() {
+    const ROMAN_LIST = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
+    const body = h("div", { class: "col" });
+    body.append(h("div", { class: "tiny muted", style: "margin-bottom:6px;line-height:1.5" }, t("modal.bulk.lead")));
+
+    // Grade range
+    const rangeRow = h("div", { class: "row cols-2" });
+    const startSel = h("select", { class: "select", id: "bulk-from" });
+    const endSel   = h("select", { class: "select", id: "bulk-to" });
+    ROMAN_LIST.forEach(r => {
+      startSel.append(h("option", { value: r, selected: r === "VI" ? "selected" : null }, r));
+      endSel.append(h("option", { value: r, selected: r === "VIII" ? "selected" : null }, r));
+    });
+    rangeRow.append(
+      h("div", { class: "field" }, h("label", {}, t("modal.bulk.from")), startSel),
+      h("div", { class: "field" }, h("label", {}, t("modal.bulk.to")),   endSel)
+    );
+    body.append(rangeRow);
+
+    // Sections (chip toggles)
+    body.append(h("div", { class: "field", style: "margin-top:6px" },
+      h("label", {}, t("modal.bulk.sections")),
+      h("div", { class: "tiny muted", style: "margin-bottom:6px" }, t("modal.bulk.sections.hint"))
+    ));
+    const sectionBox = h("div", { class: "flex wrap", style: "gap:6px;margin-bottom:8px" });
+    const SECTIONS = ["A","B","C","D","E","F"];
+    SECTIONS.forEach((s, i) => {
+      const cb = h("input", { type: "checkbox", "data-sec": s, checked: i < 2 ? "checked" : null, style: "margin-right:6px" });
+      sectionBox.append(h("label", { class: "chip", style: "cursor:pointer;padding:6px 10px" }, cb, h("strong", {}, s)));
+    });
+    body.append(sectionBox);
+
+    // Default strength
+    body.append(h("div", { class: "field", style: "margin-top:6px" },
+      h("label", {}, t("modal.bulk.strength")),
+      h("input", { type: "number", class: "input", id: "bulk-strength", min: 1, max: 80, value: 40, placeholder: "40" })
+    ));
+
+    // Live preview area
+    const preview = h("div", { class: "tiny", id: "bulk-preview", style: "margin-top:6px;padding:10px;background:var(--surface-2);border:1px dashed var(--stroke-strong);border-radius:8px;line-height:1.7" });
+    body.append(preview);
+
+    const recompute = () => {
+      const ROMAN = { I:1, II:2, III:3, IV:4, V:5, VI:6, VII:7, VIII:8, IX:9, X:10, XI:11, XII:12 };
+      const from = ROMAN[$("#bulk-from").value]; const to = ROMAN[$("#bulk-to").value];
+      const lo = Math.min(from, to), hi = Math.max(from, to);
+      const grades = ROMAN_LIST.filter(r => ROMAN[r] >= lo && ROMAN[r] <= hi);
+      const sections = $$('#bulk-preview').length // dummy to ensure DOM ready
+        ? $$("input[data-sec]").filter(c => c.checked).map(c => c.dataset.sec) : [];
+      const realSections = $$("input[data-sec]").filter(c => c.checked).map(c => c.dataset.sec);
+      const list = [];
+      grades.forEach(g => realSections.forEach(s => list.push(`${g}-${s}`)));
+      // De-dupe against existing classes
+      const existing = new Set((this.store.state.classes || []).map(c => `${c.name}-${c.section}`));
+      const toAdd  = list.filter(x => !existing.has(x));
+      const skip   = list.filter(x =>  existing.has(x));
+      preview.innerHTML = "";
+      const header = h("div", { style: "font-weight:600;margin-bottom:4px" }, `${t("modal.bulk.willadd")}: ${toAdd.length}`);
+      const chipsRow = h("div", { class: "flex wrap", style: "gap:4px" });
+      if (toAdd.length) {
+        toAdd.forEach(x => chipsRow.append(h("span", { class: "chip cyan tiny", style: "margin:2px" }, x)));
+      } else {
+        chipsRow.append(h("span", { class: "muted" }, t("modal.bulk.nothing")));
+      }
+      preview.append(header, chipsRow);
+      if (skip.length) {
+        preview.append(h("div", { style: "margin-top:6px;color:var(--amber)" }, `⚠ ${t("modal.bulk.skip").replace("{n}", skip.length)}: ${skip.join(", ")}`));
+      }
+      preview.dataset.toadd = JSON.stringify(toAdd);
+    };
+
+    this.showModal({
+      title: t("modal.bulk.title"),
+      sub: t("modal.bulk.sub"),
+      body,
+      actions: [
+        { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
+        { label: t("modal.bulk.go"), cls: "btn primary", onClick: () => {
+          const toAdd = JSON.parse($("#bulk-preview").dataset.toadd || "[]");
+          if (!toAdd.length) { this.toast(t("modal.bulk.nothing"), "info"); return; }
+          const strength = parseInt($("#bulk-strength").value, 10) || 40;
+          this.store.mutate(st => {
+            toAdd.forEach(label => {
+              const [name, section] = label.split("-");
+              st.classes.push({
+                id: uid("cls"),
+                name, section,
+                strength,
+                classTeacherId: null
+              });
+            });
+            st.meta.updatedAt = Date.now();
+          });
+          this.closeModal();
+          this.toast(t("modal.bulk.added").replace("{n}", toAdd.length), "success");
+          this.go("classes"); // ensure user lands on the registry
+        }}
+      ]
+    });
+
+    // Wire live recompute, then run once
+    setTimeout(() => {
+      $("#bulk-from").addEventListener("change", recompute);
+      $("#bulk-to").addEventListener("change", recompute);
+      $$("input[data-sec]").forEach(cb => cb.addEventListener("change", recompute));
+      recompute();
+    }, 30);
+  },
+
   openForm(kind, existing = null) {
     const s = this.store.state;
     const body = h("div", { class: "row" });
@@ -2825,7 +2967,7 @@ const App = {
         const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
         if (typeof doc.autoTable !== "function") { this.toast(t("toast.pdf.fallback"), "info"); setTimeout(() => window.print(), 400); return; }
         const isClass = this.state.ttScope === "class";
-        const target = isClass ? s.classes.find(c=>c.id===this.state.ttTarget) : s.teachers.find(t=>t.id===this.state.ttTarget);
+        const target = isClass ? s.classes.find(c=>c.id===this.state.ttTarget) : s.teachers.find(tc=>tc.id===this.state.ttTarget);
         if (!target) { this.toast(t("toast.pick"), "error"); return; }
         this._buildPDFPage(doc, s, target, isClass, /*addPage=*/false);
         const fname = `${(s.school?.name || "KVS").replace(/\s+/g,"_")}_${(isClass ? `${target.name}-${target.section}` : target.code).replace(/\s+/g,"_")}.pdf`;
@@ -3130,7 +3272,7 @@ const App = {
 
   _exportCSV(s) {
     const isClass = this.state.ttScope === "class";
-    const target = isClass ? s.classes.find(c=>c.id===this.state.ttTarget) : s.teachers.find(t=>t.id===this.state.ttTarget);
+    const target = isClass ? s.classes.find(c=>c.id===this.state.ttTarget) : s.teachers.find(tc=>tc.id===this.state.ttTarget);
     if (!target) return;
     const title = isClass ? `Class ${target.name} - ${target.section}` : `${target.name} (${target.code})`;
     const schoolName = s.school?.name || "Kendriya Vidyalaya";
@@ -3501,7 +3643,7 @@ const App = {
 
         let teacherOpts;
         if (forceTeacherId) {
-          const tc = s.teachers.find(t => t.id === forceTeacherId);
+          const tc = s.teachers.find(tc => tc.id === forceTeacherId);
           if (!tc) continue;
           if (busy[key].has(tc.id)) continue;
           if ((tdc[`${slot.day}|${tc.id}`] || 0) >= maxPerDay) continue;
@@ -3545,7 +3687,7 @@ const App = {
     // Find a subject id this class teacher actually teaches FOR THIS CLASS
     const findCTSubjectId = (cls) => {
       if (!cls.classTeacherId) return null;
-      const tc = s.teachers.find(t => t.id === cls.classTeacherId);
+      const tc = s.teachers.find(tc => tc.id === cls.classTeacherId);
       if (!tc) return null;
       const subPlan = plan[cls.id] || {};
       // Prefer subjects in this class's plan that the CT teaches
@@ -3704,11 +3846,14 @@ const App = {
   },
 
   renderBackup() {
-    const bytes = this.store.bytes();
-    const kb = (bytes / 1024).toFixed(2);
     const s = this.store.state;
-    $("#storage-info").textContent =
-      `${kb} KB · ${s.classes.length} classes · ${s.teachers.length} teachers · ${s.subjects.length} subjects · ${s.assignments.length} assignments · updated ${new Date(s.meta.updatedAt).toLocaleString()}`;
+    const storageEl = $("#storage-info");
+    if (storageEl) {
+      const bytes = this.store.bytes();
+      const kb = (bytes / 1024).toFixed(2);
+      storageEl.textContent =
+        `${kb} KB · ${s.classes.length} classes · ${s.teachers.length} teachers · ${s.subjects.length} subjects · ${s.assignments.length} assignments · updated ${new Date(s.meta.updatedAt).toLocaleString()}`;
+    }
     // Populate school settings fields
     const nameEl = $("#f-school-name");
     const sessEl = $("#f-school-session");
@@ -3726,7 +3871,6 @@ const App = {
     if (ccaCb) ccaCb.checked = s.settings?.pinCCA !== false;
     const ctP1Cb = $("#f-ct-p1");
     if (ctP1Cb) ctP1Cb.checked = s.settings?.ctTakesP1 !== false;
-    // Live preview of what will appear on exports
     const prev = $("#school-preview");
     if (prev) {
       const bits = [s.school?.name || t("settings.notset")];
