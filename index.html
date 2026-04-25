@@ -970,6 +970,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span data-i18n="nav.rooms">Rooms</span>
       </button>
+      <button class="nav-item" data-view="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        <span data-i18n="nav.settings">School Settings</span>
+      </button>
 
       <div class="nav-section" data-i18n="nav.system">System</div>
       <button class="nav-item" data-view="backup">
@@ -1183,8 +1187,8 @@
         </div>
       </section>
 
-      <!-- ░░░░░ BACKUP ░░░░░ -->
-      <section class="view" data-view="backup">
+      <!-- ░░░░░ SCHOOL SETTINGS ░░░░░ -->
+      <section class="view" data-view="settings">
         <div class="panel tilt">
           <div class="panel-head">
             <h3><span class="dot" style="background:var(--cyan);box-shadow:0 0 10px var(--cyan)"></span> <span data-i18n="settings.title">School Settings</span></h3>
@@ -1239,8 +1243,11 @@
             </button>
           </div>
         </div>
+      </section>
 
-        <div class="panel tilt" style="margin-top:18px">
+      <!-- ░░░░░ BACKUP ░░░░░ -->
+      <section class="view" data-view="backup">
+        <div class="panel tilt">
           <div class="panel-head">
             <h3><span class="dot"></span> <span data-i18n="backup.title">Vault & Sync</span></h3>
           </div>
@@ -1501,7 +1508,7 @@ const I18N = {
     "nav.core":"Core", "nav.manage":"Manage", "nav.system":"System",
     "nav.dashboard":"Dashboard", "nav.timetable":"Timetable",
     "nav.classes":"Classes", "nav.teachers":"Teachers", "nav.subjects":"Subjects",
-    "nav.periods":"Periods", "nav.rooms":"Rooms", "nav.backup":"Backup", "nav.about":"About",
+    "nav.periods":"Periods", "nav.rooms":"Rooms", "nav.settings":"School Settings", "nav.backup":"Backup", "nav.about":"About",
     "sig.crafted":"CRAFTED BY", "sig.offline":"OFFLINE-FIRST · v1.0",
     "topbar.welcome":"Welcome",
     "hero.badge":"Kendriya Vidyalaya · Operations Cortex",
@@ -1615,6 +1622,25 @@ const I18N = {
     "toast.csv":"CSV ready (opens in Excel)",
     "toast.pdf.err":"PDF error", "toast.xlsx.err":"Excel error",
     "settings.notset":"Not set — tap Save below",
+    "modal.export.title":"Choose Export Scope",
+    "modal.export.sub":"What do you want to download?",
+    "modal.export.lead":"Pick which timetables to include in this export.",
+    "modal.export.school.reminder":"Add School Name & Principal — they appear at the top of every export",
+    "modal.export.school.hint":"You can also edit these later in the Backup tab.",
+    "modal.export.go":"Download",
+    "modal.export.current":"Current view only",
+    "modal.export.current.d":"Just the class or teacher you're looking at right now.",
+    "modal.export.all.combined":"All classes — one combined PDF",
+    "modal.export.all.combined.d":"Every class on its own page in a single PDF file.",
+    "modal.export.all.combined.x":"All classes — one combined Excel",
+    "modal.export.all.combined.x.d":"Every class as a separate sheet (tab) inside one .xlsx file.",
+    "modal.export.all.separate":"All classes — separate files",
+    "modal.export.all.separate.d":"Downloads one PDF file per class.",
+    "modal.export.all.separate.x.d":"Downloads one .xlsx file per class.",
+    "toast.pdf.all":"Combined PDF ready · {n} classes included",
+    "toast.pdf.sep":"Generating {n} PDF files — please allow multiple downloads",
+    "toast.xlsx.all":"Combined workbook ready · {n} class sheets",
+    "toast.xlsx.sep":"Generating {n} Excel files — please allow multiple downloads",
     "toast.theme.light":"Light mode on", "toast.theme.dark":"Dark mode on",
     "toast.autogen.need":"Add this first", "toast.autogen.nosubj":"Assign subjects to teachers first",
     "toast.autogen.done":"Auto-generated · {n} slots filled",
@@ -1627,7 +1653,7 @@ const I18N = {
     "nav.core":"मुख्य", "nav.manage":"प्रबंधन", "nav.system":"सिस्टम",
     "nav.dashboard":"डैशबोर्ड", "nav.timetable":"समय सारणी",
     "nav.classes":"कक्षाएँ", "nav.teachers":"शिक्षक", "nav.subjects":"विषय",
-    "nav.periods":"कालांश", "nav.rooms":"कक्ष", "nav.backup":"बैकअप", "nav.about":"परिचय",
+    "nav.periods":"कालांश", "nav.rooms":"कक्ष", "nav.settings":"विद्यालय सेटिंग्स", "nav.backup":"बैकअप", "nav.about":"परिचय",
     "sig.crafted":"निर्माण", "sig.offline":"ऑफ़लाइन-प्रथम · v1.0",
     "topbar.welcome":"स्वागत है",
     "hero.badge":"केन्द्रीय विद्यालय · संचालन केंद्र",
@@ -1741,6 +1767,23 @@ const I18N = {
     "toast.csv":"CSV तैयार (Excel में खुलता है)",
     "toast.pdf.err":"PDF त्रुटि", "toast.xlsx.err":"Excel त्रुटि",
     "settings.notset":"सेट नहीं — नीचे सहेजें दबाएँ",
+    "modal.export.title":"निर्यात क्षेत्र चुनें",
+    "modal.export.sub":"क्या डाउनलोड करना है?",
+    "modal.export.lead":"इस निर्यात में कौन-सी समय सारणियाँ शामिल हों?",
+    "modal.export.go":"डाउनलोड",
+    "modal.export.current":"केवल वर्तमान दृश्य",
+    "modal.export.current.d":"केवल वही कक्षा या शिक्षक जो अभी देख रहे हैं।",
+    "modal.export.all.combined":"सभी कक्षाएँ — एक संयुक्त PDF",
+    "modal.export.all.combined.d":"प्रत्येक कक्षा एक पृष्ठ पर, एक ही PDF फ़ाइल में।",
+    "modal.export.all.combined.x":"सभी कक्षाएँ — एक संयुक्त Excel",
+    "modal.export.all.combined.x.d":"प्रत्येक कक्षा एक अलग शीट के रूप में, एक .xlsx फ़ाइल में।",
+    "modal.export.all.separate":"सभी कक्षाएँ — पृथक फ़ाइलें",
+    "modal.export.all.separate.d":"प्रत्येक कक्षा हेतु एक अलग PDF।",
+    "modal.export.all.separate.x.d":"प्रत्येक कक्षा हेतु एक अलग .xlsx फ़ाइल।",
+    "toast.pdf.all":"संयुक्त PDF तैयार · {n} कक्षाएँ शामिल",
+    "toast.pdf.sep":"{n} PDF फ़ाइलें बन रही हैं — कई डाउनलोड की अनुमति दें",
+    "toast.xlsx.all":"संयुक्त वर्कबुक तैयार · {n} कक्षा शीट्स",
+    "toast.xlsx.sep":"{n} Excel फ़ाइलें बन रही हैं — कई डाउनलोड की अनुमति दें",
     "toast.theme.light":"उज्ज्वल मोड चालू", "toast.theme.dark":"श्याम मोड चालू",
     "toast.autogen.need":"पहले यह जोड़ें", "toast.autogen.nosubj":"पहले शिक्षकों को विषय सौंपें",
     "toast.autogen.done":"स्वतः निर्मित · {n} खण्ड भरे",
@@ -2695,47 +2738,156 @@ const App = {
   /* ── EXPORT ── */
   exportPDF() {
     const s = this.store.state;
-    if (!this.state.ttTarget) { this.toast(t("toast.pick"), "error"); return; }
-    // If jsPDF or autoTable not loaded (offline / CDN blocked), fall back to browser print-to-PDF
+    // If jsPDF unavailable, fall back to print
     if (!window.jspdf || !window.jspdf.jsPDF) {
       this.toast(t("toast.pdf.fallback"), "info");
       setTimeout(() => window.print(), 400);
       return;
     }
+    // Need at least one class to enable "All classes" options
+    const hasClasses = s.classes.length > 0;
+    if (!this.state.ttTarget && !hasClasses) { this.toast(t("toast.pick"), "error"); return; }
+
+    // Scope picker modal
+    const body = h("div", { class: "col" });
+
+    // Inline school-name reminder/editor — surfaces directly in the export dialog
+    const schName = s.school?.name || "";
+    const schPrin = s.school?.principal || "";
+    const isPlaceholder = !schName || schName === "Kendriya Vidyalaya";
+    if (isPlaceholder || !schPrin) {
+      const reminder = h("div", { class: "panel", style: "padding:12px;background:var(--amber-soft);border:1px dashed var(--amber);border-radius:10px;margin-bottom:12px" });
+      reminder.append(h("div", { class: "tiny", style: "font-weight:600;margin-bottom:6px;color:var(--amber)" }, "⚠ " + t("modal.export.school.reminder")));
+      const inputName = h("input", { type: "text", class: "input", id: "exp-school-name", placeholder: t("settings.school"), value: schName, style: "margin-bottom:6px" });
+      const inputPrin = h("input", { type: "text", class: "input", id: "exp-school-prin", placeholder: t("settings.principal"), value: schPrin });
+      reminder.append(inputName, inputPrin);
+      reminder.append(h("div", { class: "tiny muted", style: "margin-top:4px" }, t("modal.export.school.hint")));
+      body.append(reminder);
+    }
+
+    body.append(h("div", { class: "tiny muted", style: "margin-bottom:10px" }, t("modal.export.lead")));
+    const opts = h("div", { class: "col", style: "gap:6px" });
+    const radios = [];
+    const mkRadio = (val, lbl, desc, isDefault) => {
+      const r = h("input", { type: "radio", name: "exp-scope", value: val, checked: isDefault ? "checked" : null, style: "margin-right:8px" });
+      radios.push(r);
+      return h("label", { class: "chip", style: "cursor:pointer;align-items:flex-start;flex-direction:column;padding:10px 14px;gap:4px" },
+        h("span", { class: "flex", style: "gap:6px" }, r, h("strong", {}, lbl)),
+        h("span", { class: "tiny muted", style: "margin-left:22px" }, desc)
+      );
+    };
+    if (this.state.ttTarget) {
+      opts.append(mkRadio("current", t("modal.export.current"), t("modal.export.current.d"), true));
+    }
+    if (hasClasses) {
+      opts.append(mkRadio("all_combined", t("modal.export.all.combined"), t("modal.export.all.combined.d"), !this.state.ttTarget));
+      opts.append(mkRadio("all_separate", t("modal.export.all.separate"), t("modal.export.all.separate.d"), false));
+    }
+    body.append(opts);
+
+    this.showModal({
+      title: "PDF · " + t("modal.export.title"),
+      sub: t("modal.export.sub"),
+      body,
+      actions: [
+        { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
+        { label: t("modal.export.go"), cls: "btn primary", onClick: () => {
+          const scope = radios.find(r => r.checked)?.value || "current";
+          // Persist any inline school edits before exporting
+          this._captureInlineSchool();
+          this.closeModal();
+          setTimeout(() => this._dispatchPDF(scope), 80);
+        }}
+      ]
+    });
+  },
+
+  _captureInlineSchool() {
+    const nameEl = $("#exp-school-name");
+    const prinEl = $("#exp-school-prin");
+    if (!nameEl && !prinEl) return;
+    const newName = nameEl?.value.trim();
+    const newPrin = prinEl?.value.trim();
+    if (!newName && !newPrin) return;
+    this.store.mutate(st => {
+      st.school = st.school || {};
+      if (newName) st.school.name = newName;
+      if (newPrin !== undefined) st.school.principal = newPrin;
+      st.meta.updatedAt = Date.now();
+    });
+  },
+
+  _dispatchPDF(scope) {
+    const s = this.store.state;
     try {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-      if (typeof doc.autoTable !== "function") {
-        // autotable plugin missing — fall back to print
-        this.toast(t("toast.pdf.fallback"), "info");
-        setTimeout(() => window.print(), 400);
-        return;
+      if (scope === "current") {
+        const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+        if (typeof doc.autoTable !== "function") { this.toast(t("toast.pdf.fallback"), "info"); setTimeout(() => window.print(), 400); return; }
+        const isClass = this.state.ttScope === "class";
+        const target = isClass ? s.classes.find(c=>c.id===this.state.ttTarget) : s.teachers.find(t=>t.id===this.state.ttTarget);
+        if (!target) { this.toast(t("toast.pick"), "error"); return; }
+        this._buildPDFPage(doc, s, target, isClass, /*addPage=*/false);
+        const fname = `${(s.school?.name || "KVS").replace(/\s+/g,"_")}_${(isClass ? `${target.name}-${target.section}` : target.code).replace(/\s+/g,"_")}.pdf`;
+        doc.save(fname);
+        this.toast(t("toast.pdf"), "success");
+      } else if (scope === "all_combined") {
+        const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+        if (typeof doc.autoTable !== "function") { this.toast(t("toast.pdf.fallback"), "info"); setTimeout(() => window.print(), 400); return; }
+        if (!s.classes.length) { this.toast(t("toast.pick"), "error"); return; }
+        // Sort classes by grade then section for predictable order
+        const sorted = [...s.classes].sort((a,b) => {
+          const ga = classGradeNumber(a) || 99, gb = classGradeNumber(b) || 99;
+          if (ga !== gb) return ga - gb;
+          return (a.section || "").localeCompare(b.section || "");
+        });
+        sorted.forEach((cls, i) => this._buildPDFPage(doc, s, cls, /*isClass=*/true, /*addPage=*/i > 0));
+        const fname = `${(s.school?.name || "KVS").replace(/\s+/g,"_")}_All_Classes_${Date.now()}.pdf`;
+        doc.save(fname);
+        this.toast(t("toast.pdf.all").replace("{n}", sorted.length), "success");
+      } else if (scope === "all_separate") {
+        if (!s.classes.length) { this.toast(t("toast.pick"), "error"); return; }
+        const sorted = [...s.classes].sort((a,b) => {
+          const ga = classGradeNumber(a) || 99, gb = classGradeNumber(b) || 99;
+          if (ga !== gb) return ga - gb;
+          return (a.section || "").localeCompare(b.section || "");
+        });
+        // Generate one PDF per class with a small delay between saves so browsers don't merge dialogs
+        sorted.forEach((cls, idx) => {
+          setTimeout(() => {
+            try {
+              const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+              this._buildPDFPage(doc, s, cls, true, false);
+              const fname = `${(s.school?.name || "KVS").replace(/\s+/g,"_")}_${cls.name}-${cls.section}.pdf`;
+              doc.save(fname);
+            } catch (e) { console.error("PDF (separate) error for", cls.name, e); }
+          }, idx * 350);
+        });
+        this.toast(t("toast.pdf.sep").replace("{n}", sorted.length), "info");
       }
-      this._buildPDF(doc, s);
     } catch (err) {
       console.error("PDF error:", err);
       this.toast(t("toast.pdf.err") + ": " + (err.message || err), "error");
     }
   },
 
-  _buildPDF(doc, s) {
-    const isClass = this.state.ttScope === "class";
-    const target = isClass ? s.classes.find(c=>c.id===this.state.ttTarget) : s.teachers.find(t=>t.id===this.state.ttTarget);
-    if (!target) return;
+  // Build ONE class/teacher page into the supplied jsPDF doc (no save).
+  _buildPDFPage(doc, s, target, isClass, addPage) {
+    if (addPage) doc.addPage();
     const title = isClass ? `Class ${target.name} - ${target.section}` : `${target.name} (${target.code})`;
     const schoolName = s.school?.name || "Kendriya Vidyalaya";
     const session    = s.school?.session || "";
     const principal  = s.school?.principal || "";
     const classTeacher = isClass && target.classTeacherId ? s.teachers.find(tc => tc.id === target.classTeacherId) : null;
 
-    doc.setFillColor(5, 7, 13); doc.rect(0, 0, 297, 26, "F");
+    doc.setFillColor(7, 16, 30); doc.rect(0, 0, 297, 26, "F");
     doc.setTextColor(255,255,255);
     doc.setFont("helvetica","bold"); doc.setFontSize(18);
     doc.text(schoolName, 148.5, 11, { align: "center" });
-    doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(200, 220, 255);
+    doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(255, 184, 77);
     const sub1 = [session ? `Session ${session}` : "", title].filter(Boolean).join("   ·   ");
     doc.text(sub1, 148.5, 18, { align: "center" });
-    doc.setFontSize(9); doc.setTextColor(160, 180, 210);
+    doc.setFontSize(9); doc.setTextColor(220, 200, 160);
     const sub2parts = [];
     if (classTeacher) sub2parts.push(`Class Teacher: ${classTeacher.name} (${classTeacher.code})`);
     if (principal)    sub2parts.push(`Principal: ${principal}`);
@@ -2762,12 +2914,10 @@ const App = {
     });
 
     doc.autoTable({
-      head, body,
-      startY: 32,
-      theme: "grid",
+      head, body, startY: 32, theme: "grid",
       styles: { font: "helvetica", fontSize: 8, cellPadding: 3, textColor: 30, lineColor: [180,180,180], lineWidth: 0.2 },
-      headStyles: { fillColor: [10,14,24], textColor: 255, fontStyle: "bold", halign: "center", valign: "middle" },
-      columnStyles: { 0: { fillColor: [235,240,250], fontStyle: "bold", halign:"center", valign:"middle", cellWidth: 22 } },
+      headStyles: { fillColor: [7,16,30], textColor: 255, fontStyle: "bold", halign: "center", valign: "middle" },
+      columnStyles: { 0: { fillColor: [253, 240, 210], fontStyle: "bold", halign:"center", valign:"middle", cellWidth: 22 } },
       didParseCell: (data) => {
         if (data.section === "body" && data.column.index > 0) {
           const txt = data.cell.text.join(" ");
@@ -2784,7 +2934,7 @@ const App = {
         dayTeachers[d] = set.size;
       });
       const endY = doc.lastAutoTable?.finalY || 180;
-      if (endY < 190) {
+      if (endY < 195) {
         doc.setFontSize(8); doc.setTextColor(60);
         doc.setFont("helvetica","bold");
         doc.text("Teachers per day:", 14, endY + 6);
@@ -2796,26 +2946,186 @@ const App = {
 
     doc.setFontSize(8); doc.setTextColor(130);
     doc.text(`${schoolName} · Generated ${new Date().toLocaleString()} · Made by Aayush Singh`, 14, 205);
-    doc.save(`${schoolName.replace(/\s+/g,"_")}_${title.replace(/\s+/g,"_")}.pdf`);
-    this.toast(t("toast.pdf"), "success");
   },
 
   exportXLSX() {
     const s = this.store.state;
-    if (!this.state.ttTarget) { this.toast(t("toast.pick"), "error"); return; }
     if (!window.XLSX) {
-      // Offline / CDN blocked → fall back to simple CSV
       this.toast(t("toast.xlsx.fallback"), "info");
       this._exportCSV(s);
       return;
     }
+    const hasClasses = s.classes.length > 0;
+    if (!this.state.ttTarget && !hasClasses) { this.toast(t("toast.pick"), "error"); return; }
+
+    const body = h("div", { class: "col" });
+    const schName2 = s.school?.name || "";
+    const schPrin2 = s.school?.principal || "";
+    const isPlaceholder2 = !schName2 || schName2 === "Kendriya Vidyalaya";
+    if (isPlaceholder2 || !schPrin2) {
+      const reminder = h("div", { class: "panel", style: "padding:12px;background:var(--amber-soft);border:1px dashed var(--amber);border-radius:10px;margin-bottom:12px" });
+      reminder.append(h("div", { class: "tiny", style: "font-weight:600;margin-bottom:6px;color:var(--amber)" }, "⚠ " + t("modal.export.school.reminder")));
+      const inputName = h("input", { type: "text", class: "input", id: "exp-school-name", placeholder: t("settings.school"), value: schName2, style: "margin-bottom:6px" });
+      const inputPrin = h("input", { type: "text", class: "input", id: "exp-school-prin", placeholder: t("settings.principal"), value: schPrin2 });
+      reminder.append(inputName, inputPrin);
+      reminder.append(h("div", { class: "tiny muted", style: "margin-top:4px" }, t("modal.export.school.hint")));
+      body.append(reminder);
+    }
+
+    body.append(h("div", { class: "tiny muted", style: "margin-bottom:10px" }, t("modal.export.lead")));
+    const opts = h("div", { class: "col", style: "gap:6px" });
+    const radios = [];
+    const mkRadio = (val, lbl, desc, isDefault) => {
+      const r = h("input", { type: "radio", name: "exp-scope", value: val, checked: isDefault ? "checked" : null, style: "margin-right:8px" });
+      radios.push(r);
+      return h("label", { class: "chip", style: "cursor:pointer;align-items:flex-start;flex-direction:column;padding:10px 14px;gap:4px" },
+        h("span", { class: "flex", style: "gap:6px" }, r, h("strong", {}, lbl)),
+        h("span", { class: "tiny muted", style: "margin-left:22px" }, desc)
+      );
+    };
+    if (this.state.ttTarget) {
+      opts.append(mkRadio("current", t("modal.export.current"), t("modal.export.current.d"), true));
+    }
+    if (hasClasses) {
+      opts.append(mkRadio("all_combined", t("modal.export.all.combined.x"), t("modal.export.all.combined.x.d"), !this.state.ttTarget));
+      opts.append(mkRadio("all_separate", t("modal.export.all.separate"), t("modal.export.all.separate.x.d"), false));
+    }
+    body.append(opts);
+
+    this.showModal({
+      title: "Excel · " + t("modal.export.title"),
+      sub: t("modal.export.sub"),
+      body,
+      actions: [
+        { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
+        { label: t("modal.export.go"), cls: "btn primary", onClick: () => {
+          const scope = radios.find(r => r.checked)?.value || "current";
+          this._captureInlineSchool();
+          this.closeModal();
+          setTimeout(() => this._dispatchXLSX(scope), 80);
+        }}
+      ]
+    });
+  },
+
+  _dispatchXLSX(scope) {
+    const s = this.store.state;
     try {
-      this._buildXLSX(s);
+      const sname = (s.school?.name || "KVS").replace(/\s+/g,"_");
+      const summary = [
+        ["KVS Timetable Maker — Export"], [],
+        ["School",     s.school?.name || "—"],
+        ["Session",    s.school?.session || "—"],
+        ["Principal",  s.school?.principal || "—"],
+        ["Generated",  new Date().toLocaleString()],
+        ["Developer",  "Aayush Singh (M.Tech, IIT Delhi)"]
+      ];
+
+      if (scope === "current") {
+        const isClass = this.state.ttScope === "class";
+        const list = isClass ? s.classes : s.teachers;
+        const curr = list.find(x => x.id === this.state.ttTarget);
+        if (!curr) { this.toast(t("toast.pick"), "error"); return; }
+        const wb = XLSX.utils.book_new();
+        const name = isClass ? `${curr.name}-${curr.section}` : curr.code;
+        XLSX.utils.book_append_sheet(wb, this._buildXLSXSheet(s, curr, isClass), name.substring(0, 30));
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), "School Info");
+        XLSX.writeFile(wb, `${sname}_${name}.xlsx`);
+        this.toast(t("toast.xlsx"), "success");
+      } else if (scope === "all_combined") {
+        if (!s.classes.length) { this.toast(t("toast.pick"), "error"); return; }
+        const wb = XLSX.utils.book_new();
+        const sorted = [...s.classes].sort((a,b) => {
+          const ga = classGradeNumber(a) || 99, gb = classGradeNumber(b) || 99;
+          if (ga !== gb) return ga - gb;
+          return (a.section || "").localeCompare(b.section || "");
+        });
+        // Track sheet names to avoid duplicates
+        const used = new Set();
+        sorted.forEach(cls => {
+          let name = `${cls.name}-${cls.section}`.substring(0, 30);
+          let i = 2;
+          while (used.has(name)) { name = `${cls.name}-${cls.section}_${i++}`.substring(0, 30); }
+          used.add(name);
+          XLSX.utils.book_append_sheet(wb, this._buildXLSXSheet(s, cls, true), name);
+        });
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), "School Info");
+        XLSX.writeFile(wb, `${sname}_All_Classes_${Date.now()}.xlsx`);
+        this.toast(t("toast.xlsx.all").replace("{n}", sorted.length), "success");
+      } else if (scope === "all_separate") {
+        if (!s.classes.length) { this.toast(t("toast.pick"), "error"); return; }
+        const sorted = [...s.classes].sort((a,b) => {
+          const ga = classGradeNumber(a) || 99, gb = classGradeNumber(b) || 99;
+          if (ga !== gb) return ga - gb;
+          return (a.section || "").localeCompare(b.section || "");
+        });
+        sorted.forEach((cls, idx) => {
+          setTimeout(() => {
+            try {
+              const wb = XLSX.utils.book_new();
+              XLSX.utils.book_append_sheet(wb, this._buildXLSXSheet(s, cls, true), `${cls.name}-${cls.section}`.substring(0, 30));
+              XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), "School Info");
+              XLSX.writeFile(wb, `${sname}_${cls.name}-${cls.section}.xlsx`);
+            } catch (e) { console.error("XLSX (separate) error for", cls.name, e); }
+          }, idx * 350);
+        });
+        this.toast(t("toast.xlsx.sep").replace("{n}", sorted.length), "info");
+      }
     } catch (err) {
       console.error("Excel error:", err);
       this.toast(t("toast.xlsx.err") + ": " + (err.message || err), "error");
-      this._exportCSV(s); // still give user a download
     }
+  },
+
+  _buildXLSXSheet(s, target, isClassSheet) {
+    const title = isClassSheet ? `Class ${target.name} - ${target.section}` : `${target.name} (${target.code})`;
+    const classTeacher = isClassSheet && target.classTeacherId ? s.teachers.find(tc => tc.id === target.classTeacherId) : null;
+    const rows = [];
+    rows.push([s.school?.name || "Kendriya Vidyalaya"]);
+    rows.push([`Session: ${s.school?.session || "—"}    ·    ${title}`]);
+    const line3 = [];
+    if (classTeacher)         line3.push(`Class Teacher: ${classTeacher.name} (${classTeacher.code})`);
+    if (s.school?.principal)  line3.push(`Principal: ${s.school.principal}`);
+    line3.push(`Generated: ${new Date().toLocaleDateString()}`);
+    rows.push([line3.join("    ·    ")]);
+    rows.push([]);
+    const header = ["Day", ...s.periods.map(p => `${p.label} (${p.start}-${p.end})`)];
+    rows.push(header);
+    DAYS.forEach(d => {
+      const row = [d.toUpperCase()];
+      s.periods.forEach(p => {
+        if (p.isBreak) { row.push("BREAK"); return; }
+        const a = s.assignments.find(x => x.day===d && x.periodId===p.id && (isClassSheet ? x.classId===target.id : x.teacherId===target.id));
+        if (!a) { row.push(""); return; }
+        const sub = s.subjects.find(x=>x.id===a.subjectId);
+        const tc  = s.teachers.find(x=>x.id===a.teacherId);
+        const cl  = s.classes.find(x=>x.id===a.classId);
+        const rm  = s.rooms.find(x=>x.id===a.roomId);
+        const lines = [ sub?.name || "?" ];
+        lines.push(isClassSheet ? (tc?.name || "") : (cl ? `${cl.name}-${cl.section}` : ""));
+        if (rm) lines.push(rm.name);
+        row.push(lines.join(" / "));
+      });
+      rows.push(row);
+    });
+    if (isClassSheet) {
+      rows.push([]);
+      const dayTeachers = DAYS.map(d => {
+        const set = new Set();
+        s.assignments.filter(a => a.classId === target.id && a.day === d).forEach(a => set.add(a.teacherId));
+        return `${d.toUpperCase()}: ${set.size}`;
+      });
+      rows.push(["Teachers per day:", ...dayTeachers]);
+    }
+    const ws = XLSX.utils.aoa_to_sheet(rows);
+    ws["!cols"] = [{ wch: 10 }, ...s.periods.map(() => ({ wch: 22 }))];
+    const totalCols = 1 + s.periods.length;
+    ws["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: totalCols - 1 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: totalCols - 1 } },
+      { s: { r: 2, c: 0 }, e: { r: 2, c: totalCols - 1 } },
+    ];
+    return ws;
   },
 
   _exportCSV(s) {
@@ -2858,88 +3168,6 @@ const App = {
     document.body.append(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     this.toast(t("toast.csv"), "success");
-  },
-
-  _buildXLSX(s) {
-    const isClass = this.state.ttScope === "class";
-    const wb = XLSX.utils.book_new();
-
-    const buildSheet = (target) => {
-      const isClassSheet = isClass;
-      const title = isClassSheet ? `Class ${target.name} - ${target.section}` : `${target.name} (${target.code})`;
-      const classTeacher = isClassSheet && target.classTeacherId ? s.teachers.find(tc => tc.id === target.classTeacherId) : null;
-      // Header block
-      const rows = [];
-      rows.push([s.school?.name || "Kendriya Vidyalaya"]);
-      rows.push([`Session: ${s.school?.session || "—"}    ·    ${title}`]);
-      const line3 = [];
-      if (classTeacher)         line3.push(`Class Teacher: ${classTeacher.name} (${classTeacher.code})`);
-      if (s.school?.principal)  line3.push(`Principal: ${s.school.principal}`);
-      line3.push(`Generated: ${new Date().toLocaleDateString()}`);
-      rows.push([line3.join("    ·    ")]);
-      rows.push([]); // blank
-      // Table
-      const header = ["Day", ...s.periods.map(p => `${p.label} (${p.start}-${p.end})`)];
-      rows.push(header);
-      DAYS.forEach(d => {
-        const row = [d.toUpperCase()];
-        s.periods.forEach(p => {
-          if (p.isBreak) { row.push("BREAK"); return; }
-          const a = s.assignments.find(x => x.day===d && x.periodId===p.id && (isClassSheet ? x.classId===target.id : x.teacherId===target.id));
-          if (!a) { row.push(""); return; }
-          const sub = s.subjects.find(x=>x.id===a.subjectId);
-          const tc  = s.teachers.find(x=>x.id===a.teacherId);
-          const cl  = s.classes.find(x=>x.id===a.classId);
-          const rm  = s.rooms.find(x=>x.id===a.roomId);
-          const lines = [ sub?.name || "?" ];
-          lines.push(isClassSheet ? (tc?.name || "") : (cl ? `${cl.name}-${cl.section}` : ""));
-          if (rm) lines.push(rm.name);
-          row.push(lines.join(" / "));
-        });
-        rows.push(row);
-      });
-      // Teachers-per-day footer (class mode)
-      if (isClassSheet) {
-        rows.push([]);
-        const dayTeachers = DAYS.map(d => {
-          const set = new Set();
-          s.assignments.filter(a => a.classId === target.id && a.day === d).forEach(a => set.add(a.teacherId));
-          return `${d.toUpperCase()}: ${set.size}`;
-        });
-        rows.push(["Teachers per day:", ...dayTeachers]);
-      }
-      const ws = XLSX.utils.aoa_to_sheet(rows);
-      ws["!cols"] = [{ wch: 10 }, ...s.periods.map(() => ({ wch: 22 }))];
-      // Merge the top 3 header rows across all columns
-      const totalCols = 1 + s.periods.length;
-      ws["!merges"] = [
-        { s: { r: 0, c: 0 }, e: { r: 0, c: totalCols - 1 } },
-        { s: { r: 1, c: 0 }, e: { r: 1, c: totalCols - 1 } },
-        { s: { r: 2, c: 0 }, e: { r: 2, c: totalCols - 1 } },
-      ];
-      return ws;
-    };
-
-    // export either one sheet (current target) or all classes
-    const list = isClass ? s.classes : s.teachers;
-    const curr = list.find(x => x.id === this.state.ttTarget);
-    if (curr) {
-      const name = isClass ? `${curr.name}-${curr.section}` : `${curr.code}`;
-      XLSX.utils.book_append_sheet(wb, buildSheet(curr), name.substring(0, 30));
-    }
-    // also append a summary sheet listing everything
-    const summary = [
-      ["KVS Timetable Maker — Export"], [],
-      ["School",     s.school?.name || "—"],
-      ["Session",    s.school?.session || "—"],
-      ["Principal",  s.school?.principal || "—"],
-      ["Generated",  new Date().toLocaleString()],
-      ["Developer",  "Aayush Singh (M.Tech, IIT Delhi)"]
-    ];
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), "School Info");
-    const sname = (s.school?.name || "KVS").replace(/\s+/g,"_");
-    XLSX.writeFile(wb, `${sname}_Timetable_${Date.now()}.xlsx`);
-    this.toast(t("toast.xlsx"), "success");
   },
 
   exportJSON() {
