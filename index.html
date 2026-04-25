@@ -715,6 +715,9 @@
     max-width: 330px;
   }
   .install-banner.show { transform: translateY(0); opacity: 1; }
+  /* When restore banner shows, lift install banner above it */
+  .restore-banner.show ~ #install-banner.show { bottom: 100px; }
+  .restore-banner { bottom: 20px; }
   .install-banner-icon {
     width: 40px; height: 40px; border-radius: 10px;
     background: var(--grad-accent); display: grid; place-items: center;
@@ -1370,6 +1373,21 @@
   </button>
 </div>
 
+<!-- ═══════════════ RESTORE BANNER (after sample load) ═══════════════ -->
+<div class="install-banner restore-banner" id="restore-banner">
+  <div class="install-banner-icon" style="background:linear-gradient(135deg,#ffb84d,#ff7a29)">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0a0f1a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9"/><polyline points="3 4 3 12 11 12"/></svg>
+  </div>
+  <div class="install-banner-text">
+    <strong data-i18n="restore.title">Restore your data</strong>
+    <span id="restore-summary" data-i18n="restore.sub">Your previous data was saved before loading the sample</span>
+  </div>
+  <button class="btn small primary" id="restore-go" data-i18n="restore.go">Restore</button>
+  <button class="icon-btn" id="restore-dismiss" aria-label="Dismiss">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+</div>
+
 <!-- ═══════════════════════════════════════════════════════════════════
      APPLICATION KERNEL
      Architected by Aayush Singh — class-based, observable, reactive.
@@ -1647,6 +1665,25 @@ const I18N = {
     "modal.export.school.reminder":"Add School Name & Principal — they appear at the top of every export",
     "modal.export.school.hint":"You can also edit these later in the Backup tab.",
     "modal.export.go":"Download",
+    "modal.sample.title":"Load Sample KVS Data?",
+    "modal.sample.sub":"This will replace what's currently in the vault.",
+    "modal.sample.warn":"You already have data in this app",
+    "modal.sample.has":"Loading sample data will replace everything below with KVS demo content:",
+    "modal.sample.info":"Don't worry — your current data will be saved automatically. You'll see a Restore button after loading so you can bring it back any time.",
+    "modal.sample.load":"Save my data & load sample",
+    "modal.restore.title":"Restore your previous data?",
+    "modal.restore.sub":"This replaces the current sample with what you had before.",
+    "modal.restore.info":"Restoring will overwrite the sample data currently shown. Your real data will be brought back exactly as it was.",
+    "modal.restore.go":"↩ Restore my data",
+    "modal.restore.discard":"Delete backup",
+    "restore.title":"Restore your data",
+    "restore.sub":"Your previous data was saved before loading the sample",
+    "restore.saved":"Saved",
+    "restore.go":"Restore",
+    "toast.sample.saved":"Sample loaded · your data was backed up",
+    "toast.restore.done":"Your data is back",
+    "toast.restore.discarded":"Backup discarded",
+    "toast.restore.none":"No backup to restore",
     "modal.export.current":"Current view only",
     "modal.export.current.d":"Just the class or teacher you're looking at right now.",
     "modal.export.all.combined":"All classes — one combined PDF",
@@ -1803,6 +1840,25 @@ const I18N = {
     "modal.export.sub":"क्या डाउनलोड करना है?",
     "modal.export.lead":"इस निर्यात में कौन-सी समय सारणियाँ शामिल हों?",
     "modal.export.go":"डाउनलोड",
+    "modal.sample.title":"नमूना KVS डेटा लोड करें?",
+    "modal.sample.sub":"यह वर्तमान सभी डेटा को बदल देगा।",
+    "modal.sample.warn":"इस ऐप में आपका डेटा पहले से मौजूद है",
+    "modal.sample.has":"नमूना डेटा लोड करने पर निम्न सभी प्रतिस्थापित हो जाएगा:",
+    "modal.sample.info":"चिंता न करें — आपका वर्तमान डेटा स्वचालित रूप से सहेजा जाएगा। लोड के बाद आपको Restore बटन दिखेगा जिससे कभी भी वापस ला सकते हैं।",
+    "modal.sample.load":"मेरा डेटा सहेजें व नमूना लोड करें",
+    "modal.restore.title":"अपना पिछला डेटा पुनः लाएँ?",
+    "modal.restore.sub":"यह वर्तमान नमूना डेटा को आपके पुराने डेटा से बदल देगा।",
+    "modal.restore.info":"पुनः लाने पर वर्तमान नमूना डेटा हट जाएगा। आपका वास्तविक डेटा यथावत वापस आ जाएगा।",
+    "modal.restore.go":"↩ मेरा डेटा वापस लाएँ",
+    "modal.restore.discard":"बैकअप हटाएँ",
+    "restore.title":"अपना डेटा पुनः लाएँ",
+    "restore.sub":"नमूना लोड करने से पहले आपका पिछला डेटा सहेजा गया था",
+    "restore.saved":"सहेजा गया",
+    "restore.go":"पुनः लाएँ",
+    "toast.sample.saved":"नमूना लोड · आपका डेटा सहेजा गया",
+    "toast.restore.done":"आपका डेटा वापस है",
+    "toast.restore.discarded":"बैकअप हटाया गया",
+    "toast.restore.none":"पुनः लाने हेतु कोई बैकअप नहीं",
     "modal.export.current":"केवल वर्तमान दृश्य",
     "modal.export.current.d":"केवल वही कक्षा या शिक्षक जो अभी देख रहे हैं।",
     "modal.export.all.combined":"सभी कक्षाएँ — एक संयुक्त PDF",
@@ -1980,6 +2036,8 @@ const App = {
     setTimeout(() => { $("#boot").classList.add("done"); }, 3000);
     this.updateTopbarDate();
     setInterval(() => this.updateTopbarDate(), 60000);
+    // Show restore banner if a backup exists from a prior sample-load
+    setTimeout(() => this._renderRestoreBanner(), 3200);
   },
 
   setTheme(theme) {
@@ -2039,11 +2097,8 @@ const App = {
     $$("[data-new]").forEach(b => b.addEventListener("click", () => this.openForm(b.dataset.new)));
     $("#btn-bulk-class")?.addEventListener("click", () => this.openBulkAddClasses());
 
-    // Sample seed
-    $("#btn-seed").addEventListener("click", () => {
-      this.store.replace(SAMPLE_VAULT());
-      this.toast(t("toast.sample"), "success");
-    });
+    // Sample seed — protects user data with confirm + auto-backup
+    $("#btn-seed").addEventListener("click", () => this.confirmLoadSample());
 
     // Timetable controls
     $("#tt-view").addEventListener("change", (e) => { this.state.ttViewMode = e.target.value; this.renderTimetable(); });
@@ -2119,6 +2174,13 @@ const App = {
       $("#install-banner").classList.remove("show");
     });
     $("#install-dismiss").addEventListener("click", () => $("#install-banner").classList.remove("show"));
+
+    // Restore banner buttons
+    $("#restore-go")?.addEventListener("click", () => this.confirmRestoreUserData());
+    $("#restore-dismiss")?.addEventListener("click", () => {
+      // Don't delete the backup, just hide the banner; user can still use Backup tab
+      $("#restore-banner").classList.remove("show");
+    });
 
     // 3D tilt for panels
     this.bindTilt();
@@ -3336,6 +3398,114 @@ const App = {
     };
     fr.readAsText(file);
     $("#file-import").value = "";
+  },
+
+  confirmLoadSample() {
+    const s = this.store.state;
+    const hasUserData = (s.classes.length + s.teachers.length + s.subjects.length + s.assignments.length) > 0;
+
+    // If the vault is empty, just load directly — no need to confirm
+    if (!hasUserData) {
+      this._performLoadSample(/*saveBackup=*/false);
+      return;
+    }
+
+    // Otherwise warn the user and offer to back up first
+    const summary = `${s.classes.length} ${t("nav.classes").toLowerCase()} · ${s.teachers.length} ${t("nav.teachers").toLowerCase()} · ${s.subjects.length} ${t("nav.subjects").toLowerCase()} · ${s.assignments.length} ${t("stat.assigned").toLowerCase()}`;
+
+    const body = h("div", { class: "col" });
+    body.append(
+      h("div", { class: "chip amber", style: "margin-bottom:10px" }, "⚠ " + t("modal.sample.warn")),
+      h("div", { class: "tiny", style: "line-height:1.6" }, t("modal.sample.has")),
+      h("div", { class: "chip cyan mono", style: "margin:8px 0" }, "▣ " + summary),
+      h("div", { class: "tiny muted", style: "line-height:1.6" }, t("modal.sample.info"))
+    );
+
+    this.showModal({
+      title: t("modal.sample.title"),
+      sub: t("modal.sample.sub"),
+      body,
+      actions: [
+        { label: t("modal.cancel"), cls: "btn ghost", onClick: () => this.closeModal() },
+        { label: t("modal.sample.load"), cls: "btn primary", onClick: () => {
+          this._performLoadSample(/*saveBackup=*/true);
+          this.closeModal();
+        }}
+      ]
+    });
+  },
+
+  _performLoadSample(saveBackup) {
+    if (saveBackup) {
+      // Save current state as a "previous data" backup the user can restore
+      try {
+        const snapshot = {
+          savedAt: Date.now(),
+          data: clone(this.store.state)
+        };
+        localStorage.setItem("kvs_user_data_backup", JSON.stringify(snapshot));
+      } catch (e) {
+        console.warn("Could not save backup:", e);
+      }
+    }
+    this.store.replace(SAMPLE_VAULT());
+    this.toast(saveBackup ? t("toast.sample.saved") : t("toast.sample"), "success");
+    // Re-render install banner area to surface restore option
+    this._renderRestoreBanner();
+  },
+
+  _hasUserBackup() {
+    try {
+      const raw = localStorage.getItem("kvs_user_data_backup");
+      if (!raw) return null;
+      const obj = JSON.parse(raw);
+      if (!obj || !obj.data) return null;
+      return obj;
+    } catch (e) { return null; }
+  },
+
+  _renderRestoreBanner() {
+    const backup = this._hasUserBackup();
+    const banner = $("#restore-banner");
+    if (!banner) return;
+    if (!backup) { banner.classList.remove("show"); return; }
+    const d = new Date(backup.savedAt);
+    const dateStr = d.toLocaleDateString() + " " + d.toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+    const ds = backup.data;
+    const summary = `${(ds.classes||[]).length}c · ${(ds.teachers||[]).length}t · ${(ds.subjects||[]).length}s · ${(ds.assignments||[]).length}a`;
+    $("#restore-summary").textContent = `${t("restore.saved")} ${dateStr} · ${summary}`;
+    banner.classList.add("show");
+  },
+
+  confirmRestoreUserData() {
+    const backup = this._hasUserBackup();
+    if (!backup) { this.toast(t("toast.restore.none"), "info"); return; }
+    const d = new Date(backup.savedAt);
+    const dateStr = d.toLocaleDateString() + " " + d.toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+    this.showModal({
+      title: t("modal.restore.title"),
+      sub: t("modal.restore.sub"),
+      body: h("div", { class: "col" },
+        h("div", { class: "chip cyan", style: "margin-bottom:10px" }, "↩ " + t("restore.saved") + " " + dateStr),
+        h("div", { class: "tiny muted", style: "line-height:1.6" }, t("modal.restore.info"))
+      ),
+      actions: [
+        { label: t("modal.cancel"),  cls: "btn ghost",   onClick: () => this.closeModal() },
+        { label: t("modal.restore.discard"), cls: "btn danger", onClick: () => {
+          localStorage.removeItem("kvs_user_data_backup");
+          this._renderRestoreBanner();
+          this.closeModal();
+          this.toast(t("toast.restore.discarded"), "info");
+        }},
+        { label: t("modal.restore.go"), cls: "btn primary", onClick: () => {
+          this.store.replace(backup.data);
+          localStorage.removeItem("kvs_user_data_backup");
+          this._renderRestoreBanner();
+          this.closeModal();
+          this.toast(t("toast.restore.done"), "success");
+        }}
+      ]
+    });
   },
 
   confirmWipe() {
