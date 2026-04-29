@@ -19,11 +19,29 @@
 <meta name="msapplication-TileColor" content="#05070d" />
 <meta name="msapplication-tap-highlight" content="no" />
 
-<title>KVS Timetable Nexus · आकाश</title>
+<title>KVS Timetable Maker · आकाश</title>
+
+<!-- ═══════════════ PWA / Add-to-Home-Screen ═══════════════ -->
+<meta name="theme-color" content="#ff7a29" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d1a2e" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="KVS Timetable">
+
+<!-- iOS / Safari standalone-mode support — when user taps Add to Home Screen, the app launches without browser chrome -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="KVS Timetable">
+<meta name="format-detection" content="telephone=no">
+
+<!-- Installable manifest — inlined as a data: URL so the single-file build works without any external server file. -->
+<link rel="manifest" href='data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22KVS%20Timetable%20Maker%22%2C%22short_name%22%3A%22KVS%20Timetable%22%2C%22description%22%3A%22Offline%20timetable%20engine%20for%20Kendriya%20Vidyalaya%20schools%22%2C%22start_url%22%3A%22.%22%2C%22scope%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22display_override%22%3A%5B%22standalone%22%2C%22minimal-ui%22%5D%2C%22orientation%22%3A%22any%22%2C%22background_color%22%3A%22%23fdf7e9%22%2C%22theme_color%22%3A%22%23ff7a29%22%2C%22categories%22%3A%5B%22education%22%2C%22productivity%22%5D%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%2522http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%2522%2520viewBox%3D%25220%25200%2520192%2520192%2522%253E%253Cdefs%253E%253ClinearGradient%2520id%3D%2522g%2522%2520x1%3D%25220%2522%2520x2%3D%25221%2522%2520y1%3D%25220%2522%2520y2%3D%25221%2522%253E%253Cstop%2520offset%3D%25220%2522%2520stop-color%3D%2522%2523ffb84d%2522%2F%253E%253Cstop%2520offset%3D%25221%2522%2520stop-color%3D%2522%2523ff7a29%2522%2F%253E%253C%2FlinearGradient%253E%253C%2Fdefs%253E%253Crect%2520width%3D%2522192%2522%2520height%3D%2522192%2522%2520rx%3D%252242%2522%2520fill%3D%2522%252307101e%2522%2F%253E%253Cpath%2520d%3D%2522M44%252042h22v42l36-42h28L92%252094l42%252052h-28L66%2520104v42H44z%2522%2520fill%3D%2522url(%2523g)%2522%2F%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%2C%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%2522http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%2522%2520viewBox%3D%25220%25200%2520512%2520512%2522%253E%253Cdefs%253E%253ClinearGradient%2520id%3D%2522g%2522%2520x1%3D%25220%2522%2520x2%3D%25221%2522%2520y1%3D%25220%2522%2520y2%3D%25221%2522%253E%253Cstop%2520offset%3D%25220%2522%2520stop-color%3D%2522%2523ffb84d%2522%2F%253E%253Cstop%2520offset%3D%25221%2522%2520stop-color%3D%2522%2523ff7a29%2522%2F%253E%253C%2FlinearGradient%253E%253C%2Fdefs%253E%253Crect%2520width%3D%2522512%2522%2520height%3D%2522512%2522%2520rx%3D%2522110%2522%2520fill%3D%2522%252307101e%2522%2F%253E%253Cpath%2520d%3D%2522M120%2520112h58v112l96-112h74L248%2520250l112%2520138h-74L178%2520278v110h-58z%2522%2520fill%3D%2522url(%2523g)%2522%2F%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D' />
 
 <!-- Inline SVG favicon + apple-touch-icon (so everything stays in a single file) -->
-<link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="%2300e5ff"/><stop offset="1" stop-color="%23ff9933"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="%23070a12"/><path d="M14 14h8v14l12-14h10L30 32l14 18H34L22 36v14h-8z" fill="url(%23g)"/></svg>' />
-<link rel="apple-touch-icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="%2300e5ff"/><stop offset="1" stop-color="%23ff9933"/></linearGradient></defs><rect width="180" height="180" rx="40" fill="%23070a12"/><path d="M40 40h22v40l34-40h28L86 90l40 50H98L62 100v40H40z" fill="url(%23g)"/></svg>' />
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="%23ffb84d"/><stop offset="1" stop-color="%23ff7a29"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="%2307101e"/><path d="M14 14h8v14l12-14h10L30 32l14 18H34L22 36v14h-8z" fill="url(%23g)"/></svg>' />
+<link rel="apple-touch-icon" sizes="180x180" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="%23ffb84d"/><stop offset="1" stop-color="%23ff7a29"/></linearGradient></defs><rect width="180" height="180" rx="40" fill="%2307101e"/><path d="M40 40h22v40l34-40h28L86 90l40 50H98L62 100v40H40z" fill="url(%23g)"/></svg>' />
+<link rel="apple-touch-icon" sizes="167x167" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 167 167"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="%23ffb84d"/><stop offset="1" stop-color="%23ff7a29"/></linearGradient></defs><rect width="167" height="167" rx="38" fill="%2307101e"/><path d="M38 38h20v38l32-38h26L80 84l38 47h-22L58 95v38H38z" fill="url(%23g)"/></svg>' />
+<link rel="apple-touch-icon" sizes="152x152" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 152 152"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="%23ffb84d"/><stop offset="1" stop-color="%23ff7a29"/></linearGradient></defs><rect width="152" height="152" rx="34" fill="%2307101e"/><path d="M34 34h18v34l28-34h24L72 76l34 42h-22L52 86v34H34z" fill="url(%23g)"/></svg>' />
 
 <!-- External libraries via CDN (used for export only; the app runs fully offline after first load) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
@@ -1893,7 +1911,21 @@ const I18N = {
     "about.f4":"Bilingual · English & हिन्दी",
     "about.f5":"PDF & Excel export",
     "about.f6":"Installable on iPhone, Android, Windows",
-    "install.title":"Install Nexus", "install.sub":"Add to home screen for an app-like experience", "install.go":"Install",
+    "install.title":"Install KVS Timetable", "install.sub":"Add to your home screen — works offline like an app", "install.go":"Install",
+    "install.howto.title":"Install on this device",
+    "install.howto.sub":"Add KVS Timetable to your home screen",
+    "install.howto.lead":"Adding to home screen lets you open the app from an icon — just like any other app on your phone. Works fully offline. No app store needed.",
+    "install.howto.hint":"After installing, the boot screen will appear with the saffron \"A\" loader.",
+    "install.ios.s1":"Tap the Share button at the bottom of Safari (the square with an arrow ↑).",
+    "install.ios.s2":"Scroll down in the share sheet and tap \"Add to Home Screen\".",
+    "install.ios.s3":"Tap \"Add\" in the top-right corner.",
+    "install.ios.s4":"The KVS Timetable app icon will appear on your home screen.",
+    "install.and.s1":"Tap the menu (⋮) button at the top-right of Chrome.",
+    "install.and.s2":"Tap \"Install app\" or \"Add to Home screen\".",
+    "install.and.s3":"Confirm the install — the icon will appear on your home screen.",
+    "install.desk.s1":"Click the install icon (⊕) in the address bar of your browser.",
+    "install.desk.s2":"The app will open in its own window like a desktop app.",
+    "modal.ok":"OK",
     "modal.cancel":"Cancel", "modal.save":"Save", "modal.delete":"Delete", "modal.confirm":"Confirm",
     "f.class.name":"Class Name", "f.class.section":"Section", "f.class.strength":"Strength",
     "f.class.teacher":"Class Teacher", "f.class.noteacher":"No class teacher", "f.class.alreadyct":"already class teacher of",
@@ -2108,7 +2140,21 @@ const I18N = {
     "about.f4":"द्विभाषी · English व हिन्दी",
     "about.f5":"PDF व Excel निर्यात",
     "about.f6":"iPhone, Android, Windows पर इंस्टॉल",
-    "install.title":"Nexus इंस्टॉल करें", "install.sub":"ऐप-जैसा अनुभव — होम स्क्रीन पर जोड़ें", "install.go":"इंस्टॉल",
+    "install.title":"KVS Timetable इंस्टॉल करें", "install.sub":"होम स्क्रीन पर जोड़ें — ऐप जैसा अनुभव", "install.go":"इंस्टॉल",
+    "install.howto.title":"इस उपकरण पर इंस्टॉल करें",
+    "install.howto.sub":"KVS Timetable को होम स्क्रीन पर जोड़ें",
+    "install.howto.lead":"होम स्क्रीन पर जोड़ने से ऐप एक आइकन से खुलेगा — किसी भी सामान्य ऐप जैसा। ऑफ़लाइन भी काम करता है। ऐप स्टोर की आवश्यकता नहीं।",
+    "install.howto.hint":"इंस्टॉल के बाद, खुलते समय \"A\" लोडर वाली बूट स्क्रीन दिखेगी।",
+    "install.ios.s1":"Safari में नीचे शेयर बटन पर टैप करें (तीर सहित चौकोर ↑)।",
+    "install.ios.s2":"शेयर शीट में नीचे स्क्रॉल कर \"Add to Home Screen\" पर टैप करें।",
+    "install.ios.s3":"ऊपर-दाएँ कोने में \"Add\" पर टैप करें।",
+    "install.ios.s4":"KVS Timetable का आइकन आपकी होम स्क्रीन पर दिख जाएगा।",
+    "install.and.s1":"Chrome में ऊपर-दाएँ कोने पर मेन्यू (⋮) बटन पर टैप करें।",
+    "install.and.s2":"\"Install app\" या \"Add to Home screen\" पर टैप करें।",
+    "install.and.s3":"इंस्टॉल की पुष्टि करें — आइकन होम स्क्रीन पर आ जाएगा।",
+    "install.desk.s1":"ब्राउज़र की एड्रेस बार में इंस्टॉल आइकन (⊕) पर क्लिक करें।",
+    "install.desk.s2":"ऐप अपनी अलग विंडो में खुलेगा — डेस्कटॉप ऐप जैसा।",
+    "modal.ok":"ठीक है",
     "modal.cancel":"रद्द", "modal.save":"सहेजें", "modal.delete":"हटाएँ", "modal.confirm":"पुष्टि करें",
     "f.class.name":"कक्षा नाम", "f.class.section":"वर्ग", "f.class.strength":"विद्यार्थी संख्या",
     "f.class.teacher":"कक्षा शिक्षक", "f.class.noteacher":"कक्षा शिक्षक नहीं", "f.class.alreadyct":"पहले से कक्षा शिक्षक",
@@ -2521,21 +2567,36 @@ const App = {
       if (e.key === "Escape" && $("#modal-backdrop").classList.contains("open")) this.closeModal();
     });
 
-    // PWA install prompt
+    // PWA install prompt — Android / Chrome
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       this.state.deferredInstall = e;
       setTimeout(() => $("#install-banner").classList.add("show"), 2500);
     });
     $("#install-go").addEventListener("click", async () => {
-      if (!this.state.deferredInstall) return;
+      // iOS path — Safari has no beforeinstallprompt; we show the manual instructions
+      if (!this.state.deferredInstall) {
+        this._showIOSInstallInstructions();
+        return;
+      }
       this.state.deferredInstall.prompt();
       const { outcome } = await this.state.deferredInstall.userChoice;
       if (outcome === "accepted") this.toast(t("toast.installed"), "success");
       this.state.deferredInstall = null;
       $("#install-banner").classList.remove("show");
     });
-    $("#install-dismiss").addEventListener("click", () => $("#install-banner").classList.remove("show"));
+    $("#install-dismiss").addEventListener("click", () => {
+      $("#install-banner").classList.remove("show");
+      try { localStorage.setItem("kvs_install_dismissed", "1"); } catch(e) {}
+    });
+
+    // Show install banner on iOS too — Safari doesn't fire beforeinstallprompt, so we surface our own
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+    const dismissed = localStorage.getItem("kvs_install_dismissed");
+    if (isIOS && !isStandalone && !dismissed) {
+      setTimeout(() => $("#install-banner").classList.add("show"), 3000);
+    }
 
     // Restore banner buttons
     $("#restore-go")?.addEventListener("click", () => this.confirmRestoreUserData());
@@ -5021,16 +5082,61 @@ const App = {
   },
 
   /* ── PWA Service Worker (registered from inline blob) ── */
+  _showIOSInstallInstructions() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isAndroid = /Android/.test(navigator.userAgent);
+    const body = h("div", { class: "col" });
+    body.append(h("div", { class: "tiny muted", style: "line-height:1.7;margin-bottom:12px" }, t("install.howto.lead")));
+
+    const steps = h("ol", { style: "padding-left:22px;margin:0;line-height:1.9" });
+    if (isIOS) {
+      steps.append(
+        h("li", {}, t("install.ios.s1")),
+        h("li", {}, t("install.ios.s2")),
+        h("li", {}, t("install.ios.s3")),
+        h("li", {}, t("install.ios.s4"))
+      );
+    } else if (isAndroid) {
+      steps.append(
+        h("li", {}, t("install.and.s1")),
+        h("li", {}, t("install.and.s2")),
+        h("li", {}, t("install.and.s3"))
+      );
+    } else {
+      steps.append(
+        h("li", {}, t("install.desk.s1")),
+        h("li", {}, t("install.desk.s2"))
+      );
+    }
+    body.append(steps);
+    body.append(h("div", { class: "chip cyan", style: "margin-top:14px;display:inline-block" }, "✦ " + t("install.howto.hint")));
+
+    this.showModal({
+      title: t("install.howto.title"),
+      sub: t("install.howto.sub"),
+      body,
+      actions: [
+        { label: t("modal.ok"), cls: "btn primary", onClick: () => this.closeModal() }
+      ]
+    });
+  },
+
   registerSW() {
     if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
     try {
       const swCode = `
-        const CACHE = "kvs-nexus-v1";
+        const CACHE = "kvs-timetable-v2";
         self.addEventListener("install", (e) => {
           e.waitUntil(caches.open(CACHE).then(c => c.add(self.registration.scope)));
           self.skipWaiting();
         });
-        self.addEventListener("activate", (e) => { e.waitUntil(self.clients.claim()); });
+        self.addEventListener("activate", (e) => {
+          e.waitUntil(
+            caches.keys().then(keys =>
+              Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+            ).then(() => self.clients.claim())
+          );
+        });
         self.addEventListener("fetch", (e) => {
           const req = e.request;
           if (req.method !== "GET") return;
@@ -5046,29 +5152,8 @@ const App = {
       const blob = new Blob([swCode], { type: "application/javascript" });
       const url  = URL.createObjectURL(blob);
       navigator.serviceWorker.register(url).catch(() => {/* silent */});
-
-      // Inline manifest via data URI for add-to-home-screen
-      const manifest = {
-        name: "KVS Timetable Nexus",
-        short_name: "KVS Nexus",
-        description: "Offline timetable engine for Kendriya Vidyalaya schools · by Aayush Singh",
-        start_url: ".",
-        scope: ".",
-        display: "standalone",
-        orientation: "any",
-        background_color: "#05070d",
-        theme_color: "#05070d",
-        icons: [
-          { src: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0' stop-color='%2300e5ff'/><stop offset='1' stop-color='%23ff9933'/></linearGradient></defs><rect width='192' height='192' rx='42' fill='%23070a12'/><path d='M44 42h22v42l36-42h28L92 94l42 52h-28L66 104v42H44z' fill='url(%23g)'/></svg>", sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" },
-          { src: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0' stop-color='%2300e5ff'/><stop offset='1' stop-color='%23ff9933'/></linearGradient></defs><rect width='512' height='512' rx='110' fill='%23070a12'/><path d='M120 112h58v112l96-112h74L248 250l112 138h-74L178 278v110h-58z' fill='url(%23g)'/></svg>", sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
-        ]
-      };
-      const manifestUrl = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" }));
-      const link = document.createElement("link");
-      link.rel = "manifest";
-      link.href = manifestUrl;
-      document.head.append(link);
-    } catch (e) { console.warn("SW/Manifest failed:", e); }
+      // Manifest is now declared statically in <head> — no runtime injection needed.
+    } catch (e) { console.warn("SW failed:", e); }
   }
 };
 
