@@ -880,6 +880,8 @@
 
   /* Lock indicator on locked timetable slots */
   .lock-tag { position: absolute; top: 6px; right: 6px; font-size: 12px; opacity: .85; line-height: 1; }
+  .block-tag { position: absolute; top: 6px; left: 6px; font-size: 11px; line-height: 1; padding: 2px 5px; border-radius: 4px; background: var(--violet); color: #fff; font-weight: 700; }
+  .practical-tag { position: absolute; bottom: 6px; right: 6px; font-size: 12px; line-height: 1; opacity: .9; }
   .slot.filled { position: relative; }
   /* Drag-to-swap visual states */
   .slot.dragging { opacity: .4; transform: scale(.96); }
@@ -1987,6 +1989,14 @@ const I18N = {
     "f.teacher.overrides.hint":"Override the general list for specific classes (e.g. teaches Math in Class 7 but Computer in Class 8). Leave a class as-is to inherit the general list above.",
     "f.teacher.overrides.noclasses":"Add some classes first to map per-class subjects.",
     "f.subject.name":"Subject Name", "f.subject.code":"Code", "f.subject.color":"Accent Colour",
+    "f.subject.block":"Block period (2 consecutive periods)",
+    "f.subject.block.hint":"For Class 9 & 10 — auto-gen will place this subject as 2 back-to-back periods on the same day. Recommended for Maths and Science by Team-10 KVS feedback.",
+    "f.subject.practical":"Practical / Lab subject",
+    "f.subject.practical.hint":"For Class XI/XII — auto-gen places this as a 2-period block automatically (same teacher both periods).",
+    "f.subject.labcap":"Lab Capacity (max students per batch)",
+    "f.subject.labcap.hint":"KVS norm: max 20 students per batch in physics/chemistry/biology lab. Shown on the timetable so teachers know to split larger classes.",
+    "f.slot.block.tag":"Block period (2 consecutive)",
+    "f.slot.practical.tag":"Practical / lab",
     "f.period.label":"Label", "f.period.start":"Start Time", "f.period.end":"End Time", "f.period.break":"This is a break period",
     "f.room.name":"Room Name", "f.room.capacity":"Capacity",
     "f.slot.subject":"Subject", "f.slot.teacher":"Teacher", "f.slot.room":"Room (optional)", "f.slot.none":"— None —",
@@ -2212,6 +2222,14 @@ const I18N = {
     "f.class.teacher":"कक्षा शिक्षक", "f.class.noteacher":"कक्षा शिक्षक नहीं", "f.class.alreadyct":"पहले से कक्षा शिक्षक",
     "f.teacher.name":"शिक्षक नाम", "f.teacher.code":"कोड", "f.teacher.subjects":"पढ़ाए जाने वाले विषय",
     "f.subject.name":"विषय नाम", "f.subject.code":"कोड", "f.subject.color":"एक्सेंट रंग",
+    "f.subject.block":"ब्लॉक कालांश (2 लगातार कालांश)",
+    "f.subject.block.hint":"कक्षा 9 व 10 हेतु — Auto-Generate इस विषय को एक ही दिन 2 लगातार कालांश में रखेगा। टीम-10 KVS फीडबैक के अनुसार गणित व विज्ञान के लिए अनुशंसित।",
+    "f.subject.practical":"प्रयोगात्मक / प्रयोगशाला विषय",
+    "f.subject.practical.hint":"कक्षा XI/XII हेतु — Auto-Generate स्वतः 2-कालांश ब्लॉक में रखेगा (दोनों कालांश में वही शिक्षक)।",
+    "f.subject.labcap":"प्रयोगशाला क्षमता (प्रति बैच अधिकतम विद्यार्थी)",
+    "f.subject.labcap.hint":"KVS मानक: प्रत्येक बैच में अधिकतम 20 विद्यार्थी। समय सारणी में दिखेगा ताकि शिक्षक बड़ी कक्षाओं को विभाजित कर सकें।",
+    "f.slot.block.tag":"ब्लॉक कालांश (2 लगातार)",
+    "f.slot.practical.tag":"प्रयोगात्मक / प्रयोगशाला",
     "f.period.label":"लेबल", "f.period.start":"प्रारम्भ समय", "f.period.end":"समाप्ति समय", "f.period.break":"यह विराम कालांश है",
     "f.room.name":"कक्ष नाम", "f.room.capacity":"क्षमता",
     "f.slot.subject":"विषय", "f.slot.teacher":"शिक्षक", "f.slot.room":"कक्ष (वैकल्पिक)", "f.slot.none":"— कुछ नहीं —",
@@ -2367,13 +2385,17 @@ const SAMPLE_VAULT = () => {
   const subjects = [
     { id: "sub_hin", name: "Hindi",          code: "HIN", color: "#ff7a29" },
     { id: "sub_eng", name: "English",        code: "ENG", color: "#00e5ff" },
-    { id: "sub_mth", name: "Mathematics",    code: "MTH", color: "#a18bff" },
-    { id: "sub_sci", name: "Science",        code: "SCI", color: "#9eff5a" },
+    { id: "sub_mth", name: "Mathematics",    code: "MTH", color: "#a18bff", block: true },
+    { id: "sub_sci", name: "Science",        code: "SCI", color: "#9eff5a", block: true },
     { id: "sub_sst", name: "Social Science", code: "SST", color: "#ffab3d" },
     { id: "sub_snk", name: "Sanskrit",       code: "SNK", color: "#ff5d8f" },
     { id: "sub_cmp", name: "Computer",       code: "CMP", color: "#5dd3ff" },
     { id: "sub_art", name: "Art",            code: "ART", color: "#f49bff" },
     { id: "sub_pe" , name: "Phys. Edu.",     code: "PE",  color: "#ffd75d" },
+    // XI/XII subjects (used for sample stream classes if added)
+    { id: "sub_phy", name: "Physics",        code: "PHY", color: "#74b9ff", practical: true, labCapacity: 20 },
+    { id: "sub_chm", name: "Chemistry",      code: "CHM", color: "#55efc4", practical: true, labCapacity: 20 },
+    { id: "sub_bio", name: "Biology",        code: "BIO", color: "#a8e063", practical: true, labCapacity: 20 },
   ];
   const teachers = [
     { id: "t_ak", name: "Sh. A. Kumar",    code: "AK", subjects: ["sub_mth","sub_cmp"] },
@@ -3043,6 +3065,8 @@ const App = {
           }
           if (room) slot.append(h("div", { class: "room" }, room.name));
           if (asg.locked) slot.append(h("span", { class: "lock-tag", title: t("f.slot.lock") }, "🔒"));
+          if (asg.block) slot.append(h("span", { class: "block-tag", title: t("f.slot.block.tag") }, "▣"));
+          if (subj?.practical) slot.append(h("span", { class: "practical-tag", title: subj.labCapacity ? `${t("f.slot.practical.tag")} · max ${subj.labCapacity}/batch` : t("f.slot.practical.tag") }, "🧪"));
           if (conflictKeys.has(asg.id)) slot.append(h("span", { class: "conflict-tag" }, t("conflict")));
           slot.addEventListener("click", () => this.openSlotModal(day, per.id, asg));
           if (isClassScope) this._wireSlotDnD(slot, asg, day, per.id);
@@ -3557,6 +3581,25 @@ const App = {
         this.field("name", t("f.subject.name"), "input", existing?.name || ""),
         this.field("code", t("f.subject.code"), "input", existing?.code || "", { maxLength: 5, style: "text-transform:uppercase" }),
         this.field("color", t("f.subject.color"), "input", existing?.color || "#00e5ff", { type: "color" }),
+        h("div", { class: "field" },
+          h("label", { class: "flex", style: "cursor:pointer;gap:8px" },
+            h("input", { type: "checkbox", id: "f-block", checked: existing?.block ? "checked" : null }),
+            h("span", {}, t("f.subject.block"))
+          ),
+          h("div", { class: "tiny muted" }, t("f.subject.block.hint"))
+        ),
+        h("div", { class: "field" },
+          h("label", { class: "flex", style: "cursor:pointer;gap:8px" },
+            h("input", { type: "checkbox", id: "f-practical", checked: existing?.practical ? "checked" : null }),
+            h("span", {}, t("f.subject.practical"))
+          ),
+          h("div", { class: "tiny muted" }, t("f.subject.practical.hint"))
+        ),
+        h("div", { class: "field" },
+          h("label", {}, t("f.subject.labcap")),
+          h("input", { type: "number", class: "input", id: "f-labcap", min: 0, max: 80, value: existing?.labCapacity || 20, placeholder: "20" }),
+          h("div", { class: "tiny muted" }, t("f.subject.labcap.hint"))
+        )
       );
     } else if (kind === "period") {
       body.append(
@@ -3636,7 +3679,10 @@ const App = {
         id: existing?.id || uid("sub"),
         name: $("#f-name").value.trim() || "Subject",
         code: ($("#f-code").value || "").toUpperCase().trim() || "SUB",
-        color: $("#f-color").value || "#00e5ff"
+        color: $("#f-color").value || "#00e5ff",
+        block:     $("#f-block")?.checked || false,
+        practical: $("#f-practical")?.checked || false,
+        labCapacity: parseInt($("#f-labcap")?.value, 10) || 0
       };
     } else if (kind === "period") {
       record = {
@@ -4925,6 +4971,63 @@ const App = {
           if (result) { commit(cls, result, CLA_ID, dayCount); subPlan[CLA_ID] -= 1; }
         }
       }
+
+      plan[cid] = subPlan;
+    }
+
+    // ══════════════════════════════════════════
+    // PASS 1.5 — Place BLOCK subjects (2 consecutive periods on same day)
+    // Used for Class 9/10 block periods + XI/XII practicals
+    // ══════════════════════════════════════════
+    for (const cid of classIds) {
+      const cls = s.classes.find(c => c.id === cid);
+      if (!cls) continue;
+      const grade = classGradeNumber(cls);
+      // Per teacher feedback: block periods are most useful for Class 9 onwards (Sec & Sr.Sec)
+      if (grade && grade < 9) continue;
+      const subPlan = plan[cid] || {};
+      const dayCount = cls.__dayCount || {}; DAYS.forEach(d => { if (!dayCount[d]) dayCount[d] = {}; });
+
+      // Find every subject in this class's plan that is flagged block or practical
+      const blockSubjects = Object.keys(subPlan).filter(subId => {
+        const sb = s.subjects.find(x => x.id === subId);
+        return sb && (sb.block || sb.practical) && subPlan[subId] >= 2;
+      });
+
+      blockSubjects.forEach(subjectId => {
+        // We can place floor(needed / 2) blocks of 2 consecutive periods
+        const blocksNeeded = Math.floor(subPlan[subjectId] / 2);
+        let placedBlocks = 0;
+        // Try each day, prefer different days for separate blocks
+        const dayOrder = shuffle(DAYS.slice());
+        for (const day of dayOrder) {
+          if (placedBlocks >= blocksNeeded) break;
+          // Find pairs of consecutive non-break periods
+          for (let i = 0; i < nonBreak.length - 1; i++) {
+            if (placedBlocks >= blocksNeeded) break;
+            const p1 = nonBreak[i], p2 = nonBreak[i + 1];
+            // Check both slots are open & no break between (consecutive in s.periods order)
+            const p1Idx = s.periods.indexOf(p1);
+            const p2Idx = s.periods.indexOf(p2);
+            if (p2Idx - p1Idx !== 1) continue; // a break sits between them
+            // Place period 1
+            const r1 = tryPlace(cls, subjectId, [{ day, period: p1 }], dayCount, { allowThird: true });
+            if (!r1) continue;
+            // Place period 2 with the SAME teacher (block must have same teacher)
+            const r2 = tryPlace(cls, subjectId, [{ day, period: p2 }], dayCount, { allowThird: true, forceTeacherId: r1.teacherId });
+            if (!r2) continue; // 2nd period unavailable — abandon this attempt
+            // Both succeeded, commit both as a block
+            commit(cls, r1, subjectId, dayCount);
+            commit(cls, r2, subjectId, dayCount);
+            // Tag both newly-pushed assignments as a block (for visual indicator)
+            const lastTwo = newAssignments.slice(-2);
+            lastTwo.forEach(a => { a.block = true; });
+            subPlan[subjectId] -= 2;
+            placedBlocks++;
+            break; // move to next day
+          }
+        }
+      });
 
       plan[cid] = subPlan;
     }
